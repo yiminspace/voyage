@@ -1,0 +1,94 @@
+name: voyage Publish
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'packages/voyage/**'
+      - '.github/workflows/voyage-publish.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: packages/voyage
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Check if should publish
+        id: check
+        run: |
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          echo "Current version: $CURRENT_VERSION"
+
+          NPM_VERSION=$(npm view @yiminlab/voyage version 2>/dev/null || echo "0.0.0")
+          echo "NPM version: $NPM_VERSION"
+
+          if [ "$CURRENT_VERSION" != "$NPM_VERSION" ]; then
+            echo "New version detected: $CURRENT_VERSION"
+            echo "should_publish=true" >> $GITHUB_OUTPUT
+            echo "version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+          else
+            echo "Version $CURRENT_VERSION already published"
+            echo "should_publish=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Install dependencies
+        if: steps.check.outputs.should_publish == 'true'
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck
+        if: steps.check.outputs.should_publish == 'true'
+        run: pnpm typecheck
+
+      - name: Build
+        if: steps.check.outputs.should_publish == 'true'
+        run: pnpm build
+
+      - name: Publish to npm
+        if: steps.check.outputs.should_publish == 'true'
+        run: pnpm publish --access public --no-git-checks
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Create Git tag
+        if: steps.check.outputs.should_publish == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a "voyage-v${{ steps.check.outputs.version }}" -m "Release @yiminlab/voyage v${{ steps.check.outputs.version }}"
+          git push origin "voyage-v${{ steps.check.outputs.version }}"
+
+      - name: Summary
+        if: steps.check.outputs.should_publish == 'true'
+        run: |
+          echo "## 🚀 Published @yiminlab/voyage v${{ steps.check.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- NPM: https://www.npmjs.com/package/@yiminlab/voyage" >> $GITHUB_STEP_SUMMARY
+          echo "- Tag: voyage-v${{ steps.check.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+
+      - name: Skip publish
+        if: steps.check.outputs.should_publish != 'true'
+        run: |
+          echo "## ⏭️ Skipped publishing" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Version already published or no changes detected." >> $GITHUB_STEP_SUMMARY
