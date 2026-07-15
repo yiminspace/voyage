@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>voyage 试衣间 — 主题 × 明暗 × 风格 × 对比</title>
+<link rel="stylesheet" href="../tokens.css" />
+<link rel="stylesheet" href="../voyage.css" />
+<style>
+  /* 本文件只含「展厅」自身的壳样式; 被测样式全部来自上面两个 <link> */
+  * { box-sizing: border-box; margin: 0; }
+  body { background: #0a0c10; color: #eef0f3; font-family: -apple-system, 'SF Pro Text', 'PingFang SC', sans-serif; font-size: 15px; line-height: 1.7; }
+  .wrap { max-width: 1280px; margin: 0 auto; padding: 40px 28px 90px; }
+  h1 { font-size: 26px; font-weight: 800; margin-bottom: 6px; }
+  .sub { color: #a3abb8; font-size: 13.5px; margin-bottom: 22px; }
+  .bench { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+  .lbl { font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: #8e97a4; width: 44px; flex: none; }
+  .chip { display: inline-flex; align-items: center; gap: 7px; font-size: 12.5px; color: #c4cbd6; cursor: pointer; border: 1px solid #3a4150; border-radius: 8px; padding: 5.5px 12px; background: #14171d; font-family: inherit; }
+  .chip i { width: 11px; height: 11px; border-radius: 3px; background: var(--ac); flex: none; }
+  .chip:hover { border-color: #58627a; color: #eef0f3; }
+  .chip.on { border-color: #c4cbd6; color: #eef0f3; box-shadow: 0 0 0 1px #c4cbd6 inset; }
+  .stage { margin-top: 18px; }
+  .stage .vg-app { height: 580px; border: 1px solid var(--line-c, var(--line)); box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45); }
+  .scale-cap { font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: #8e97a4; margin: 18px 0 8px; }
+  .scale { display: grid; grid-template-columns: repeat(12, 1fr); gap: 6px; padding: 14px; border-radius: 10px; background: var(--bg0); border: 1px solid var(--line); }
+  @media (max-width: 720px) { .scale { grid-template-columns: repeat(6, 1fr); } }
+  .st i { display: block; height: 38px; border-radius: 6px; border: 1px solid rgba(128, 140, 160, 0.18); background: var(--sc); }
+  .st.txt i { display: flex; align-items: center; justify-content: center; background: var(--bg2); color: var(--sc); font-weight: 700; font-size: 15px; font-style: normal; }
+  .st s { text-decoration: none; display: block; font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 8.5px; color: var(--fg3); text-align: center; margin-top: 5px; white-space: nowrap; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>voyage 试衣间</h1>
+  <p class="sub">被测样式全部来自 <code>tokens.css</code> + <code>voyage.css</code> 本体 —— 本页兼作视觉回归基准。</p>
+
+  <div class="bench">
+    <span class="lbl">主题</span>
+    <button class="chip on" data-pick="slate" style="--ac:#c0824f"><i></i>板岩铜</button>
+    <button class="chip" data-pick="ink" style="--ac:#c14b38"><i></i>纸墨朱</button>
+    <button class="chip" data-pick="navy" style="--ac:#c9a55f"><i></i>深海黄铜</button>
+    <button class="chip" data-pick="jade" style="--ac:#4fa878"><i></i>玄武玉</button>
+    <button class="chip" data-pick="aurora" style="--ac:linear-gradient(120deg,#8b7cf8,#4cc9f0)"><i></i>极光</button>
+    <button class="chip" data-pick="sunset" style="--ac:linear-gradient(120deg,#ff8a5c,#f5548e)"><i></i>日暮</button>
+    <button class="chip" data-pick="horizon" style="--ac:linear-gradient(120deg,#3f8ef0,#2fd4b4)"><i></i>苍穹</button>
+    <button class="chip" data-pick="oolong" style="--ac:linear-gradient(120deg,#eab465,#e07a8a)"><i></i>蜜桃乌龙</button>
+  </div>
+  <div class="bench">
+    <span class="lbl">明暗</span>
+    <button class="chip on" data-mode-pick="dark" style="--ac:#2f3641"><i></i>暗</button>
+    <button class="chip" data-mode-pick="light" style="--ac:#e7e5dd"><i></i>亮</button>
+    <span class="lbl" style="margin-left:14px">风格</span>
+    <button class="chip on" data-style-pick="classic" style="--ac:#6b7684"><i></i>经典</button>
+    <button class="chip" data-style-pick="glass" style="--ac:#8fb6d9"><i></i>玻璃</button>
+    <button class="chip" data-style-pick="soft" style="--ac:#a4b08e"><i></i>圆软</button>
+    <button class="chip" data-style-pick="sharp" style="--ac:#8e97a4"><i></i>方锐</button>
+    <span class="lbl" style="margin-left:14px">对比</span>
+    <button class="chip" data-tone-pick="normal" style="--ac:#d4966a"><i></i>标准</button>
+    <button class="chip on" data-tone-pick="quiet" style="--ac:#8d7a67"><i></i>柔和</button>
+  </div>
+
+  <div class="stage">
+    <div class="vg vg-app" id="fit" data-theme="slate" data-mode="dark" data-style="classic" data-tone="quiet">
+      <div class="vg-topline"></div>
+      <div class="vg-header">
+        <span class="vg-logo">忆</span><span class="vg-brand">engram</span><span class="vg-ws">划词讲解 · local</span>
+        <span class="vg-sp"></span><span class="vg-badge ok">rw</span>
+        <button class="vg-iconbtn" id="moon">☾</button><button class="vg-iconbtn">⚙</button>
+      </div>
+      <div class="vg-main">
+        <div class="vg-aside" style="width:190px">
+          <div class="vg-grp">视图</div>
+          <div class="vg-row on"><span class="vg-dot ok"></span>摘录<small>今日 6</small></div>
+          <div class="vg-row"><span class="vg-dot"></span>复习<small>24</small></div>
+          <div class="vg-row"><span class="vg-dot"></span>词库<small>1,284</small></div>
+          <div class="vg-row"><span class="vg-dot"></span>统计</div>
+          <div class="vg-grp">领域</div>
+          <div class="vg-pills">
+            <span class="vg-pill on">全部</span><span class="vg-pill">物理</span><span class="vg-pill">算法</span><span class="vg-pill">设计</span><span class="vg-pill">交互</span>
+          </div>
+          <div class="vg-grp">最近词条</div>
+          <div class="vg-tname on">hysteresis</div>
+          <div class="vg-tname">amortized</div>
+          <div class="vg-tname">affordance</div>
+        </div>
+        <div class="vg-section">
+          <div class="vg-qhead">
+            <span class="vg-qtitle">hysteresis</span>
+            <span class="vg-runon">物理 · 复习 12 次 · 正确率 96%</span>
+            <span class="vg-sp"></span>
+            <span class="vg-ep on">讲解</span><span class="vg-ep">例句</span>
+          </div>
+          <div class="vg-ed">
+            <div class="vg-src">"The system exhibits <b>hysteresis</b>: the output depends on the history of its inputs, not just their present values."</div>
+            <div style="height:7px"></div>
+            <div class="vg-prose">滞后效应。系统的输出不只取决于当前输入, 还取决于它走过的路径 —— 恒温器上下各留一度的缓冲带, 就是为了制造滞后, 避免反复开关。</div>
+          </div>
+          <div class="vg-toolbar">
+            <button class="vg-btn primary">开始复习 · 24</button>
+            <button class="vg-btn">标记掌握</button>
+            <button class="vg-btn">导出</button>
+            <span class="vg-sp"></span>
+            <span class="vg-runon">128 卡 · 今日 +6</span>
+          </div>
+          <div class="vg-gridwrap">
+            <table class="vg-table">
+              <thead><tr><th>词条<span class="vg-ty">text</span></th><th>次数<span class="vg-ty">int</span></th><th>正确率<span class="vg-ty">%</span></th><th>最近<span class="vg-ty">ts</span></th><th>状态</th></tr></thead>
+              <tbody>
+                <tr><td>hysteresis</td><td class="num">12</td><td class="num">96</td><td class="ts">09:41</td><td><span class="vg-state ok">已掌握</span></td></tr>
+                <tr class="sel"><td>amortized</td><td class="num">7</td><td class="num">83</td><td class="ts">昨天</td><td><span class="vg-state warn">巩固中</span></td></tr>
+                <tr><td>gestalt</td><td class="num">3</td><td class="num">67</td><td class="ts">3 天前</td><td><span class="vg-state warn">巩固中</span></td></tr>
+                <tr><td>entropy</td><td class="num">21</td><td class="num">98</td><td class="ts">08:12</td><td><span class="vg-state ok">已掌握</span></td></tr>
+                <tr><td>affordance</td><td class="num">1</td><td class="null">null</td><td class="ts">刚刚</td><td><span class="vg-state neu">新词</span></td></tr>
+                <tr><td>heuristic</td><td class="num">9</td><td class="num">88</td><td class="ts">周一</td><td><span class="vg-state ok">已掌握</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="scale-cap">色阶尺 · 一枚种子色 → 12 级语义 (随上方选择实时重算)</div>
+    <div class="scale vg" id="scale" data-theme="slate" data-mode="dark" data-style="classic" data-tone="quiet">
+      <div class="st"><i style="--sc:var(--bg0)"></i><s>1 底</s></div>
+      <div class="st"><i style="--sc:var(--bg1)"></i><s>2 面</s></div>
+      <div class="st"><i style="--sc:color-mix(in srgb, var(--accent) 6%, var(--bg0))"></i><s>3 组件底</s></div>
+      <div class="st"><i style="--sc:color-mix(in srgb, var(--accent) 11%, var(--bg0))"></i><s>4 悬停</s></div>
+      <div class="st"><i style="--sc:color-mix(in srgb, var(--accent) 16%, var(--bg0))"></i><s>5 选中</s></div>
+      <div class="st"><i style="--sc:color-mix(in srgb, var(--accent) 20%, var(--line))"></i><s>6 弱边</s></div>
+      <div class="st"><i style="--sc:color-mix(in srgb, var(--accent) 38%, var(--line))"></i><s>7 边框</s></div>
+      <div class="st"><i style="--sc:color-mix(in srgb, var(--accent) 55%, var(--line))"></i><s>8 强边</s></div>
+      <div class="st"><i style="--sc:var(--acc)"></i><s>9 实色</s></div>
+      <div class="st"><i style="--sc:var(--acc-hi)"></i><s>10 实色亮</s></div>
+      <div class="st txt"><i style="--sc:var(--acc-text)">文</i><s>11 彩文</s></div>
+      <div class="st txt"><i style="--sc:var(--fg)">文</i><s>12 正文</s></div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  var targets = [document.getElementById('fit'), document.getElementById('scale')];
+  function bind(sel, attr, hostAttr, after) {
+    var chips = document.querySelectorAll(sel);
+    function set(v) {
+      targets.forEach(function (t) { t.setAttribute(hostAttr, v); });
+      chips.forEach(function (c) { c.classList.toggle('on', c.getAttribute(attr) === v); });
+      if (after) after(v);
+    }
+    chips.forEach(function (c) { c.addEventListener('click', function () { set(c.getAttribute(attr)); }); });
+  }
+  bind('[data-pick]', 'data-pick', 'data-theme');
+  bind('[data-mode-pick]', 'data-mode-pick', 'data-mode', function (v) {
+    document.getElementById('moon').textContent = v === 'dark' ? '☾' : '☀';
+  });
+  bind('[data-style-pick]', 'data-style-pick', 'data-style');
+  bind('[data-tone-pick]', 'data-tone-pick', 'data-tone');
+})();
+</script>
+</body>
+</html>
