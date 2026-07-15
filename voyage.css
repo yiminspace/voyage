@@ -320,3 +320,58 @@
 @media (prefers-reduced-motion: reduce) {
   .vg-dot.chk { animation: none; }
 }
+
+/* ---- 主题切换器 (VoyageSwitcher, @yiminlab/voyage/react) ---- */
+.vg-switcher { position: relative; display: inline-flex; align-items: center; gap: 2px; }
+/*
+ * 面板用 position:fixed + JS 算好的 viewport 坐标 (见 voyage-switcher.tsx 的
+ * updatePanelPosition), 不能用 position:absolute 依赖 .vg-switcher 作为包含块:
+ * 面板挂了 popover="auto", 支持原生 Popover API 的浏览器打开后会把它提升到
+ * top layer, 脱离 DOM 祖先的定位包含块关系, 只认 viewport 坐标。
+ * inset:auto 是必须的: 原生 Popover 的浏览器默认样式给 [popover]:popover-open
+ * 加了 inset:0 (top/right/bottom/left 全 0), 这里只用行内样式覆盖 top/right,
+ * 若不把 left/bottom 也显式重置为 auto, 未覆盖的 left:0 会和 width 一起造成
+ * 横向过约束, 按 CSS 规范 right 会被忽略, 面板最终贴在视口左边而不是触发按钮旁。
+ */
+.vg-switcher-panel {
+  position: fixed;
+  inset: auto;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 236px;
+  margin: 0;
+  padding: 12px;
+  border-radius: var(--r-win);
+  border: 1px solid var(--line2-c, var(--line2));
+  background: var(--surf-1);
+  color: var(--fg);
+  backdrop-filter: var(--blur, none);
+  -webkit-backdrop-filter: var(--blur, none);
+}
+.vg-switcher-group { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.vg-theme-dot {
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid var(--line2-c, var(--line2));
+  background: var(--acc-grad);
+  cursor: pointer;
+}
+.vg-theme-dot.on { outline: 2px solid var(--acc); outline-offset: 2px; }
+.vg-switcher-row { display: flex; gap: 4px; }
+.vg-seg {
+  flex: 1;
+  font-size: 12px;
+  padding: 5px 8px;
+  border-radius: var(--r-btn);
+  border: 1px solid var(--line2-c, var(--line2));
+  background: var(--bg2);
+  color: var(--fg2);
+  cursor: pointer;
+  font-family: inherit;
+}
+.vg-seg:hover { background: var(--bg3); color: var(--fg); }
+.vg-seg.on { background: var(--fill-grad); border-color: transparent; color: var(--fill-ink); }

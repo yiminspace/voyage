@@ -1,6 +1,6 @@
 {
   "name": "@yiminlab/voyage",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "YiminLab 统一样式系统: 四轴 token 矩阵 (theme x mode x style x tone) + quarry 规格组件层",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -17,19 +17,48 @@
       "import": "./dist/index.mjs",
       "require": "./dist/index.js"
     },
+    "./react": {
+      "types": "./dist/react/index.d.ts",
+      "import": "./dist/react/index.mjs",
+      "require": "./dist/react/index.js"
+    },
     "./tokens.css": "./tokens.css",
     "./voyage.css": "./voyage.css",
     "./index.css": "./index.css"
   },
   "scripts": {
-    "build": "tsup",
+    "build": "rimraf dist && tsup",
     "dev": "tsup --watch",
     "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "prepublishOnly": "pnpm build"
   },
+  "peerDependencies": {
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
+    "react-dom": {
+      "optional": true
+    }
+  },
   "devDependencies": {
+    "@testing-library/react": "^16.1.0",
+    "@types/node": "^22",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "@vitejs/plugin-react": "^4.3.4",
+    "jsdom": "^25.0.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "rimraf": "^6.0.0",
     "tsup": "^8.0.0",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^3.0.0"
   },
   "repository": {
     "type": "git",

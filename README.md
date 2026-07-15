@@ -56,6 +56,34 @@ applyVoyagePrefs(document.documentElement, prefs);
 
 组件类一律 `vg-*` 前缀 (vg-app / vg-header / vg-aside / vg-row / vg-btn / vg-table / vg-state ...), 完整清单见 [voyage.css](./voyage.css)。**任何组件新增可见颜色, 只能引用 tokens 变量, 不允许写字面量色值。**
 
+## React: `@yiminlab/voyage/react`
+
+子路径导出开箱即用的主题切换 UI, 参照 [`@yiminlab/authkit`](../authkit) 的分发方式 (peerDependencies react, 不打进包体)。
+
+```bash
+pnpm add @yiminlab/voyage react react-dom
+```
+
+```tsx
+import { VoyageProvider, VoyageSwitcher } from '@yiminlab/voyage/react';
+import { VOYAGE_APP_DEFAULTS } from '@yiminlab/voyage';
+
+function App() {
+  return (
+    <VoyageProvider defaults={VOYAGE_APP_DEFAULTS.engram}>
+      <header className="vg-header">
+        {/* ... */}
+        <VoyageSwitcher />
+      </header>
+    </VoyageProvider>
+  );
+}
+```
+
+- **`VoyageProvider`** — 挂载时执行 `initVoyage`, 通过 context 分发偏好与四个 setter; 需要同时维护 tailwind `.dark` class 的应用传 `syncDarkClass`。SSR 场景仍需配合 `voyageInitScript` 防闪烁 (本组件只管挂载后的状态)。
+- **`useVoyage()`** — 返回 `{ prefs, setTheme, setMode, setStyle, setTone, reset }`, 每次调用写入 `localStorage('vg_prefs')` 并同步宿主元素属性。
+- **`VoyageSwitcher`** — 顶栏放一个即可: ☾/☀ 一键切明暗 + 展开按钮弹出完整面板 (8 枚主题色点阵 + 明暗/风格/对比三组分段)。浮层用原生 Popover API (支持时启用), 交互始终由 React state 兜底, 键盘可达 (Esc 关闭, 焦点环见 voyage.css)。
+
 ## 各应用默认组合
 
 | 应用 | theme | mode | style | tone |
@@ -74,11 +102,12 @@ applyVoyagePrefs(document.documentElement, prefs);
 open demo/fitting-room.html
 ```
 
-被测样式全部来自 tokens.css / voyage.css 本体; 改 token 后先开这页对照四轴组合。
+被测样式全部来自 tokens.css / voyage.css 本体; 改 token 后先开这页对照四轴组合。页面顶栏内嵌了一个 `vg-switcher` 静态实例 (原生 JS 驱动, 与 `VoyageSwitcher` 组件同一份标记/样式), 兼作切换器的视觉基准。
 
 ## Roadmap
 
-- [ ] react/ 薄封装: Dialog (原生 `<dialog>`) / Menu (Popover API) / Toast
+- [x] react/ 薄封装: VoyageProvider / useVoyage / VoyageSwitcher (Popover API, 有支持时启用)
+- [ ] react/ 其余薄封装: Dialog (原生 `<dialog>`) / Toast
 - [ ] engram 迁移 (首个宿主) → jsontailor → ai
 - [ ] focus / disabled / pressed / loading 状态完备化
 - [ ] 间距与排印 scale 系统化

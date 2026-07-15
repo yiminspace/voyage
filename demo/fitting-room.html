@@ -65,7 +65,37 @@
       <div class="vg-header">
         <span class="vg-logo">忆</span><span class="vg-brand">engram</span><span class="vg-ws">划词讲解 · local</span>
         <span class="vg-sp"></span><span class="vg-badge ok">rw</span>
-        <button class="vg-iconbtn" id="moon">☾</button><button class="vg-iconbtn">⚙</button>
+        <!-- VoyageSwitcher (@yiminlab/voyage/react) 的静态视觉基准: 同款 vg-switcher / vg-theme-dot / vg-seg 标记与样式, 用原生 JS 驱动而非 React, 但复用的是同一份 voyage.css -->
+        <div class="vg-switcher" id="switcher">
+          <button class="vg-iconbtn vg-switcher-mode" id="switcherMode" aria-label="切换为亮色模式">☾</button>
+          <button class="vg-iconbtn vg-switcher-trigger" id="switcherTrigger" aria-label="展开主题设置" aria-haspopup="true" aria-expanded="false">⚙</button>
+          <div class="vg-switcher-panel" id="switcherPanel" role="menu" aria-label="主题设置" hidden>
+            <div class="vg-switcher-group" role="group" aria-label="主题色">
+              <button class="vg vg-theme-dot on" data-switch-theme="slate" data-theme="slate" data-mode="dark" role="menuitemradio" aria-checked="true" aria-label="板岩铜" title="板岩铜"></button>
+              <button class="vg vg-theme-dot" data-switch-theme="ink" data-theme="ink" data-mode="dark" role="menuitemradio" aria-checked="false" aria-label="纸墨朱" title="纸墨朱"></button>
+              <button class="vg vg-theme-dot" data-switch-theme="navy" data-theme="navy" data-mode="dark" role="menuitemradio" aria-checked="false" aria-label="深海黄铜" title="深海黄铜"></button>
+              <button class="vg vg-theme-dot" data-switch-theme="jade" data-theme="jade" data-mode="dark" role="menuitemradio" aria-checked="false" aria-label="玄武玉" title="玄武玉"></button>
+              <button class="vg vg-theme-dot" data-switch-theme="aurora" data-theme="aurora" data-mode="dark" role="menuitemradio" aria-checked="false" aria-label="极光" title="极光"></button>
+              <button class="vg vg-theme-dot" data-switch-theme="sunset" data-theme="sunset" data-mode="dark" role="menuitemradio" aria-checked="false" aria-label="日暮" title="日暮"></button>
+              <button class="vg vg-theme-dot" data-switch-theme="horizon" data-theme="horizon" data-mode="dark" role="menuitemradio" aria-checked="false" aria-label="苍穹" title="苍穹"></button>
+              <button class="vg vg-theme-dot" data-switch-theme="oolong" data-theme="oolong" data-mode="dark" role="menuitemradio" aria-checked="false" aria-label="蜜桃乌龙" title="蜜桃乌龙"></button>
+            </div>
+            <div class="vg-switcher-row" role="radiogroup" aria-label="明暗">
+              <button class="vg-seg on" data-switch-mode="dark" role="radio" aria-checked="true">暗</button>
+              <button class="vg-seg" data-switch-mode="light" role="radio" aria-checked="false">亮</button>
+            </div>
+            <div class="vg-switcher-row" role="radiogroup" aria-label="风格">
+              <button class="vg-seg on" data-switch-style="classic" role="radio" aria-checked="true">经典</button>
+              <button class="vg-seg" data-switch-style="glass" role="radio" aria-checked="false">玻璃</button>
+              <button class="vg-seg" data-switch-style="soft" role="radio" aria-checked="false">圆软</button>
+              <button class="vg-seg" data-switch-style="sharp" role="radio" aria-checked="false">方锐</button>
+            </div>
+            <div class="vg-switcher-row" role="radiogroup" aria-label="对比">
+              <button class="vg-seg" data-switch-tone="normal" role="radio" aria-checked="false">标准</button>
+              <button class="vg-seg on" data-switch-tone="quiet" role="radio" aria-checked="true">柔和</button>
+            </div>
+          </div>
+        </div>
       </div>
       <div class="vg-main">
         <div class="vg-aside" style="width:190px">
@@ -140,21 +170,87 @@
 <script>
 (function () {
   var targets = [document.getElementById('fit'), document.getElementById('scale')];
-  function bind(sel, attr, hostAttr, after) {
-    var chips = document.querySelectorAll(sel);
+
+  // pairs: 同一根轴上 "试衣间上方 bench 的 chip" 与 "vg-switcher 面板的控件" 两组
+  // 标记不同 (data-pick vs data-switch-theme 等), 但要联动同一个 hostAttr。
+  function bind(pairs, hostAttr, after) {
     function set(v) {
       targets.forEach(function (t) { t.setAttribute(hostAttr, v); });
-      chips.forEach(function (c) { c.classList.toggle('on', c.getAttribute(attr) === v); });
+      pairs.forEach(function (p) {
+        document.querySelectorAll(p.sel).forEach(function (c) {
+          var on = c.getAttribute(p.attr) === v;
+          c.classList.toggle('on', on);
+          if (c.hasAttribute('aria-checked')) c.setAttribute('aria-checked', String(on));
+        });
+      });
       if (after) after(v);
     }
-    chips.forEach(function (c) { c.addEventListener('click', function () { set(c.getAttribute(attr)); }); });
+    pairs.forEach(function (p) {
+      document.querySelectorAll(p.sel).forEach(function (c) {
+        c.addEventListener('click', function () { set(c.getAttribute(p.attr)); });
+      });
+    });
   }
-  bind('[data-pick]', 'data-pick', 'data-theme');
-  bind('[data-mode-pick]', 'data-mode-pick', 'data-mode', function (v) {
-    document.getElementById('moon').textContent = v === 'dark' ? '☾' : '☀';
+
+  bind(
+    [{ sel: '[data-pick]', attr: 'data-pick' }, { sel: '[data-switch-theme]', attr: 'data-switch-theme' }],
+    'data-theme'
+  );
+  bind(
+    [{ sel: '[data-mode-pick]', attr: 'data-mode-pick' }, { sel: '[data-switch-mode]', attr: 'data-switch-mode' }],
+    'data-mode',
+    function (v) {
+      var switcherMode = document.getElementById('switcherMode');
+      switcherMode.textContent = v === 'dark' ? '☾' : '☀';
+      switcherMode.setAttribute('aria-label', v === 'dark' ? '切换为亮色模式' : '切换为暗色模式');
+      // 主题色点阵按当前明暗刷新色板 (每套主题的 dark/light 取值不同)
+      document.querySelectorAll('.vg-theme-dot').forEach(function (d) { d.setAttribute('data-mode', v); });
+    }
+  );
+  bind(
+    [{ sel: '[data-style-pick]', attr: 'data-style-pick' }, { sel: '[data-switch-style]', attr: 'data-switch-style' }],
+    'data-style'
+  );
+  bind(
+    [{ sel: '[data-tone-pick]', attr: 'data-tone-pick' }, { sel: '[data-switch-tone]', attr: 'data-switch-tone' }],
+    'data-tone'
+  );
+
+  // vg-switcher: 展开按钮切换面板 + 明暗按钮一键翻转, 与 VoyageSwitcher 组件同款交互;
+  // 面板是 position:fixed, 位置要跟组件一样现算 viewport 坐标 (见 voyage-switcher.tsx
+  // 的 updatePanelPosition), 不能指望 CSS 靠 .vg-switcher 当包含块自动摆好。
+  var switcherEl = document.getElementById('switcher');
+  var trigger = document.getElementById('switcherTrigger');
+  var panel = document.getElementById('switcherPanel');
+  function positionSwitcherPanel() {
+    var rect = trigger.getBoundingClientRect();
+    panel.style.top = (rect.bottom + 8) + 'px';
+    panel.style.right = Math.max(0, window.innerWidth - rect.right) + 'px';
+  }
+  trigger.addEventListener('click', function () {
+    var open = panel.hasAttribute('hidden');
+    if (open) { positionSwitcherPanel(); panel.removeAttribute('hidden'); } else { panel.setAttribute('hidden', ''); }
+    trigger.setAttribute('aria-expanded', String(open));
   });
-  bind('[data-style-pick]', 'data-style-pick', 'data-style');
-  bind('[data-tone-pick]', 'data-tone-pick', 'data-tone');
+  window.addEventListener('resize', function () {
+    if (!panel.hasAttribute('hidden')) positionSwitcherPanel();
+  });
+  document.getElementById('switcherMode').addEventListener('click', function () {
+    var current = document.getElementById('fit').getAttribute('data-mode');
+    document.querySelector('[data-switch-mode="' + (current === 'dark' ? 'light' : 'dark') + '"]').click();
+  });
+  document.addEventListener('click', function (event) {
+    if (!panel.hasAttribute('hidden') && !switcherEl.contains(event.target)) {
+      panel.setAttribute('hidden', '');
+      trigger.setAttribute('aria-expanded', 'false');
+    }
+  });
+  document.addEventListener('keydown', function (event) {
+    if (event.key === 'Escape' && !panel.hasAttribute('hidden')) {
+      panel.setAttribute('hidden', '');
+      trigger.setAttribute('aria-expanded', 'false');
+    }
+  });
 })();
 </script>
 </body>
