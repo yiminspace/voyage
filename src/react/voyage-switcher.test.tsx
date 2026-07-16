@@ -131,6 +131,20 @@ describe('VoyageSwitcher', () => {
     expect(screen.getByTestId('host-sun')).toBeTruthy();
   });
 
+  it('locale="en" 时全部 UI 文案与预设名切换为英文', () => {
+    render(
+      <VoyageProvider defaults={{ theme: 'slate', mode: 'dark', style: 'classic', tone: 'normal' }}>
+        <VoyageSwitcher locale="en" />
+      </VoyageProvider>
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'Theme settings' }));
+    expect(screen.getByRole('menuitemradio', { name: 'Slate & Copper' })).toBeTruthy();
+    expect(screen.getByRole('menuitemradio', { name: 'Tokyo Night' })).toBeTruthy();
+    expect(screen.getByRole('radio', { name: 'Light' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Switch to light mode' })).toBeTruthy();
+  });
+
   it('传 syncDarkClass 时, mode 切换同步增删 <html> 的 .dark class', () => {
     render(
       <VoyageProvider syncDarkClass defaults={{ theme: 'slate', mode: 'dark', style: 'classic', tone: 'quiet' }}>

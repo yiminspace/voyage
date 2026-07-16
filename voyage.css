@@ -624,10 +624,12 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 4px;
   padding: 0 2px;
   font-size: 11px;
   line-height: 1;
   color: var(--fg2);
+  white-space: nowrap;
 }
 .vg-preset-card.on .vg-preset-name { color: var(--fg); }
 .vg-preset-card.on .vg-preset-name::after { content: '✓'; color: var(--acc-text); font-weight: 700; }

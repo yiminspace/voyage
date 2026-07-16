@@ -57,6 +57,9 @@ export const VOYAGE_APP_DEFAULTS: Record<string, VoyagePrefs> = {
   quarry:     { theme: 'slate', mode: 'dark', style: 'classic', tone: 'normal' },
 };
 
+/** 切换器 UI 文案语言 (token 引擎与存储无关语言) */
+export type VoyageLocale = 'zh' | 'en';
+
 /**
  * 策展主题 (preset): 四轴空间上一个被设计过的点。
  *
@@ -69,9 +72,9 @@ export const VOYAGE_APP_DEFAULTS: Record<string, VoyagePrefs> = {
 export interface VoyagePreset {
   /** 与 theme 同名: 每个色系恰好一个策展组合 */
   id: VoyageTheme;
-  label: string;
+  label: Record<VoyageLocale, string>;
   /** 一句话气质描述, 主题卡 tooltip 用 */
-  hint: string;
+  hint: Record<VoyageLocale, string>;
   theme: VoyageTheme;
   style: VoyageStyle;
   tone: VoyageTone;
@@ -80,16 +83,16 @@ export interface VoyagePreset {
 export const VOYAGE_PRESETS: readonly VoyagePreset[] = [
   // slate 是 quarry 原版基准: classic + normal (实色 accent 填充), 见 README;
   // 其余经典配色的出处见 tokens.css 主题矩阵注释
-  { id: 'slate',      label: '板岩铜',    hint: 'Quarry 原版基准',        theme: 'slate',      style: 'classic', tone: 'normal' },
-  { id: 'ink',        label: '纸墨朱',    hint: '纸感阅读',               theme: 'ink',        style: 'soft',    tone: 'quiet' },
-  { id: 'github',     label: '石墨',      hint: 'GitHub Primer 工具蓝',   theme: 'github',     style: 'classic', tone: 'quiet' },
-  { id: 'nord',       label: '北极',      hint: 'Nord 冷蓝灰',            theme: 'nord',       style: 'classic', tone: 'quiet' },
-  { id: 'tokyo',      label: '东京夜',    hint: 'Tokyo Night 靛蓝夜航',   theme: 'tokyo',      style: 'glass',   tone: 'quiet' },
-  { id: 'catppuccin', label: '摩卡',      hint: 'Catppuccin 柔和粉彩',    theme: 'catppuccin', style: 'soft',    tone: 'quiet' },
-  { id: 'onedark',    label: '原子',      hint: 'One Dark 中性耐看',      theme: 'onedark',    style: 'classic', tone: 'quiet' },
-  { id: 'solarized',  label: '日晒',      hint: 'Solarized 学院经典',     theme: 'solarized',  style: 'classic', tone: 'quiet' },
-  { id: 'rosepine',   label: '玫瑰松',    hint: 'Rosé Pine 哑光玫瑰',     theme: 'rosepine',   style: 'soft',    tone: 'quiet' },
-  { id: 'everforest', label: '常青林',    hint: 'Everforest 护眼绿',      theme: 'everforest', style: 'soft',    tone: 'quiet' },
+  { id: 'slate',      label: { zh: '板岩铜', en: 'Slate & Copper' }, hint: { zh: 'Quarry 原版基准',      en: 'Quarry original' },      theme: 'slate',      style: 'classic', tone: 'normal' },
+  { id: 'ink',        label: { zh: '纸墨朱', en: 'Ink & Cinnabar' }, hint: { zh: '纸感阅读',             en: 'Paper-and-ink reading' }, theme: 'ink',        style: 'soft',    tone: 'quiet' },
+  { id: 'github',     label: { zh: '石墨',   en: 'GitHub' },         hint: { zh: 'GitHub Primer 工具蓝', en: 'Primer workhorse blue' }, theme: 'github',     style: 'classic', tone: 'quiet' },
+  { id: 'nord',       label: { zh: '北极',   en: 'Nord' },           hint: { zh: 'Nord 冷蓝灰',          en: 'Cool arctic blue-gray' }, theme: 'nord',       style: 'classic', tone: 'quiet' },
+  { id: 'tokyo',      label: { zh: '东京夜', en: 'Tokyo Night' },    hint: { zh: 'Tokyo Night 靛蓝夜航', en: 'Indigo city night' },     theme: 'tokyo',      style: 'glass',   tone: 'quiet' },
+  { id: 'catppuccin', label: { zh: '摩卡',   en: 'Catppuccin' },     hint: { zh: 'Catppuccin 柔和粉彩',  en: 'Soothing pastel mocha' }, theme: 'catppuccin', style: 'soft',    tone: 'quiet' },
+  { id: 'onedark',    label: { zh: '原子',   en: 'One Dark' },       hint: { zh: 'One Dark 中性耐看',    en: 'Atom classic' },          theme: 'onedark',    style: 'classic', tone: 'quiet' },
+  { id: 'solarized',  label: { zh: '日晒',   en: 'Solarized' },      hint: { zh: 'Solarized 学院经典',   en: 'The academic classic' },  theme: 'solarized',  style: 'classic', tone: 'quiet' },
+  { id: 'rosepine',   label: { zh: '玫瑰松', en: 'Rosé Pine' },      hint: { zh: 'Rosé Pine 哑光玫瑰',   en: 'Muted rosé elegance' },   theme: 'rosepine',   style: 'soft',    tone: 'quiet' },
+  { id: 'everforest', label: { zh: '常青林', en: 'Everforest' },     hint: { zh: 'Everforest 护眼绿',    en: 'Comfy forest green' },    theme: 'everforest', style: 'soft',    tone: 'quiet' },
 ] as const;
 
 /** preset + 当前明暗 -> 完整四轴偏好 */

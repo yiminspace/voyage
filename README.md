@@ -87,6 +87,7 @@ function App() {
 
 ```tsx
 <VoyageSwitcher
+  locale={LANG}  // 'zh' | 'en', 跟随宿主语言状态; 缺省中文
   icons={{
     moon: <i className="ti ti-moon" />,
     sun: <i className="ti ti-sun" />,

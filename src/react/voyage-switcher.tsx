@@ -15,12 +15,36 @@ import {
   applyVoyagePrefs,
   matchVoyagePreset,
   voyagePresetPrefs,
+  type VoyageLocale,
   type VoyageMode,
   type VoyagePreset,
 } from '../index';
 import { useVoyage } from './voyage-provider';
 
-const MODE_LABELS: Record<VoyageMode, string> = { dark: '暗', light: '亮' };
+/** 切换器自身的全部 UI 文案 (预设名/描述在 VOYAGE_PRESETS 里双语) */
+const STRINGS: Record<
+  VoyageLocale,
+  { modes: Record<VoyageMode, string>; toLight: string; toDark: string; open: string; panel: string; themes: string; modeGroup: string }
+> = {
+  zh: {
+    modes: { dark: '暗', light: '亮' },
+    toLight: '切换为亮色模式',
+    toDark: '切换为暗色模式',
+    open: '展开主题设置',
+    panel: '主题设置',
+    themes: '主题',
+    modeGroup: '明暗',
+  },
+  en: {
+    modes: { dark: 'Dark', light: 'Light' },
+    toLight: 'Switch to light mode',
+    toDark: 'Switch to dark mode',
+    open: 'Theme settings',
+    panel: 'Theme settings',
+    themes: 'Themes',
+    modeGroup: 'Mode',
+  },
+};
 
 /** 有原生 showPopover 才启用; jsdom / 旧浏览器静默跳过, 交互仍由 React state 驱动 */
 function supportsPopover(el: Element | null): el is HTMLElement & {
@@ -89,6 +113,8 @@ export interface VoyageSwitcherProps {
   className?: string;
   /** 宿主用自家图标体系时传入 (如 quarry 传 tabler webfont 的 <i>), 与顶栏其余图标保持同一视觉语言 */
   icons?: VoyageSwitcherIcons;
+  /** UI 文案语言, 跟随宿主的语言状态传入; 缺省中文 */
+  locale?: VoyageLocale;
 }
 
 /**
@@ -103,8 +129,9 @@ export interface VoyageSwitcherProps {
  * 同时始终由 React state 驱动可见性与交互, 保证在不支持 Popover 的环境下
  * (包括测试用的 jsdom) 依然可用。
  */
-export function VoyageSwitcher({ className, icons }: VoyageSwitcherProps = {}) {
+export function VoyageSwitcher({ className, icons, locale = 'zh' }: VoyageSwitcherProps = {}) {
   const { prefs, setPrefs, setMode } = useVoyage();
+  const tr = STRINGS[locale];
   const [open, setOpen] = useState(false);
   const [panelPos, setPanelPos] = useState<{ top: number; right: number } | null>(null);
   const panelRef = useRef<HTMLDivElement | null>(null);
@@ -213,7 +240,7 @@ export function VoyageSwitcher({ className, icons }: VoyageSwitcherProps = {}) {
       <button
         type="button"
         className="vg-iconbtn vg-switcher-mode"
-        aria-label={prefs.mode === 'dark' ? '切换为亮色模式' : '切换为暗色模式'}
+        aria-label={prefs.mode === 'dark' ? tr.toLight : tr.toDark}
         onClick={toggleMode}
       >
         {prefs.mode === 'dark' ? (
@@ -230,7 +257,7 @@ export function VoyageSwitcher({ className, icons }: VoyageSwitcherProps = {}) {
         type="button"
         ref={triggerRef}
         className="vg-iconbtn vg-switcher-trigger"
-        aria-label="展开主题设置"
+        aria-label={tr.open}
         aria-haspopup="true"
         aria-expanded={open}
         aria-controls={panelId}
@@ -244,13 +271,13 @@ export function VoyageSwitcher({ className, icons }: VoyageSwitcherProps = {}) {
           ref={setPanelRef}
           className="vg-switcher-panel"
           role="menu"
-          aria-label="主题设置"
+          aria-label={tr.panel}
           style={panelPos ? { top: panelPos.top, right: panelPos.right } : undefined}
         >
           <div
             className="vg-preset-grid"
             role="group"
-            aria-label="主题"
+            aria-label={tr.themes}
             onPointerLeave={revertPreview}
           >
             {VOYAGE_PRESETS.map((preset) => (
@@ -259,8 +286,8 @@ export function VoyageSwitcher({ className, icons }: VoyageSwitcherProps = {}) {
                 type="button"
                 role="menuitemradio"
                 aria-checked={activePreset.id === preset.id}
-                aria-label={preset.label}
-                title={`${preset.label} · ${preset.hint}`}
+                aria-label={preset.label[locale]}
+                title={`${preset.label[locale]} · ${preset.hint[locale]}`}
                 className={`vg-preset-card${activePreset.id === preset.id ? ' on' : ''}`}
                 onPointerEnter={() => previewPreset(preset)}
                 onFocus={() => previewPreset(preset)}
@@ -284,12 +311,12 @@ export function VoyageSwitcher({ className, icons }: VoyageSwitcherProps = {}) {
                   <span className="vg-preset-thumb-line short" />
                   <span className="vg-preset-thumb-fill" />
                 </span>
-                <span className="vg-preset-name">{preset.label}</span>
+                <span className="vg-preset-name">{preset.label[locale]}</span>
               </button>
             ))}
           </div>
 
-          <div className="vg-switcher-row" role="radiogroup" aria-label="明暗">
+          <div className="vg-switcher-row" role="radiogroup" aria-label={tr.modeGroup}>
             {VOYAGE_MODES.map((mode) => (
               <button
                 key={mode}
@@ -299,7 +326,7 @@ export function VoyageSwitcher({ className, icons }: VoyageSwitcherProps = {}) {
                 className={`vg-seg${prefs.mode === mode ? ' on' : ''}`}
                 onClick={() => setMode(mode)}
               >
-                {MODE_LABELS[mode]}
+                {tr.modes[mode]}
               </button>
             ))}
           </div>
