@@ -6,10 +6,15 @@
    ========================================================================== */
 
 .vg {
-  font-family: -apple-system, 'SF Pro Text', 'PingFang SC', 'Segoe UI', Roboto, sans-serif;
+  /* 字体提成 token, 宿主可整体覆写; mono 栈优先经典等宽 (本机装了就用,
+     没装回落系统等宽, 零加载成本); no-contextual 关掉 != -> 这类代码连字,
+     数据网格里原样呈现字符, 不影响常规排版连字 */
+  --vg-font-ui: -apple-system, 'SF Pro Text', 'PingFang SC', 'Segoe UI', Roboto, sans-serif;
+  --vg-mono: 'JetBrains Mono', 'Fira Code', ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+  font-family: var(--vg-font-ui);
+  font-variant-ligatures: no-contextual;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  --vg-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
 }
 
 /* ---- 应用外框 ---- */
@@ -191,8 +196,8 @@
   backdrop-filter: var(--blur, none);
   -webkit-backdrop-filter: var(--blur, none);
 }
-.vg-ed .vg-prose { font-family: inherit; font-size: 13.5px; color: var(--fg); font-family: -apple-system, 'SF Pro Text', 'PingFang SC', sans-serif; }
-.vg-ed .vg-src { color: var(--fg2); font-style: italic; font-family: -apple-system, 'SF Pro Text', 'PingFang SC', sans-serif; }
+.vg-ed .vg-prose { font-size: 13.5px; color: var(--fg); font-family: var(--vg-font-ui); }
+.vg-ed .vg-src { color: var(--fg2); font-style: italic; font-family: var(--vg-font-ui); }
 .vg-ed .vg-src b, .vg-mark { color: var(--acc-text); font-style: normal; font-weight: 650; background: var(--hl-bg); }
 
 /* 代码 token (JSON / SQL 语法着色, 与数据类型色同源) */
@@ -499,7 +504,9 @@
 }
 
 /* ---- 主题切换器 (VoyageSwitcher, @yiminlab/voyage/react) ---- */
-.vg-switcher { position: relative; display: inline-flex; align-items: center; gap: 2px; }
+/* gap 继承宿主容器 (vg-header 为 11px): 明暗与调色板两钮之间的间距
+   要与顶栏其余图标同一节奏, 不能自带更紧的分组间距 */
+.vg-switcher { position: relative; display: inline-flex; align-items: center; gap: inherit; }
 .vg-switcher-mode { overflow: hidden; }
 .vg-switcher-mode:active .vg-mode-wrap { transform: scale(0.82) rotate(-8deg); }
 /* 月亮/太阳每次挂载都重放一遍这个入场动效 (key 按 mode 切换触发 remount);
