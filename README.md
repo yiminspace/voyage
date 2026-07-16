@@ -10,7 +10,7 @@ yiminlab 统一样式系统。**所有 GUI 应用的视觉基础**: 一套 quarr
 
 | 轴 | 取值 | 管什么 |
 |---|---|---|
-| `data-theme` | `slate` 板岩铜 / `ink` 纸墨朱 / `navy` 深海黄铜 / `jade` 玄武玉 / `aurora` 极光 / `sunset` 日暮 / `horizon` 苍穹 / `oolong` 蜜桃乌龙 | 颜色 (后四套为渐变主题) |
+| `data-theme` | 自研: `slate` 板岩铜 (quarry 基准) / `ink` 纸墨朱; 经典采编 (MIT, 出处见 tokens.css): `github` 石墨 / `nord` 北极 / `tokyo` 东京夜 / `catppuccin` 摩卡 / `onedark` 原子 / `solarized` 日晒 / `rosepine` 玫瑰松 / `everforest` 常青林 | 颜色 |
 | `data-mode` | `dark` / `light` | 底色深浅 |
 | `data-style` | `classic` / `glass` / `soft` / `sharp` | 结构: 圆角 / 密度 / 材质 / 阴影 |
 | `data-tone` | `normal` / `quiet` | 对比强度; **quiet (久航) 是日常默认**, normal 留给演示 / 截图 |
@@ -100,8 +100,8 @@ function App() {
 | 应用 | theme | mode | style | tone |
 |---|---|---|---|---|
 | engram | ink 纸墨朱 | light | soft | quiet |
-| jsontailor | navy 深海黄铜 | dark | glass | quiet |
-| ai | jade 玄武玉 | dark | classic | quiet |
+| jsontailor | tokyo 东京夜 | dark | glass | quiet |
+| ai | everforest 常青林 | dark | classic | quiet |
 | quarry | slate 板岩铜 (原始基准) | dark | classic | normal |
 | portal | — 搁置, 保持现有设计 | | | |
 

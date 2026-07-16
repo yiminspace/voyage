@@ -49,10 +49,10 @@ describe('VoyageSwitcher', () => {
     );
 
     openPanel();
-    fireEvent.focus(screen.getByRole('menuitemradio', { name: '玄武玉' }));
+    fireEvent.focus(screen.getByRole('menuitemradio', { name: '北极' }));
 
-    // 预览: DOM 已经切到 jade, 但没有持久化
-    expect(document.documentElement.getAttribute('data-theme')).toBe('jade');
+    // 预览: DOM 已经切到 nord, 但没有持久化
+    expect(document.documentElement.getAttribute('data-theme')).toBe('nord');
     expect(window.localStorage.getItem(VOYAGE_STORAGE_KEY)).toBeNull();
 
     // Esc 关面板 -> 还原到默认 slate
@@ -69,12 +69,12 @@ describe('VoyageSwitcher', () => {
     );
 
     openPanel();
-    const card = screen.getByRole('menuitemradio', { name: '深海黄铜' });
+    const card = screen.getByRole('menuitemradio', { name: '东京夜' });
     fireEvent.focus(card);
     fireEvent.click(card);
     fireEvent.keyDown(document, { key: 'Escape' });
 
-    expect(document.documentElement.getAttribute('data-theme')).toBe('navy');
+    expect(document.documentElement.getAttribute('data-theme')).toBe('tokyo');
     expect(document.documentElement.getAttribute('data-style')).toBe('glass');
   });
 

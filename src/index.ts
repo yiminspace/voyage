@@ -9,14 +9,16 @@
  */
 
 export type VoyageTheme =
-  | 'slate'   // 板岩铜 — quarry 原版基准
-  | 'ink'     // 纸墨朱 — 阅读应用主场
-  | 'navy'    // 深海黄铜 — 工具夜场
-  | 'jade'    // 玄武玉 — 最冷静
-  | 'aurora'  // 极光 (渐变 紫->青)
-  | 'sunset'  // 日暮 (渐变 橙->品红)
-  | 'horizon' // 苍穹 (渐变 蓝->青绿)
-  | 'oolong'; // 蜜桃乌龙 (渐变 金->玫瑰)
+  | 'slate'      // 板岩铜 — quarry 原版基准 (自研)
+  | 'ink'        // 纸墨朱 — 阅读应用主场 (自研)
+  | 'github'     // 石墨 — GitHub Primer
+  | 'nord'       // 北极 — Nord
+  | 'tokyo'      // 东京夜 — Tokyo Night
+  | 'catppuccin' // 摩卡 — Catppuccin Mocha/Latte
+  | 'onedark'    // 原子 — One Dark / One Light (Atom)
+  | 'solarized'  // 日晒 — Solarized
+  | 'rosepine'   // 玫瑰松 — Rosé Pine main/dawn
+  | 'everforest'; // 常青林 — Everforest
 
 export type VoyageMode = 'dark' | 'light';
 export type VoyageStyle = 'classic' | 'glass' | 'soft' | 'sharp';
@@ -30,7 +32,8 @@ export interface VoyagePrefs {
 }
 
 export const VOYAGE_THEMES: readonly VoyageTheme[] = [
-  'slate', 'ink', 'navy', 'jade', 'aurora', 'sunset', 'horizon', 'oolong',
+  'slate', 'ink', 'github', 'nord', 'tokyo',
+  'catppuccin', 'onedark', 'solarized', 'rosepine', 'everforest',
 ] as const;
 export const VOYAGE_MODES: readonly VoyageMode[] = ['dark', 'light'] as const;
 export const VOYAGE_STYLES: readonly VoyageStyle[] = ['classic', 'glass', 'soft', 'sharp'] as const;
@@ -46,9 +49,9 @@ export const VOYAGE_DEFAULT_PREFS: VoyagePrefs = {
 
 /** 各应用推荐默认 (用户仍可自行切换并持久化) */
 export const VOYAGE_APP_DEFAULTS: Record<string, VoyagePrefs> = {
-  engram:     { theme: 'ink',  mode: 'light', style: 'soft',    tone: 'quiet' },
-  jsontailor: { theme: 'navy', mode: 'dark',  style: 'glass',   tone: 'quiet' },
-  ai:         { theme: 'jade', mode: 'dark',  style: 'classic', tone: 'quiet' },
+  engram:     { theme: 'ink',        mode: 'light', style: 'soft',    tone: 'quiet' },
+  jsontailor: { theme: 'tokyo',      mode: 'dark',  style: 'glass',   tone: 'quiet' },
+  ai:         { theme: 'everforest', mode: 'dark',  style: 'classic', tone: 'quiet' },
   // quarry 是本规格的原始基准: tone 用 normal (原版是实色 accent 填充,
   // 不是 quiet 的压明度+白字), 以贴合它现有视觉不变。
   quarry:     { theme: 'slate', mode: 'dark', style: 'classic', tone: 'normal' },
@@ -75,15 +78,18 @@ export interface VoyagePreset {
 }
 
 export const VOYAGE_PRESETS: readonly VoyagePreset[] = [
-  // slate 是 quarry 原版基准: classic + normal (实色 accent 填充), 见 README
-  { id: 'slate',   label: '板岩铜',   hint: 'Quarry 原版基准',   theme: 'slate',   style: 'classic', tone: 'normal' },
-  { id: 'ink',     label: '纸墨朱',   hint: '纸感阅读',          theme: 'ink',     style: 'soft',    tone: 'quiet' },
-  { id: 'navy',    label: '深海黄铜', hint: '玻璃质感夜航',      theme: 'navy',    style: 'glass',   tone: 'quiet' },
-  { id: 'jade',    label: '玄武玉',   hint: '冷静克制',          theme: 'jade',    style: 'classic', tone: 'quiet' },
-  { id: 'aurora',  label: '极光',     hint: '紫青渐变',          theme: 'aurora',  style: 'glass',   tone: 'quiet' },
-  { id: 'sunset',  label: '日暮',     hint: '橙品红渐变',        theme: 'sunset',  style: 'soft',    tone: 'quiet' },
-  { id: 'horizon', label: '苍穹',     hint: '蓝青绿渐变',        theme: 'horizon', style: 'classic', tone: 'quiet' },
-  { id: 'oolong',  label: '蜜桃乌龙', hint: '暖金玫瑰渐变',      theme: 'oolong',  style: 'soft',    tone: 'quiet' },
+  // slate 是 quarry 原版基准: classic + normal (实色 accent 填充), 见 README;
+  // 其余经典配色的出处见 tokens.css 主题矩阵注释
+  { id: 'slate',      label: '板岩铜',    hint: 'Quarry 原版基准',        theme: 'slate',      style: 'classic', tone: 'normal' },
+  { id: 'ink',        label: '纸墨朱',    hint: '纸感阅读',               theme: 'ink',        style: 'soft',    tone: 'quiet' },
+  { id: 'github',     label: '石墨',      hint: 'GitHub Primer 工具蓝',   theme: 'github',     style: 'classic', tone: 'quiet' },
+  { id: 'nord',       label: '北极',      hint: 'Nord 冷蓝灰',            theme: 'nord',       style: 'classic', tone: 'quiet' },
+  { id: 'tokyo',      label: '东京夜',    hint: 'Tokyo Night 靛蓝夜航',   theme: 'tokyo',      style: 'glass',   tone: 'quiet' },
+  { id: 'catppuccin', label: '摩卡',      hint: 'Catppuccin 柔和粉彩',    theme: 'catppuccin', style: 'soft',    tone: 'quiet' },
+  { id: 'onedark',    label: '原子',      hint: 'One Dark 中性耐看',      theme: 'onedark',    style: 'classic', tone: 'quiet' },
+  { id: 'solarized',  label: '日晒',      hint: 'Solarized 学院经典',     theme: 'solarized',  style: 'classic', tone: 'quiet' },
+  { id: 'rosepine',   label: '玫瑰松',    hint: 'Rosé Pine 哑光玫瑰',     theme: 'rosepine',   style: 'soft',    tone: 'quiet' },
+  { id: 'everforest', label: '常青林',    hint: 'Everforest 护眼绿',      theme: 'everforest', style: 'soft',    tone: 'quiet' },
 ] as const;
 
 /** preset + 当前明暗 -> 完整四轴偏好 */

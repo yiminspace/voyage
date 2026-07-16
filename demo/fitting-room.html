@@ -38,12 +38,14 @@
     <span class="lbl">主题</span>
     <button class="chip on" data-pick="slate" style="--ac:#c0824f"><i></i>板岩铜</button>
     <button class="chip" data-pick="ink" style="--ac:#c14b38"><i></i>纸墨朱</button>
-    <button class="chip" data-pick="navy" style="--ac:#c9a55f"><i></i>深海黄铜</button>
-    <button class="chip" data-pick="jade" style="--ac:#4fa878"><i></i>玄武玉</button>
-    <button class="chip" data-pick="aurora" style="--ac:linear-gradient(120deg,#8b7cf8,#4cc9f0)"><i></i>极光</button>
-    <button class="chip" data-pick="sunset" style="--ac:linear-gradient(120deg,#ff8a5c,#f5548e)"><i></i>日暮</button>
-    <button class="chip" data-pick="horizon" style="--ac:linear-gradient(120deg,#3f8ef0,#2fd4b4)"><i></i>苍穹</button>
-    <button class="chip" data-pick="oolong" style="--ac:linear-gradient(120deg,#eab465,#e07a8a)"><i></i>蜜桃乌龙</button>
+    <button class="chip" data-pick="github" style="--ac:#1f6feb"><i></i>石墨</button>
+    <button class="chip" data-pick="nord" style="--ac:#88c0d0"><i></i>北极</button>
+    <button class="chip" data-pick="tokyo" style="--ac:#7aa2f7"><i></i>东京夜</button>
+    <button class="chip" data-pick="catppuccin" style="--ac:#cba6f7"><i></i>摩卡</button>
+    <button class="chip" data-pick="onedark" style="--ac:#61afef"><i></i>原子</button>
+    <button class="chip" data-pick="solarized" style="--ac:#268bd2"><i></i>日晒</button>
+    <button class="chip" data-pick="rosepine" style="--ac:#ebbcba"><i></i>玫瑰松</button>
+    <button class="chip" data-pick="everforest" style="--ac:#a7c080"><i></i>常青林</button>
   </div>
   <div class="bench">
     <span class="lbl">明暗</span>
@@ -160,14 +162,16 @@
 
   // 与 src/index.ts 的 VOYAGE_PRESETS 保持一致: 每个色系一个策展的 style/tone 组合
   var PRESETS = [
-    { id: 'slate',   label: '板岩铜',   hint: 'Quarry 原版基准', style: 'classic', tone: 'normal' },
-    { id: 'ink',     label: '纸墨朱',   hint: '纸感阅读',        style: 'soft',    tone: 'quiet' },
-    { id: 'navy',    label: '深海黄铜', hint: '玻璃质感夜航',    style: 'glass',   tone: 'quiet' },
-    { id: 'jade',    label: '玄武玉',   hint: '冷静克制',        style: 'classic', tone: 'quiet' },
-    { id: 'aurora',  label: '极光',     hint: '紫青渐变',        style: 'glass',   tone: 'quiet' },
-    { id: 'sunset',  label: '日暮',     hint: '橙品红渐变',      style: 'soft',    tone: 'quiet' },
-    { id: 'horizon', label: '苍穹',     hint: '蓝青绿渐变',      style: 'classic', tone: 'quiet' },
-    { id: 'oolong',  label: '蜜桃乌龙', hint: '暖金玫瑰渐变',    style: 'soft',    tone: 'quiet' }
+    { id: 'slate',      label: '板岩铜', hint: 'Quarry 原版基准',      style: 'classic', tone: 'normal' },
+    { id: 'ink',        label: '纸墨朱', hint: '纸感阅读',             style: 'soft',    tone: 'quiet' },
+    { id: 'github',     label: '石墨',   hint: 'GitHub Primer 工具蓝', style: 'classic', tone: 'quiet' },
+    { id: 'nord',       label: '北极',   hint: 'Nord 冷蓝灰',          style: 'classic', tone: 'quiet' },
+    { id: 'tokyo',      label: '东京夜', hint: 'Tokyo Night 靛蓝夜航', style: 'glass',   tone: 'quiet' },
+    { id: 'catppuccin', label: '摩卡',   hint: 'Catppuccin 柔和粉彩',  style: 'soft',    tone: 'quiet' },
+    { id: 'onedark',    label: '原子',   hint: 'One Dark 中性耐看',    style: 'classic', tone: 'quiet' },
+    { id: 'solarized',  label: '日晒',   hint: 'Solarized 学院经典',   style: 'classic', tone: 'quiet' },
+    { id: 'rosepine',   label: '玫瑰松', hint: 'Rosé Pine 哑光玫瑰',   style: 'soft',    tone: 'quiet' },
+    { id: 'everforest', label: '常青林', hint: 'Everforest 护眼绿',    style: 'soft',    tone: 'quiet' }
   ];
 
   // 已落定的四轴状态 (bind 的 after 回调里维护), 预览还原时以它为准
