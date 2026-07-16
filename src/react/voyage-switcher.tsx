@@ -1,37 +1,50 @@
 'use client';
 
-import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useId,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from 'react';
 import {
   VOYAGE_MODES,
-  VOYAGE_STYLES,
-  VOYAGE_THEMES,
-  VOYAGE_TONES,
+  VOYAGE_PRESETS,
+  applyVoyagePrefs,
+  matchVoyagePreset,
+  voyagePresetPrefs,
+  type VoyageLocale,
   type VoyageMode,
-  type VoyageStyle,
-  type VoyageTheme,
-  type VoyageTone,
+  type VoyagePreset,
 } from '../index';
 import { useVoyage } from './voyage-provider';
 
-const THEME_LABELS: Record<VoyageTheme, string> = {
-  slate: '板岩铜',
-  ink: '纸墨朱',
-  navy: '深海黄铜',
-  jade: '玄武玉',
-  aurora: '极光',
-  sunset: '日暮',
-  horizon: '苍穹',
-  oolong: '蜜桃乌龙',
+/** 切换器自身的全部 UI 文案 (预设名/描述在 VOYAGE_PRESETS 里双语) */
+const STRINGS: Record<
+  VoyageLocale,
+  { modes: Record<VoyageMode, string>; toLight: string; toDark: string; open: string; panel: string; themes: string; modeGroup: string }
+> = {
+  zh: {
+    modes: { dark: '暗', light: '亮' },
+    toLight: '切换为亮色模式',
+    toDark: '切换为暗色模式',
+    open: '展开主题设置',
+    panel: '主题设置',
+    themes: '主题',
+    modeGroup: '明暗',
+  },
+  en: {
+    modes: { dark: 'Dark', light: 'Light' },
+    toLight: 'Switch to light mode',
+    toDark: 'Switch to dark mode',
+    open: 'Theme settings',
+    panel: 'Theme settings',
+    themes: 'Themes',
+    modeGroup: 'Mode',
+  },
 };
-
-const MODE_LABELS: Record<VoyageMode, string> = { dark: '暗', light: '亮' };
-const STYLE_LABELS: Record<VoyageStyle, string> = {
-  classic: '经典',
-  glass: '玻璃',
-  soft: '圆软',
-  sharp: '方锐',
-};
-const TONE_LABELS: Record<VoyageTone, string> = { normal: '标准', quiet: '柔和' };
 
 /** 有原生 showPopover 才启用; jsdom / 旧浏览器静默跳过, 交互仍由 React state 驱动 */
 function supportsPopover(el: Element | null): el is HTMLElement & {
@@ -41,14 +54,18 @@ function supportsPopover(el: Element | null): el is HTMLElement & {
   return !!el && typeof (el as HTMLElement).showPopover === 'function';
 }
 
-/** 描边风格, 与站内其余图标(tabler)同一视觉语言; 用 currentColor 跟随按钮色。 */
-function MoonIcon() {
+/**
+ * 内置图标: 取 Tabler Icons (MIT) 的原始 path, 24 网格 / stroke 2 / round cap,
+ * 尺寸走 1em 跟随 .vg-iconbtn 的 font-size —— 与图标字体宿主 (如 quarry 的
+ * tabler webfont) 光学一致; 宿主也可通过 icons 插槽直接传自家图标。
+ */
+function TablerIcon({ children }: { children: ReactNode }) {
   return (
     <svg
       className="vg-mode-icon"
       viewBox="0 0 24 24"
-      width="15"
-      height="15"
+      width="1em"
+      height="1em"
       fill="none"
       stroke="currentColor"
       strokeWidth="2"
@@ -56,50 +73,95 @@ function MoonIcon() {
       strokeLinejoin="round"
       aria-hidden="true"
     >
-      <path d="M20.5 14.5A8.5 8.5 0 1 1 9.5 3.5a7 7 0 0 0 11 11z" />
+      {children}
     </svg>
   );
 }
 
-function SunIcon() {
-  return (
-    <svg
-      className="vg-mode-icon"
-      viewBox="0 0 24 24"
-      width="15"
-      height="15"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <circle cx="12" cy="12" r="4.5" />
-      <path d="M12 2.5v2.2M12 19.3v2.2M4.4 4.4l1.55 1.55M18.05 18.05l1.55 1.55M2.5 12h2.2M19.3 12h2.2M4.4 19.6l1.55-1.55M18.05 5.95l1.55-1.55" />
-    </svg>
-  );
+const DEFAULT_MOON = (
+  <TablerIcon>
+    <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+  </TablerIcon>
+);
+
+const DEFAULT_SUN = (
+  <TablerIcon>
+    <path d="M12 12m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" />
+    <path d="M3 12h1m8 -9v1m8 8h1m-9 8v1m-6.4 -15.4l.7 .7m12.1 -.7l-.7 .7m0 12.1l.7 .7m-12.1 -.7l-.7 .7" />
+  </TablerIcon>
+);
+
+const DEFAULT_TRIGGER = (
+  <TablerIcon>
+    <path d="M12 21a9 9 0 0 1 0 -18c4.97 0 9 3.582 9 8c0 1.06 -.474 2.078 -1.318 2.828c-.844 .75 -1.989 1.172 -3.182 1.172h-2.5a2 2 0 0 0 -1 3.75a1.3 1.3 0 0 1 -1 2.25" />
+    <path d="M8.5 10.5m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" />
+    <path d="M12.5 7.5m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" />
+    <path d="M16.5 10.5m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" />
+  </TablerIcon>
+);
+
+export interface VoyageSwitcherIcons {
+  /** 暗色模式下顶栏按钮显示的图标 (默认内置 Tabler 月亮) */
+  moon?: ReactNode;
+  /** 亮色模式下顶栏按钮显示的图标 (默认内置 Tabler 太阳) */
+  sun?: ReactNode;
+  /** 展开主题面板的触发图标 (默认内置 Tabler 调色板) */
+  trigger?: ReactNode;
 }
 
 export interface VoyageSwitcherProps {
   className?: string;
+  /** 宿主用自家图标体系时传入 (如 quarry 传 tabler webfont 的 <i>), 与顶栏其余图标保持同一视觉语言 */
+  icons?: VoyageSwitcherIcons;
+  /** UI 文案语言, 跟随宿主的语言状态传入; 缺省中文 */
+  locale?: VoyageLocale;
 }
 
 /**
- * 顶栏切换器: 一个 vg-iconbtn 一键切明暗 + 一个展开按钮弹出完整面板
- * (主题色点阵 + 明暗/风格/对比三组分段)。
+ * 顶栏切换器: 一个 vg-iconbtn 一键切明暗 + 一个调色板按钮弹出主题面板。
+ *
+ * 面板 = 明暗分段 + 8 张策展主题卡 (VOYAGE_PRESETS): 每张卡用自己的
+ * data-theme/style/tone 作用域渲染 mini 预览; hover / 聚焦某张卡时把该主题
+ * 临时应用到整页做即时预览 (不写 localStorage), 移出 / Esc / 关面板还原,
+ * 点击才落定 —— VS Code 主题选择器的交互模型。
  *
  * 浮层用原生 Popover API (有支持时启用 top-layer + 系统级 light-dismiss),
  * 同时始终由 React state 驱动可见性与交互, 保证在不支持 Popover 的环境下
  * (包括测试用的 jsdom) 依然可用。
  */
-export function VoyageSwitcher({ className }: VoyageSwitcherProps = {}) {
-  const { prefs, setTheme, setMode, setStyle, setTone } = useVoyage();
+export function VoyageSwitcher({ className, icons, locale = 'zh' }: VoyageSwitcherProps = {}) {
+  const { prefs, setPrefs, setMode } = useVoyage();
+  const tr = STRINGS[locale];
   const [open, setOpen] = useState(false);
   const [panelPos, setPanelPos] = useState<{ top: number; right: number } | null>(null);
   const panelRef = useRef<HTMLDivElement | null>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const panelId = useId();
+
+  // 即时预览绕过 provider 直写 DOM; 还原时要拿"已落定"的偏好, 用 ref 避免
+  // 事件闭包里的 prefs 过期 (落定后 provider 更新 state, 这里跟着刷新)。
+  const committedRef = useRef(prefs);
+  committedRef.current = prefs;
+
+  const previewPreset = useCallback((preset: VoyagePreset) => {
+    if (typeof document === 'undefined') return;
+    applyVoyagePrefs(
+      document.documentElement,
+      voyagePresetPrefs(preset, committedRef.current.mode)
+    );
+  }, []);
+
+  const revertPreview = useCallback(() => {
+    if (typeof document === 'undefined') return;
+    applyVoyagePrefs(document.documentElement, committedRef.current);
+  }, []);
+
+  // 面板关闭 (Esc / 点外部 / 再点触发钮 / 卸载) 时兜底还原预览;
+  // 已点击落定的场合 committedRef 就是新偏好, 这里等价于 no-op。
+  useEffect(() => {
+    if (!open) return;
+    return () => revertPreview();
+  }, [open, revertPreview]);
 
   // popover 是较新的 DOM 属性, @types/react 18 尚未收录, 用 ref 回调 setAttribute
   // (而非 JSX 属性) 挂上去; 不支持的环境 (含测试用的 jsdom) 属性本身是惰性的。
@@ -167,28 +229,41 @@ export function VoyageSwitcher({ className }: VoyageSwitcherProps = {}) {
   }, [open, updatePanelPosition]);
 
   const toggleMode = () => setMode(prefs.mode === 'dark' ? 'light' : 'dark');
+  const activePreset = matchVoyagePreset(prefs);
+
+  const commitPreset = (preset: VoyagePreset) => {
+    setPrefs({ theme: preset.theme, style: preset.style, tone: preset.tone });
+  };
 
   return (
     <div className={['vg-switcher', className].filter(Boolean).join(' ')}>
       <button
         type="button"
         className="vg-iconbtn vg-switcher-mode"
-        aria-label={prefs.mode === 'dark' ? '切换为亮色模式' : '切换为暗色模式'}
+        aria-label={prefs.mode === 'dark' ? tr.toLight : tr.toDark}
         onClick={toggleMode}
       >
-        {prefs.mode === 'dark' ? <MoonIcon key="moon" /> : <SunIcon key="sun" />}
+        {prefs.mode === 'dark' ? (
+          <span className="vg-mode-wrap" key="moon">
+            {icons?.moon ?? DEFAULT_MOON}
+          </span>
+        ) : (
+          <span className="vg-mode-wrap" key="sun">
+            {icons?.sun ?? DEFAULT_SUN}
+          </span>
+        )}
       </button>
       <button
         type="button"
         ref={triggerRef}
         className="vg-iconbtn vg-switcher-trigger"
-        aria-label="展开主题设置"
+        aria-label={tr.open}
         aria-haspopup="true"
         aria-expanded={open}
         aria-controls={panelId}
         onClick={() => setOpen((v) => !v)}
       >
-        ⚙
+        {icons?.trigger ?? DEFAULT_TRIGGER}
       </button>
       {open ? (
         <div
@@ -196,27 +271,52 @@ export function VoyageSwitcher({ className }: VoyageSwitcherProps = {}) {
           ref={setPanelRef}
           className="vg-switcher-panel"
           role="menu"
-          aria-label="主题设置"
+          aria-label={tr.panel}
           style={panelPos ? { top: panelPos.top, right: panelPos.right } : undefined}
         >
-          <div className="vg-switcher-group" role="group" aria-label="主题色">
-            {VOYAGE_THEMES.map((theme) => (
+          <div
+            className="vg-preset-grid"
+            role="group"
+            aria-label={tr.themes}
+            onPointerLeave={revertPreview}
+          >
+            {VOYAGE_PRESETS.map((preset) => (
               <button
-                key={theme}
+                key={preset.id}
                 type="button"
                 role="menuitemradio"
-                aria-checked={prefs.theme === theme}
-                aria-label={THEME_LABELS[theme]}
-                title={THEME_LABELS[theme]}
-                className={`vg vg-theme-dot${prefs.theme === theme ? ' on' : ''}`}
-                data-theme={theme}
-                data-mode={prefs.mode}
-                onClick={() => setTheme(theme)}
-              />
+                aria-checked={activePreset.id === preset.id}
+                aria-label={preset.label[locale]}
+                title={`${preset.label[locale]} · ${preset.hint[locale]}`}
+                className={`vg-preset-card${activePreset.id === preset.id ? ' on' : ''}`}
+                onPointerEnter={() => previewPreset(preset)}
+                onFocus={() => previewPreset(preset)}
+                onClick={() => commitPreset(preset)}
+              >
+                {/* token 作用域只套缩略图: 卡片外框/名字用宿主面板的 tokens,
+                    避免异色主题的前景色让文字在面板底色上不可读 */}
+                <span
+                  className="vg vg-preset-thumb"
+                  data-theme={preset.theme}
+                  data-mode={prefs.mode}
+                  data-style={preset.style}
+                  data-tone={preset.tone}
+                  aria-hidden="true"
+                >
+                  <span className="vg-preset-thumb-bar">
+                    <i className="vg-preset-thumb-dot" />
+                    <i className="vg-preset-thumb-hairline" />
+                  </span>
+                  <span className="vg-preset-thumb-line" />
+                  <span className="vg-preset-thumb-line short" />
+                  <span className="vg-preset-thumb-fill" />
+                </span>
+                <span className="vg-preset-name">{preset.label[locale]}</span>
+              </button>
             ))}
           </div>
 
-          <div className="vg-switcher-row" role="radiogroup" aria-label="明暗">
+          <div className="vg-switcher-row" role="radiogroup" aria-label={tr.modeGroup}>
             {VOYAGE_MODES.map((mode) => (
               <button
                 key={mode}
@@ -226,37 +326,7 @@ export function VoyageSwitcher({ className }: VoyageSwitcherProps = {}) {
                 className={`vg-seg${prefs.mode === mode ? ' on' : ''}`}
                 onClick={() => setMode(mode)}
               >
-                {MODE_LABELS[mode]}
-              </button>
-            ))}
-          </div>
-
-          <div className="vg-switcher-row" role="radiogroup" aria-label="风格">
-            {VOYAGE_STYLES.map((style) => (
-              <button
-                key={style}
-                type="button"
-                role="radio"
-                aria-checked={prefs.style === style}
-                className={`vg-seg${prefs.style === style ? ' on' : ''}`}
-                onClick={() => setStyle(style)}
-              >
-                {STYLE_LABELS[style]}
-              </button>
-            ))}
-          </div>
-
-          <div className="vg-switcher-row" role="radiogroup" aria-label="对比">
-            {VOYAGE_TONES.map((tone) => (
-              <button
-                key={tone}
-                type="button"
-                role="radio"
-                aria-checked={prefs.tone === tone}
-                className={`vg-seg${prefs.tone === tone ? ' on' : ''}`}
-                onClick={() => setTone(tone)}
-              >
-                {TONE_LABELS[tone]}
+                {tr.modes[mode]}
               </button>
             ))}
           </div>

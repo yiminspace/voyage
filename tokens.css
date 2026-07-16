@@ -71,29 +71,44 @@
 .vg[data-theme='ink'][data-mode='dark'] { --bg0:#131211; --bg1:#1d1b19; --bg2:#262321; --bg3:#312d2a; --line:#46403b; --line2:#59524b; --accent:#c14b38; --accent-hi:#d4604c; --accent-ink:#ffffff; }
 .vg[data-theme='ink'][data-mode='light'] { --bg0:#f6f3ec; --bg1:#ffffff; --bg2:#f1ede3; --bg3:#e8e2d4; --line:#d9d2c2; --line2:#c1b8a3; --accent:#b23b2b; --accent-hi:#c24b3a; --accent-ink:#ffffff; }
 
-/* navy 深海黄铜 — 靛蓝 + 黄铜, 工具夜场 */
-.vg[data-theme='navy'][data-mode='dark'] { --bg0:#0c111c; --bg1:#161d2b; --bg2:#1e2636; --bg3:#283244; --line:#3c4a62; --line2:#4e5f7a; --accent:#c9a55f; --accent-hi:#dab873; --accent-ink:#251a04; }
-.vg[data-theme='navy'][data-mode='light'] { --bg0:#f1f2f5; --bg1:#ffffff; --bg2:#ebedf1; --bg3:#dfe3ea; --line:#cdd3dd; --line2:#b3bcca; --accent:#9c7a2e; --accent-hi:#ad8a3d; --accent-ink:#ffffff; }
+/* --------------------------------------------------------------------------
+   以下 8 套取自经过大规模使用检验的开源经典配色 (均 MIT), 只做两件事:
+   把原色板映射进本矩阵的槽位 (bg 四阶 / line 两级 / accent 三件套),
+   缺档的中间灰阶按原色板同色相内插补齐。大面积填充仍走 quiet 的
+   压明度公式, 不使用原主题的语法高亮色。
+   -------------------------------------------------------------------------- */
 
-/* jade 玄武玉 — 纯中性灰 + 玉绿, 最冷静 */
-.vg[data-theme='jade'][data-mode='dark'] { --bg0:#101013; --bg1:#1a1a1e; --bg2:#232327; --bg3:#2e2e33; --line:#434349; --line2:#56565e; --accent:#4fa878; --accent-hi:#63bd8c; --accent-ink:#06180e; }
-.vg[data-theme='jade'][data-mode='light'] { --bg0:#f3f3f2; --bg1:#ffffff; --bg2:#ededec; --bg3:#e2e2e0; --line:#d2d2cf; --line2:#b9b9b5; --accent:#2e7d54; --accent-hi:#3d8d63; --accent-ink:#ffffff; }
+/* github 石墨 — GitHub Primer (primer.style), 工具蓝 */
+.vg[data-theme='github'][data-mode='dark'] { --bg0:#0d1117; --bg1:#161b22; --bg2:#1c2128; --bg3:#262c36; --line:#30363d; --line2:#444c56; --accent:#1f6feb; --accent-hi:#4493f8; --accent-ink:#ffffff; }
+.vg[data-theme='github'][data-mode='light'] { --bg0:#f6f8fa; --bg1:#ffffff; --bg2:#f0f3f6; --bg3:#eaeef2; --line:#d0d7de; --line2:#afb8c1; --accent:#0969da; --accent-hi:#218bff; --accent-ink:#ffffff; }
 
-/* aurora 极光 — 渐变 紫 -> 青 */
-.vg[data-theme='aurora'][data-mode='dark'] { --bg0:#0e1020; --bg1:#171a30; --bg2:#1f2340; --bg3:#292e52; --line:#3d4470; --line2:#515a8e; --accent:#7d8ff4; --accent-hi:#9aa8ff; --accent-ink:#0d0f26; --acc-g1:#8b7cf8; --acc-g2:#4cc9f0; --acc-grad:linear-gradient(120deg,#8b7cf8,#4cc9f0); }
-.vg[data-theme='aurora'][data-mode='light'] { --bg0:#f3f3fa; --bg1:#ffffff; --bg2:#ededf7; --bg3:#e2e2f1; --line:#d2d3e8; --line2:#b6b8d6; --accent:#6a5cd8; --accent-hi:#7b6ee0; --accent-ink:#ffffff; --acc-g1:#6a5cd8; --acc-g2:#2aa8d8; --acc-grad:linear-gradient(120deg,#6a5cd8,#2aa8d8); }
+/* nord 北极 — Nord (nordtheme.com), 冷蓝灰 + Frost */
+.vg[data-theme='nord'][data-mode='dark'] { --bg0:#242933; --bg1:#2e3440; --bg2:#3b4252; --bg3:#434c5e; --line:#4c566a; --line2:#5d6a82; --accent:#88c0d0; --accent-hi:#9fd0de; --accent-ink:#10171e; }
+.vg[data-theme='nord'][data-mode='light'] { --bg0:#eceff4; --bg1:#f9fafc; --bg2:#e5e9f0; --bg3:#d8dee9; --line:#c5cede; --line2:#a9b6cb; --accent:#5e81ac; --accent-hi:#7093bc; --accent-ink:#ffffff; }
 
-/* sunset 日暮 — 渐变 橙 -> 品红 */
-.vg[data-theme='sunset'][data-mode='dark'] { --bg0:#171015; --bg1:#221822; --bg2:#2c1f2b; --bg3:#382936; --line:#4f3c4c; --line2:#644d60; --accent:#f4737b; --accent-hi:#ff8a92; --accent-ink:#2b0a12; --acc-g1:#ff8a5c; --acc-g2:#f5548e; --acc-grad:linear-gradient(120deg,#ff8a5c,#f5548e); }
-.vg[data-theme='sunset'][data-mode='light'] { --bg0:#faf3f1; --bg1:#ffffff; --bg2:#f6ebe7; --bg3:#efdfd9; --line:#e2cfc7; --line2:#ccb2a8; --accent:#db5560; --accent-hi:#e56670; --accent-ink:#ffffff; --acc-g1:#e8643c; --acc-g2:#d8447e; --acc-grad:linear-gradient(120deg,#e8643c,#d8447e); }
+/* tokyo 东京夜 — Tokyo Night (enkia), 靛蓝夜航 */
+.vg[data-theme='tokyo'][data-mode='dark'] { --bg0:#16161e; --bg1:#1a1b26; --bg2:#24283b; --bg3:#2f334d; --line:#3b4261; --line2:#4e577d; --accent:#7aa2f7; --accent-hi:#94b5ff; --accent-ink:#0e1017; }
+.vg[data-theme='tokyo'][data-mode='light'] { --bg0:#e1e2e7; --bg1:#f2f3f7; --bg2:#e9e9ec; --bg3:#d5d6db; --line:#c4c8da; --line2:#a4aac6; --accent:#2e7de9; --accent-hi:#4a90f0; --accent-ink:#ffffff; }
 
-/* horizon 苍穹 — 渐变 蓝 -> 青绿 */
-.vg[data-theme='horizon'][data-mode='dark'] { --bg0:#0c1219; --bg1:#141d27; --bg2:#1b2634; --bg3:#243243; --line:#38495e; --line2:#4a5f79; --accent:#54a8dc; --accent-hi:#6cbce8; --accent-ink:#06121c; --acc-g1:#3f8ef0; --acc-g2:#2fd4b4; --acc-grad:linear-gradient(120deg,#3f8ef0,#2fd4b4); }
-.vg[data-theme='horizon'][data-mode='light'] { --bg0:#f0f4f6; --bg1:#ffffff; --bg2:#e9eff2; --bg3:#dde6ea; --line:#cbd8de; --line2:#afc2ca; --accent:#1f7ab8; --accent-hi:#2e89c6; --accent-ink:#ffffff; --acc-g1:#1f7ab8; --acc-g2:#159a80; --acc-grad:linear-gradient(120deg,#1f7ab8,#159a80); }
+/* catppuccin 摩卡 — Catppuccin Mocha/Latte (catppuccin.com), 柔和粉彩紫 */
+.vg[data-theme='catppuccin'][data-mode='dark'] { --bg0:#181825; --bg1:#1e1e2e; --bg2:#313244; --bg3:#45475a; --line:#494d64; --line2:#585b70; --accent:#cba6f7; --accent-hi:#dabffa; --accent-ink:#171722; }
+.vg[data-theme='catppuccin'][data-mode='light'] { --bg0:#eff1f5; --bg1:#ffffff; --bg2:#e6e9ef; --bg3:#dce0e8; --line:#ccd0da; --line2:#9ca0b0; --accent:#8839ef; --accent-hi:#9a52f5; --accent-ink:#ffffff; }
 
-/* oolong 蜜桃乌龙 — 渐变 金 -> 玫瑰, 暖茶底 */
-.vg[data-theme='oolong'][data-mode='dark'] { --bg0:#141210; --bg1:#1f1b18; --bg2:#292420; --bg3:#342e28; --line:#4a423a; --line2:#5e544a; --accent:#e0a06a; --accent-hi:#edb37e; --accent-ink:#2a1608; --acc-g1:#eab465; --acc-g2:#e07a8a; --acc-grad:linear-gradient(120deg,#eab465,#e07a8a); }
-.vg[data-theme='oolong'][data-mode='light'] { --bg0:#f8f4ef; --bg1:#ffffff; --bg2:#f3ede5; --bg3:#ebe2d6; --line:#ddd1c1; --line2:#c6b6a2; --accent:#c07a3a; --accent-hi:#cd8a4a; --accent-ink:#ffffff; --acc-g1:#d29440; --acc-g2:#c25a70; --acc-grad:linear-gradient(120deg,#d29440,#c25a70); }
+/* onedark 原子 — One Dark / One Light (Atom), 中性耐看 */
+.vg[data-theme='onedark'][data-mode='dark'] { --bg0:#21252b; --bg1:#282c34; --bg2:#2f343e; --bg3:#3a4048; --line:#464e5c; --line2:#575f6f; --accent:#61afef; --accent-hi:#7cbdf2; --accent-ink:#0c1a26; }
+.vg[data-theme='onedark'][data-mode='light'] { --bg0:#f0f0f1; --bg1:#fafafa; --bg2:#eaeaeb; --bg3:#dbdbdc; --line:#ccccce; --line2:#a9a9ab; --accent:#4078f2; --accent-hi:#5589f4; --accent-ink:#ffffff; }
+
+/* solarized 日晒 — Solarized (Ethan Schoonover), 学院派经典 */
+.vg[data-theme='solarized'][data-mode='dark'] { --bg0:#00212b; --bg1:#002b36; --bg2:#073642; --bg3:#10414e; --line:#1d4c58; --line2:#2f6270; --accent:#268bd2; --accent-hi:#3f9fdf; --accent-ink:#ffffff; }
+.vg[data-theme='solarized'][data-mode='light'] { --bg0:#f7efd8; --bg1:#fdf6e3; --bg2:#f1e9d2; --bg3:#eee8d5; --line:#ddd4b8; --line2:#c4baa0; --accent:#268bd2; --accent-hi:#3f9fdf; --accent-ink:#ffffff; }
+
+/* rosepine 玫瑰松 — Rosé Pine main/dawn (rosepinetheme.com), 哑光玫瑰 */
+.vg[data-theme='rosepine'][data-mode='dark'] { --bg0:#191724; --bg1:#1f1d2e; --bg2:#26233a; --bg3:#312e48; --line:#403d52; --line2:#524f67; --accent:#ebbcba; --accent-hi:#f2cfce; --accent-ink:#291a19; }
+.vg[data-theme='rosepine'][data-mode='light'] { --bg0:#faf4ed; --bg1:#fffaf3; --bg2:#f2e9e1; --bg3:#e9dfd8; --line:#dfdad9; --line2:#c1bcbb; --accent:#b4637a; --accent-hi:#d7827e; --accent-ink:#ffffff; }
+
+/* everforest 常青林 — Everforest (sainnhe), 护眼绿低对比 */
+.vg[data-theme='everforest'][data-mode='dark'] { --bg0:#272e33; --bg1:#2d353b; --bg2:#343f44; --bg3:#3d484d; --line:#475258; --line2:#56635f; --accent:#a7c080; --accent-hi:#b7cf95; --accent-ink:#1c2418; }
+.vg[data-theme='everforest'][data-mode='light'] { --bg0:#f4f0d9; --bg1:#fdf6e3; --bg2:#efebd4; --bg3:#e6e2cc; --line:#d5d0b6; --line2:#bdb8a0; --accent:#8da101; --accent-hi:#a0b420; --accent-ink:#ffffff; }
 
 /* ---------------------------------------------------------------------------
    3. 有效变量层: 组件只消费这一层, tone / style 通过覆写它们生效

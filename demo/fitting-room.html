@@ -38,12 +38,14 @@
     <span class="lbl">主题</span>
     <button class="chip on" data-pick="slate" style="--ac:#c0824f"><i></i>板岩铜</button>
     <button class="chip" data-pick="ink" style="--ac:#c14b38"><i></i>纸墨朱</button>
-    <button class="chip" data-pick="navy" style="--ac:#c9a55f"><i></i>深海黄铜</button>
-    <button class="chip" data-pick="jade" style="--ac:#4fa878"><i></i>玄武玉</button>
-    <button class="chip" data-pick="aurora" style="--ac:linear-gradient(120deg,#8b7cf8,#4cc9f0)"><i></i>极光</button>
-    <button class="chip" data-pick="sunset" style="--ac:linear-gradient(120deg,#ff8a5c,#f5548e)"><i></i>日暮</button>
-    <button class="chip" data-pick="horizon" style="--ac:linear-gradient(120deg,#3f8ef0,#2fd4b4)"><i></i>苍穹</button>
-    <button class="chip" data-pick="oolong" style="--ac:linear-gradient(120deg,#eab465,#e07a8a)"><i></i>蜜桃乌龙</button>
+    <button class="chip" data-pick="github" style="--ac:#1f6feb"><i></i>石墨</button>
+    <button class="chip" data-pick="nord" style="--ac:#88c0d0"><i></i>北极</button>
+    <button class="chip" data-pick="tokyo" style="--ac:#7aa2f7"><i></i>东京夜</button>
+    <button class="chip" data-pick="catppuccin" style="--ac:#cba6f7"><i></i>摩卡</button>
+    <button class="chip" data-pick="onedark" style="--ac:#61afef"><i></i>原子</button>
+    <button class="chip" data-pick="solarized" style="--ac:#268bd2"><i></i>日晒</button>
+    <button class="chip" data-pick="rosepine" style="--ac:#ebbcba"><i></i>玫瑰松</button>
+    <button class="chip" data-pick="everforest" style="--ac:#a7c080"><i></i>常青林</button>
   </div>
   <div class="bench">
     <span class="lbl">明暗</span>
@@ -65,34 +67,21 @@
       <div class="vg-header">
         <span class="vg-logo">忆</span><span class="vg-brand">engram</span><span class="vg-ws">划词讲解 · local</span>
         <span class="vg-sp"></span><span class="vg-badge ok">rw</span>
-        <!-- VoyageSwitcher (@yiminlab/voyage/react) 的静态视觉基准: 同款 vg-switcher / vg-theme-dot / vg-seg 标记与样式, 用原生 JS 驱动而非 React, 但复用的是同一份 voyage.css -->
+        <!-- VoyageSwitcher (@yiminlab/voyage/react) 的静态视觉基准: 同款 vg-switcher / vg-preset-card / vg-seg 标记与样式, 用原生 JS 驱动而非 React, 但复用的是同一份 voyage.css。图标是 Tabler Icons 原始 path (24 网格 / stroke 2), 与组件内置默认一致。 -->
         <div class="vg-switcher" id="switcher">
-          <button class="vg-iconbtn vg-switcher-mode" id="switcherMode" aria-label="切换为亮色模式">☾</button>
-          <button class="vg-iconbtn vg-switcher-trigger" id="switcherTrigger" aria-label="展开主题设置" aria-haspopup="true" aria-expanded="false">⚙</button>
+          <button class="vg-iconbtn vg-switcher-mode" id="switcherMode" aria-label="切换为亮色模式">
+            <span class="vg-mode-wrap" id="modeWrapMoon"><svg class="vg-mode-icon" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z"/></svg></span>
+            <span class="vg-mode-wrap" id="modeWrapSun" style="display:none"><svg class="vg-mode-icon" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 12m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0"/><path d="M3 12h1m8 -9v1m8 8h1m-9 8v1m-6.4 -15.4l.7 .7m12.1 -.7l-.7 .7m0 12.1l.7 .7m-12.1 -.7l-.7 .7"/></svg></span>
+          </button>
+          <button class="vg-iconbtn vg-switcher-trigger" id="switcherTrigger" aria-label="展开主题设置" aria-haspopup="true" aria-expanded="false">
+            <svg class="vg-mode-icon" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21a9 9 0 0 1 0 -18c4.97 0 9 3.582 9 8c0 1.06 -.474 2.078 -1.318 2.828c-.844 .75 -1.989 1.172 -3.182 1.172h-2.5a2 2 0 0 0 -1 3.75a1.3 1.3 0 0 1 -1 2.25"/><path d="M8.5 10.5m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"/><path d="M12.5 7.5m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"/><path d="M16.5 10.5m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"/></svg>
+          </button>
           <div class="vg-switcher-panel" id="switcherPanel" role="menu" aria-label="主题设置" hidden>
-            <div class="vg-switcher-group" role="group" aria-label="主题色">
-              <button class="vg vg-theme-dot on" data-switch-theme="slate" data-theme="slate" data-mode="dark" role="menuitemradio" aria-checked="true" aria-label="板岩铜" title="板岩铜"></button>
-              <button class="vg vg-theme-dot" data-switch-theme="ink" data-theme="ink" data-mode="dark" role="menuitemradio" aria-checked="false" aria-label="纸墨朱" title="纸墨朱"></button>
-              <button class="vg vg-theme-dot" data-switch-theme="navy" data-theme="navy" data-mode="dark" role="menuitemradio" aria-checked="false" aria-label="深海黄铜" title="深海黄铜"></button>
-              <button class="vg vg-theme-dot" data-switch-theme="jade" data-theme="jade" data-mode="dark" role="menuitemradio" aria-checked="false" aria-label="玄武玉" title="玄武玉"></button>
-              <button class="vg vg-theme-dot" data-switch-theme="aurora" data-theme="aurora" data-mode="dark" role="menuitemradio" aria-checked="false" aria-label="极光" title="极光"></button>
-              <button class="vg vg-theme-dot" data-switch-theme="sunset" data-theme="sunset" data-mode="dark" role="menuitemradio" aria-checked="false" aria-label="日暮" title="日暮"></button>
-              <button class="vg vg-theme-dot" data-switch-theme="horizon" data-theme="horizon" data-mode="dark" role="menuitemradio" aria-checked="false" aria-label="苍穹" title="苍穹"></button>
-              <button class="vg vg-theme-dot" data-switch-theme="oolong" data-theme="oolong" data-mode="dark" role="menuitemradio" aria-checked="false" aria-label="蜜桃乌龙" title="蜜桃乌龙"></button>
-            </div>
+            <!-- 策展主题卡由下方脚本按 PRESETS 表生成 (与 VOYAGE_PRESETS 保持一致) -->
+            <div class="vg-preset-grid" id="presetGrid" role="group" aria-label="主题"></div>
             <div class="vg-switcher-row" role="radiogroup" aria-label="明暗">
               <button class="vg-seg on" data-switch-mode="dark" role="radio" aria-checked="true">暗</button>
               <button class="vg-seg" data-switch-mode="light" role="radio" aria-checked="false">亮</button>
-            </div>
-            <div class="vg-switcher-row" role="radiogroup" aria-label="风格">
-              <button class="vg-seg on" data-switch-style="classic" role="radio" aria-checked="true">经典</button>
-              <button class="vg-seg" data-switch-style="glass" role="radio" aria-checked="false">玻璃</button>
-              <button class="vg-seg" data-switch-style="soft" role="radio" aria-checked="false">圆软</button>
-              <button class="vg-seg" data-switch-style="sharp" role="radio" aria-checked="false">方锐</button>
-            </div>
-            <div class="vg-switcher-row" role="radiogroup" aria-label="对比">
-              <button class="vg-seg" data-switch-tone="normal" role="radio" aria-checked="false">标准</button>
-              <button class="vg-seg on" data-switch-tone="quiet" role="radio" aria-checked="true">柔和</button>
             </div>
           </div>
         </div>
@@ -171,8 +160,34 @@
 (function () {
   var targets = [document.getElementById('fit'), document.getElementById('scale')];
 
+  // 与 src/index.ts 的 VOYAGE_PRESETS 保持一致: 每个色系一个策展的 style/tone 组合
+  var PRESETS = [
+    { id: 'slate',      label: '板岩铜', hint: 'Quarry 原版基准',      style: 'classic', tone: 'normal' },
+    { id: 'ink',        label: '纸墨朱', hint: '纸感阅读',             style: 'soft',    tone: 'quiet' },
+    { id: 'github',     label: '石墨',   hint: 'GitHub Primer 工具蓝', style: 'classic', tone: 'quiet' },
+    { id: 'nord',       label: '北极',   hint: 'Nord 冷蓝灰',          style: 'classic', tone: 'quiet' },
+    { id: 'tokyo',      label: '东京夜', hint: 'Tokyo Night 靛蓝夜航', style: 'glass',   tone: 'quiet' },
+    { id: 'catppuccin', label: '摩卡',   hint: 'Catppuccin 柔和粉彩',  style: 'soft',    tone: 'quiet' },
+    { id: 'onedark',    label: '原子',   hint: 'One Dark 中性耐看',    style: 'classic', tone: 'quiet' },
+    { id: 'solarized',  label: '日晒',   hint: 'Solarized 学院经典',   style: 'classic', tone: 'quiet' },
+    { id: 'rosepine',   label: '玫瑰松', hint: 'Rosé Pine 哑光玫瑰',   style: 'soft',    tone: 'quiet' },
+    { id: 'everforest', label: '常青林', hint: 'Everforest 护眼绿',    style: 'soft',    tone: 'quiet' }
+  ];
+
+  // 已落定的四轴状态 (bind 的 after 回调里维护), 预览还原时以它为准
+  var committed = { theme: 'slate', mode: 'dark', style: 'classic', tone: 'quiet' };
+
+  function applyAxes(theme, mode, style, tone) {
+    targets.forEach(function (t) {
+      t.setAttribute('data-theme', theme);
+      t.setAttribute('data-mode', mode);
+      t.setAttribute('data-style', style);
+      t.setAttribute('data-tone', tone);
+    });
+  }
+
   // pairs: 同一根轴上 "试衣间上方 bench 的 chip" 与 "vg-switcher 面板的控件" 两组
-  // 标记不同 (data-pick vs data-switch-theme 等), 但要联动同一个 hostAttr。
+  // 标记不同 (data-pick vs data-switch-mode 等), 但要联动同一个 hostAttr。
   function bind(pairs, hostAttr, after) {
     function set(v) {
       targets.forEach(function (t) { t.setAttribute(hostAttr, v); });
@@ -192,29 +207,78 @@
     });
   }
 
+  function refreshPresetSelection() {
+    document.querySelectorAll('.vg-preset-card').forEach(function (card) {
+      var on = card.getAttribute('data-preset') === committed.theme;
+      card.classList.toggle('on', on);
+      card.setAttribute('aria-checked', String(on));
+    });
+  }
+
   bind(
-    [{ sel: '[data-pick]', attr: 'data-pick' }, { sel: '[data-switch-theme]', attr: 'data-switch-theme' }],
-    'data-theme'
+    [{ sel: '[data-pick]', attr: 'data-pick' }],
+    'data-theme',
+    function (v) { committed.theme = v; refreshPresetSelection(); }
   );
   bind(
     [{ sel: '[data-mode-pick]', attr: 'data-mode-pick' }, { sel: '[data-switch-mode]', attr: 'data-switch-mode' }],
     'data-mode',
     function (v) {
+      committed.mode = v;
       var switcherMode = document.getElementById('switcherMode');
-      switcherMode.textContent = v === 'dark' ? '☾' : '☀';
+      document.getElementById('modeWrapMoon').style.display = v === 'dark' ? '' : 'none';
+      document.getElementById('modeWrapSun').style.display = v === 'dark' ? 'none' : '';
       switcherMode.setAttribute('aria-label', v === 'dark' ? '切换为亮色模式' : '切换为暗色模式');
-      // 主题色点阵按当前明暗刷新色板 (每套主题的 dark/light 取值不同)
-      document.querySelectorAll('.vg-theme-dot').forEach(function (d) { d.setAttribute('data-mode', v); });
+      // 主题卡缩略图按当前明暗刷新色板 (每套主题的 dark/light 取值不同)
+      document.querySelectorAll('.vg-preset-thumb').forEach(function (d) { d.setAttribute('data-mode', v); });
     }
   );
   bind(
-    [{ sel: '[data-style-pick]', attr: 'data-style-pick' }, { sel: '[data-switch-style]', attr: 'data-switch-style' }],
-    'data-style'
+    [{ sel: '[data-style-pick]', attr: 'data-style-pick' }],
+    'data-style',
+    function (v) { committed.style = v; }
   );
   bind(
-    [{ sel: '[data-tone-pick]', attr: 'data-tone-pick' }, { sel: '[data-switch-tone]', attr: 'data-switch-tone' }],
-    'data-tone'
+    [{ sel: '[data-tone-pick]', attr: 'data-tone-pick' }],
+    'data-tone',
+    function (v) { committed.tone = v; }
   );
+
+  // 策展主题卡: 生成 + hover 即时预览 (移出还原, 点击落定 —— 落定通过点 bench
+  // chips 完成, 复用 bind 的联动同步)
+  var grid = document.getElementById('presetGrid');
+  PRESETS.forEach(function (p) {
+    var card = document.createElement('button');
+    card.type = 'button';
+    card.className = 'vg-preset-card' + (p.id === committed.theme ? ' on' : '');
+    card.setAttribute('data-preset', p.id);
+    card.setAttribute('role', 'menuitemradio');
+    card.setAttribute('aria-checked', String(p.id === committed.theme));
+    card.setAttribute('aria-label', p.label);
+    card.title = p.label + ' · ' + p.hint;
+    card.innerHTML =
+      '<span class="vg vg-preset-thumb" data-theme="' + p.id + '" data-mode="' + committed.mode +
+      '" data-style="' + p.style + '" data-tone="' + p.tone + '" aria-hidden="true">' +
+      '<span class="vg-preset-thumb-bar"><i class="vg-preset-thumb-dot"></i><i class="vg-preset-thumb-hairline"></i></span>' +
+      '<span class="vg-preset-thumb-line"></span><span class="vg-preset-thumb-line short"></span>' +
+      '<span class="vg-preset-thumb-fill"></span></span>' +
+      '<span class="vg-preset-name">' + p.label + '</span>';
+    card.addEventListener('pointerenter', function () {
+      applyAxes(p.id, committed.mode, p.style, p.tone);
+    });
+    card.addEventListener('click', function () {
+      var themeChip = document.querySelector('[data-pick="' + p.id + '"]');
+      var styleChip = document.querySelector('[data-style-pick="' + p.style + '"]');
+      var toneChip = document.querySelector('[data-tone-pick="' + p.tone + '"]');
+      if (themeChip) themeChip.click();
+      if (styleChip) styleChip.click();
+      if (toneChip) toneChip.click();
+    });
+    grid.appendChild(card);
+  });
+  grid.addEventListener('pointerleave', function () {
+    applyAxes(committed.theme, committed.mode, committed.style, committed.tone);
+  });
 
   // vg-switcher: 展开按钮切换面板 + 明暗按钮一键翻转, 与 VoyageSwitcher 组件同款交互;
   // 面板是 position:fixed, 位置要跟组件一样现算 viewport 坐标 (见 voyage-switcher.tsx
@@ -227,10 +291,21 @@
     panel.style.top = (rect.bottom + 8) + 'px';
     panel.style.right = Math.max(0, window.innerWidth - rect.right) + 'px';
   }
+  // 关面板时兜底还原预览 (悬停中直接 Esc / 点外部关闭的场合)
+  function closePanel() {
+    panel.setAttribute('hidden', '');
+    trigger.setAttribute('aria-expanded', 'false');
+    applyAxes(committed.theme, committed.mode, committed.style, committed.tone);
+  }
   trigger.addEventListener('click', function () {
     var open = panel.hasAttribute('hidden');
-    if (open) { positionSwitcherPanel(); panel.removeAttribute('hidden'); } else { panel.setAttribute('hidden', ''); }
-    trigger.setAttribute('aria-expanded', String(open));
+    if (open) {
+      positionSwitcherPanel();
+      panel.removeAttribute('hidden');
+      trigger.setAttribute('aria-expanded', 'true');
+    } else {
+      closePanel();
+    }
   });
   window.addEventListener('resize', function () {
     if (!panel.hasAttribute('hidden')) positionSwitcherPanel();
@@ -240,16 +315,10 @@
     document.querySelector('[data-switch-mode="' + (current === 'dark' ? 'light' : 'dark') + '"]').click();
   });
   document.addEventListener('click', function (event) {
-    if (!panel.hasAttribute('hidden') && !switcherEl.contains(event.target)) {
-      panel.setAttribute('hidden', '');
-      trigger.setAttribute('aria-expanded', 'false');
-    }
+    if (!panel.hasAttribute('hidden') && !switcherEl.contains(event.target)) closePanel();
   });
   document.addEventListener('keydown', function (event) {
-    if (event.key === 'Escape' && !panel.hasAttribute('hidden')) {
-      panel.setAttribute('hidden', '');
-      trigger.setAttribute('aria-expanded', 'false');
-    }
+    if (event.key === 'Escape' && !panel.hasAttribute('hidden')) closePanel();
   });
 })();
 </script>

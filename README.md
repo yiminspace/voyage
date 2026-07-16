@@ -10,7 +10,7 @@ yiminlab 统一样式系统。**所有 GUI 应用的视觉基础**: 一套 quarr
 
 | 轴 | 取值 | 管什么 |
 |---|---|---|
-| `data-theme` | `slate` 板岩铜 / `ink` 纸墨朱 / `navy` 深海黄铜 / `jade` 玄武玉 / `aurora` 极光 / `sunset` 日暮 / `horizon` 苍穹 / `oolong` 蜜桃乌龙 | 颜色 (后四套为渐变主题) |
+| `data-theme` | 自研: `slate` 板岩铜 (quarry 基准) / `ink` 纸墨朱; 经典采编 (MIT, 出处见 tokens.css): `github` 石墨 / `nord` 北极 / `tokyo` 东京夜 / `catppuccin` 摩卡 / `onedark` 原子 / `solarized` 日晒 / `rosepine` 玫瑰松 / `everforest` 常青林 | 颜色 |
 | `data-mode` | `dark` / `light` | 底色深浅 |
 | `data-style` | `classic` / `glass` / `soft` / `sharp` | 结构: 圆角 / 密度 / 材质 / 阴影 |
 | `data-tone` | `normal` / `quiet` | 对比强度; **quiet (久航) 是日常默认**, normal 留给演示 / 截图 |
@@ -80,17 +80,29 @@ function App() {
 }
 ```
 
-- **`VoyageProvider`** — 挂载时执行 `initVoyage`, 通过 context 分发偏好与四个 setter; 需要同时维护 tailwind `.dark` class 的应用传 `syncDarkClass`。SSR 场景仍需配合 `voyageInitScript` 防闪烁 (本组件只管挂载后的状态)。
-- **`useVoyage()`** — 返回 `{ prefs, setTheme, setMode, setStyle, setTone, reset }`, 每次调用写入 `localStorage('vg_prefs')` 并同步宿主元素属性。
-- **`VoyageSwitcher`** — 顶栏放一个即可: ☾/☀ 一键切明暗 + 展开按钮弹出完整面板 (8 枚主题色点阵 + 明暗/风格/对比三组分段)。浮层用原生 Popover API (支持时启用), 交互始终由 React state 兜底, 键盘可达 (Esc 关闭, 焦点环见 voyage.css)。
+- **`VoyageProvider`** — 挂载时执行 `initVoyage`, 通过 context 分发偏好与 setter; 需要同时维护 tailwind `.dark` class 的应用传 `syncDarkClass`。SSR 场景仍需配合 `voyageInitScript` 防闪烁 (本组件只管挂载后的状态)。
+- **`useVoyage()`** — 返回 `{ prefs, setTheme, setMode, setStyle, setTone, setPrefs, reset }`, 每次调用写入 `localStorage('vg_prefs')` 并同步宿主元素属性。
+- **`VoyageSwitcher`** — 顶栏放一个即可: 月亮/太阳一键切明暗 + 调色板按钮弹出主题面板。面板是 **策展主题卡** (`VOYAGE_PRESETS`, 每个色系一个设计过的 style/tone 组合, 卡片用该主题自身 tokens 渲染 mini 预览) + 明暗分段; hover / 聚焦即时全页预览, 移出 / Esc 还原, 点击落定 —— VS Code 主题选择器的交互模型。style/tone 原始轴不再直接暴露给用户 (token 引擎不变, 仍可经 `useVoyage()` 编程设置)。浮层用原生 Popover API (支持时启用), 交互始终由 React state 兜底, 键盘可达 (Esc 关闭, 焦点环见 voyage.css)。
+- **图标插槽** — `VoyageSwitcher` 内置图标取 Tabler Icons 原始 path (24 网格 / stroke 2 / 1em 跟随字号); 宿主用图标字体时可整体替换, 与顶栏其余图标保持同一视觉语言:
+
+```tsx
+<VoyageSwitcher
+  locale={LANG}  // 'zh' | 'en', 跟随宿主语言状态; 缺省中文
+  icons={{
+    moon: <i className="ti ti-moon" />,
+    sun: <i className="ti ti-sun" />,
+    trigger: <i className="ti ti-palette" />,
+  }}
+/>
+```
 
 ## 各应用默认组合
 
 | 应用 | theme | mode | style | tone |
 |---|---|---|---|---|
 | engram | ink 纸墨朱 | light | soft | quiet |
-| jsontailor | navy 深海黄铜 | dark | glass | quiet |
-| ai | jade 玄武玉 | dark | classic | quiet |
+| jsontailor | tokyo 东京夜 | dark | glass | quiet |
+| ai | everforest 常青林 | dark | classic | quiet |
 | quarry | slate 板岩铜 (原始基准) | dark | classic | normal |
 | portal | — 搁置, 保持现有设计 | | | |
 
