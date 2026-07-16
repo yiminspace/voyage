@@ -501,21 +501,24 @@
 /* ---- 主题切换器 (VoyageSwitcher, @yiminlab/voyage/react) ---- */
 .vg-switcher { position: relative; display: inline-flex; align-items: center; gap: 2px; }
 .vg-switcher-mode { overflow: hidden; }
-.vg-switcher-mode:active .vg-mode-icon { transform: scale(0.82) rotate(-8deg); }
+.vg-switcher-mode:active .vg-mode-wrap { transform: scale(0.82) rotate(-8deg); }
 /* 月亮/太阳每次挂载都重放一遍这个入场动效 (key 按 mode 切换触发 remount);
-   旋转 + 缩放 + 淡入, 让明暗切换有一点分量感, 而不是生硬的图标替换。 */
+   旋转 + 缩放 + 淡入, 让明暗切换有一点分量感, 而不是生硬的图标替换。
+   动效挂在包裹层 .vg-mode-wrap 上, 宿主通过 icons 插槽传入的图标字体
+   (如 tabler webfont 的 <i>) 同样能吃到。 */
 @keyframes vg-mode-pop {
   from { transform: scale(0.5) rotate(-50deg); opacity: 0; }
   to { transform: scale(1) rotate(0deg); opacity: 1; }
 }
-.vg-mode-icon {
-  display: block;
+.vg-mode-wrap {
+  display: inline-flex;
   transition: transform 0.12s ease;
   animation: vg-mode-pop 0.32s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
+.vg-mode-icon { display: block; }
 @media (prefers-reduced-motion: reduce) {
-  .vg-mode-icon { animation: none; }
-  .vg-switcher-mode:active .vg-mode-icon { transform: none; }
+  .vg-mode-wrap { animation: none; }
+  .vg-switcher-mode:active .vg-mode-wrap { transform: none; }
 }
 /*
  * 面板用 position:fixed + JS 算好的 viewport 坐标 (见 voyage-switcher.tsx 的
@@ -527,6 +530,9 @@
  * 若不把 left/bottom 也显式重置为 auto, 未覆盖的 left:0 会和 width 一起造成
  * 横向过约束, 按 CSS 规范 right 会被忽略, 面板最终贴在视口左边而不是触发按钮旁。
  */
+/* display:flex 会盖过 UA 的 [hidden] 默认样式, 非 React 宿主 (如试衣间 demo)
+   用 hidden 属性驱动显隐时要显式补回 */
+.vg-switcher-panel[hidden] { display: none; }
 .vg-switcher-panel {
   position: fixed;
   inset: auto;
@@ -544,17 +550,80 @@
   backdrop-filter: var(--blur, none);
   -webkit-backdrop-filter: var(--blur, none);
 }
-.vg-switcher-group { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-.vg-theme-dot {
-  width: 22px;
-  height: 22px;
-  padding: 0;
-  border-radius: 50%;
+/* 策展主题卡: 缩略图是一个用该主题自身 tokens 渲染的 mini 界面
+   (顶栏条 + accent 点 + 文字行 + 主按钮条), 取代无预览的孤立色点。
+   token 作用域 (data-theme 等) 只在 .vg-preset-thumb 上; 卡片外框与
+   名字用宿主面板 tokens, 保证任何主题组合下文字可读。 */
+.vg-preset-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+.vg-preset-card {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin: 0;
+  padding: 4px 4px 5px;
+  border-radius: calc(var(--r-btn) + 3px);
   border: 1px solid var(--line2-c, var(--line2));
-  background: var(--acc-grad);
+  background: none;
   cursor: pointer;
+  font-family: inherit;
+  text-align: left;
 }
-.vg-theme-dot.on { outline: 2px solid var(--acc); outline-offset: 2px; }
+.vg-preset-card:hover { border-color: color-mix(in srgb, var(--acc) 45%, var(--line2)); }
+.vg-preset-card.on { border-color: var(--acc); }
+.vg-preset-thumb {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  height: 42px;
+  padding: 5px 6px;
+  border-radius: 4px;
+  border: 1px solid var(--line2-c, var(--line2));
+  background: var(--bg0);
+  overflow: hidden;
+}
+.vg-preset-thumb-bar {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  height: 9px;
+  flex: none;
+  margin: -5px -6px 0;
+  padding: 0 5px;
+  background: var(--bg1);
+  border-bottom: 1px solid var(--line2-c, var(--line2));
+}
+.vg-preset-thumb-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--acc-grad); flex: none; }
+.vg-preset-thumb-hairline {
+  height: 2px;
+  width: 18px;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--fg3) 30%, transparent);
+}
+.vg-preset-thumb-line {
+  height: 3px;
+  width: 72%;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--fg3) 45%, transparent);
+}
+.vg-preset-thumb-line.short { width: 46%; }
+.vg-preset-thumb-fill {
+  margin-top: auto;
+  height: 7px;
+  width: 36%;
+  border-radius: 2px;
+  background: var(--fill-grad);
+}
+.vg-preset-name {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2px;
+  font-size: 11px;
+  line-height: 1;
+  color: var(--fg2);
+}
+.vg-preset-card.on .vg-preset-name { color: var(--fg); }
+.vg-preset-card.on .vg-preset-name::after { content: '✓'; color: var(--acc-text); font-weight: 700; }
 .vg-switcher-row { display: flex; gap: 4px; }
 .vg-seg {
   flex: 1;

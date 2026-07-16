@@ -54,6 +54,51 @@ export const VOYAGE_APP_DEFAULTS: Record<string, VoyagePrefs> = {
   quarry:     { theme: 'slate', mode: 'dark', style: 'classic', tone: 'normal' },
 };
 
+/**
+ * 策展主题 (preset): 四轴空间上一个被设计过的点。
+ *
+ * UI 层 (VoyageSwitcher) 只暴露 preset, 不再暴露 style/tone 原始轴 ——
+ * 用户面对的是「一列设计师保证好看的完整主题」, 而不是可自由组合的引擎参数
+ * (VS Code / JetBrains 的主题列表模式)。四轴 token 引擎本身不动, 每个 preset
+ * 就是一组固定的 theme x style x tone; mode 不入 preset, 每套主题都同时支持
+ * 暗/亮, 明暗是用户的全局偏好 (顶栏一键切换)。
+ */
+export interface VoyagePreset {
+  /** 与 theme 同名: 每个色系恰好一个策展组合 */
+  id: VoyageTheme;
+  label: string;
+  /** 一句话气质描述, 主题卡 tooltip 用 */
+  hint: string;
+  theme: VoyageTheme;
+  style: VoyageStyle;
+  tone: VoyageTone;
+}
+
+export const VOYAGE_PRESETS: readonly VoyagePreset[] = [
+  // slate 是 quarry 原版基准: classic + normal (实色 accent 填充), 见 README
+  { id: 'slate',   label: '板岩铜',   hint: 'Quarry 原版基准',   theme: 'slate',   style: 'classic', tone: 'normal' },
+  { id: 'ink',     label: '纸墨朱',   hint: '纸感阅读',          theme: 'ink',     style: 'soft',    tone: 'quiet' },
+  { id: 'navy',    label: '深海黄铜', hint: '玻璃质感夜航',      theme: 'navy',    style: 'glass',   tone: 'quiet' },
+  { id: 'jade',    label: '玄武玉',   hint: '冷静克制',          theme: 'jade',    style: 'classic', tone: 'quiet' },
+  { id: 'aurora',  label: '极光',     hint: '紫青渐变',          theme: 'aurora',  style: 'glass',   tone: 'quiet' },
+  { id: 'sunset',  label: '日暮',     hint: '橙品红渐变',        theme: 'sunset',  style: 'soft',    tone: 'quiet' },
+  { id: 'horizon', label: '苍穹',     hint: '蓝青绿渐变',        theme: 'horizon', style: 'classic', tone: 'quiet' },
+  { id: 'oolong',  label: '蜜桃乌龙', hint: '暖金玫瑰渐变',      theme: 'oolong',  style: 'soft',    tone: 'quiet' },
+] as const;
+
+/** preset + 当前明暗 -> 完整四轴偏好 */
+export function voyagePresetPrefs(preset: VoyagePreset, mode: VoyageMode): VoyagePrefs {
+  return { theme: preset.theme, mode, style: preset.style, tone: preset.tone };
+}
+
+/**
+ * 当前偏好归属哪个 preset (按 theme 归属; 旧版四轴 UI 留下的 style/tone
+ * 偏离组合也归到同色系卡片, 点击该卡即归位到策展组合)。
+ */
+export function matchVoyagePreset(prefs: VoyagePrefs): VoyagePreset {
+  return VOYAGE_PRESETS.find((p) => p.theme === prefs.theme) ?? VOYAGE_PRESETS[0];
+}
+
 export const VOYAGE_STORAGE_KEY = 'vg_prefs';
 
 function isValid(prefs: unknown): prefs is VoyagePrefs {

@@ -27,6 +27,8 @@ export interface VoyageContextValue {
   setMode: (mode: VoyageMode) => void;
   setStyle: (style: VoyageStyle) => void;
   setTone: (tone: VoyageTone) => void;
+  /** 批量落定多个轴 (选中一个策展 preset 时 theme/style/tone 一起变) */
+  setPrefs: (patch: Partial<VoyagePrefs>) => void;
   reset: () => void;
 }
 
@@ -92,8 +94,8 @@ export function VoyageProvider({
   const reset = useCallback(() => update(defaults), [update, defaults]);
 
   const value = useMemo<VoyageContextValue>(
-    () => ({ prefs, setTheme, setMode, setStyle, setTone, reset }),
-    [prefs, setTheme, setMode, setStyle, setTone, reset]
+    () => ({ prefs, setTheme, setMode, setStyle, setTone, setPrefs: update, reset }),
+    [prefs, setTheme, setMode, setStyle, setTone, update, reset]
   );
 
   return <VoyageContext.Provider value={value}>{children}</VoyageContext.Provider>;

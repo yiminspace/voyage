@@ -80,9 +80,20 @@ function App() {
 }
 ```
 
-- **`VoyageProvider`** — 挂载时执行 `initVoyage`, 通过 context 分发偏好与四个 setter; 需要同时维护 tailwind `.dark` class 的应用传 `syncDarkClass`。SSR 场景仍需配合 `voyageInitScript` 防闪烁 (本组件只管挂载后的状态)。
-- **`useVoyage()`** — 返回 `{ prefs, setTheme, setMode, setStyle, setTone, reset }`, 每次调用写入 `localStorage('vg_prefs')` 并同步宿主元素属性。
-- **`VoyageSwitcher`** — 顶栏放一个即可: ☾/☀ 一键切明暗 + 展开按钮弹出完整面板 (8 枚主题色点阵 + 明暗/风格/对比三组分段)。浮层用原生 Popover API (支持时启用), 交互始终由 React state 兜底, 键盘可达 (Esc 关闭, 焦点环见 voyage.css)。
+- **`VoyageProvider`** — 挂载时执行 `initVoyage`, 通过 context 分发偏好与 setter; 需要同时维护 tailwind `.dark` class 的应用传 `syncDarkClass`。SSR 场景仍需配合 `voyageInitScript` 防闪烁 (本组件只管挂载后的状态)。
+- **`useVoyage()`** — 返回 `{ prefs, setTheme, setMode, setStyle, setTone, setPrefs, reset }`, 每次调用写入 `localStorage('vg_prefs')` 并同步宿主元素属性。
+- **`VoyageSwitcher`** — 顶栏放一个即可: 月亮/太阳一键切明暗 + 调色板按钮弹出主题面板。面板是 **策展主题卡** (`VOYAGE_PRESETS`, 每个色系一个设计过的 style/tone 组合, 卡片用该主题自身 tokens 渲染 mini 预览) + 明暗分段; hover / 聚焦即时全页预览, 移出 / Esc 还原, 点击落定 —— VS Code 主题选择器的交互模型。style/tone 原始轴不再直接暴露给用户 (token 引擎不变, 仍可经 `useVoyage()` 编程设置)。浮层用原生 Popover API (支持时启用), 交互始终由 React state 兜底, 键盘可达 (Esc 关闭, 焦点环见 voyage.css)。
+- **图标插槽** — `VoyageSwitcher` 内置图标取 Tabler Icons 原始 path (24 网格 / stroke 2 / 1em 跟随字号); 宿主用图标字体时可整体替换, 与顶栏其余图标保持同一视觉语言:
+
+```tsx
+<VoyageSwitcher
+  icons={{
+    moon: <i className="ti ti-moon" />,
+    sun: <i className="ti ti-sun" />,
+    trigger: <i className="ti ti-palette" />,
+  }}
+/>
+```
 
 ## 各应用默认组合
 
