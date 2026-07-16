@@ -49,7 +49,9 @@ export const VOYAGE_APP_DEFAULTS: Record<string, VoyagePrefs> = {
   engram:     { theme: 'ink',  mode: 'light', style: 'soft',    tone: 'quiet' },
   jsontailor: { theme: 'navy', mode: 'dark',  style: 'glass',   tone: 'quiet' },
   ai:         { theme: 'jade', mode: 'dark',  style: 'classic', tone: 'quiet' },
-  // quarry: 不迁移, 保持自己的 App.css (等价于 slate x classic)
+  // quarry 是本规格的原始基准: tone 用 normal (原版是实色 accent 填充,
+  // 不是 quiet 的压明度+白字), 以贴合它现有视觉不变。
+  quarry:     { theme: 'slate', mode: 'dark', style: 'classic', tone: 'normal' },
 };
 
 export const VOYAGE_STORAGE_KEY = 'vg_prefs';

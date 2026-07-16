@@ -2,7 +2,7 @@
 
 yiminlab 统一样式系统。**所有 GUI 应用的视觉基础**: 一套 quarry 血统的组件规格 + 四轴正交的 token 矩阵。
 
-- 规格血统: 色板公式与组件尺寸源自 quarry 的 Slate & Copper 主题 (带色温的四级灰阶 + 一枚金属色 accent + 数据类型着色)。**quarry 本体不迁移**, 保持它现有的 App.css。
+- 规格血统: 色板公式与组件尺寸源自 quarry 的 Slate & Copper 主题 (带色温的四级灰阶 + 一枚金属色 accent + 数据类型着色)。**quarry 是本规格的基准**: `slate x dark x classic x normal` 必须和 quarry 现有视觉一致, 出现偏差改这里, 不在这里加 quarry 特判。
 - 零运行时依赖: 样式是纯 CSS; JS 入口只有主题偏好读写与免闪烁脚本。
 - 交互行为约定: 弹窗用原生 `<dialog>`, 浮层用 Popover API, 不引入 Radix/shadcn。
 
@@ -91,7 +91,7 @@ function App() {
 | engram | ink 纸墨朱 | light | soft | quiet |
 | jsontailor | navy 深海黄铜 | dark | glass | quiet |
 | ai | jade 玄武玉 | dark | classic | quiet |
-| quarry | — 不迁移 (自身 App.css 即 slate × classic) | | | |
+| quarry | slate 板岩铜 (原始基准) | dark | classic | normal |
 | portal | — 搁置, 保持现有设计 | | | |
 
 用户在任意应用内切换后经 `localStorage('vg_prefs')` 持久化, 覆盖应用默认。
@@ -107,6 +107,7 @@ open demo/fitting-room.html
 ## Roadmap
 
 - [x] react/ 薄封装: VoyageProvider / useVoyage / VoyageSwitcher (Popover API, 有支持时启用)
+- [x] quarry 接入 (slate x dark x classic x normal, 视觉基准)
 - [ ] react/ 其余薄封装: Dialog (原生 `<dialog>`) / Toast
 - [ ] engram 迁移 (首个宿主) → jsontailor → ai
 - [ ] focus / disabled / pressed / loading 状态完备化

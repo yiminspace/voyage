@@ -7,11 +7,14 @@
 
 .vg {
   font-family: -apple-system, 'SF Pro Text', 'PingFang SC', 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   --vg-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
 }
 
 /* ---- 应用外框 ---- */
 .vg-app {
+  margin: 0;
   display: flex;
   flex-direction: column;
   min-height: 0;
@@ -20,7 +23,7 @@
   background-color: var(--bg0);
   background-image: var(--app-img, none);
   color: var(--fg);
-  font-size: 13.5px;
+  font-size: 14px;
   line-height: 1.55;
 }
 .vg-app.vg-fullscreen { border-radius: 0; height: 100vh; height: 100dvh; }
@@ -105,7 +108,7 @@
   left: 0;
   top: 0;
   bottom: 0;
-  width: 2.5px;
+  width: 2px;
   background: var(--acc-grad);
 }
 .vg-row small { margin-left: auto; color: var(--fg3); font-size: 11.5px; }
@@ -146,7 +149,7 @@
   left: 0;
   top: 0;
   bottom: 0;
-  width: 2.5px;
+  width: 2px;
   background: var(--acc-grad);
 }
 
@@ -194,6 +197,7 @@
 
 /* 代码 token (JSON / SQL 语法着色, 与数据类型色同源) */
 .vg-tok-kw { color: var(--acc); }
+.vg-tok-fn { color: var(--num); }
 .vg-tok-str { color: var(--ok); }
 .vg-tok-num { color: var(--num); }
 .vg-tok-bool { color: var(--bool); }
@@ -263,13 +267,14 @@
   font-weight: 500;
   text-align: left;
   padding: 8px 24px 8px 12px;
-  border-bottom: 2px solid var(--thline);
+  border-bottom: 1px solid var(--thline);
   border-right: var(--td-rb, 1px solid var(--line-c, var(--line)));
   white-space: nowrap;
   text-transform: var(--th-tt, none);
   letter-spacing: var(--th-ls, 0);
 }
 .vg-table th .vg-ty { color: var(--fg3); font-size: 11px; margin-left: 5px; font-weight: 400; text-transform: none; letter-spacing: 0; }
+.vg-table th .vg-ar { color: var(--acc); margin-left: 4px; font-size: 10px; }
 .vg-table td {
   padding: var(--cell-py) 12px;
   border-bottom: 1px solid var(--line-c, var(--line));
@@ -291,6 +296,38 @@
 .vg-table td.bool { color: var(--bool); }
 .vg-table td.json { color: var(--uuid); }
 .vg-table td.null { color: var(--null); font-style: italic; }
+.vg-table td.sel { outline: 2px solid var(--acc); outline-offset: -2px; }
+.vg-table td.rownum { color: var(--fg3); text-align: right; cursor: pointer; background: var(--bg2); position: sticky; left: 0; }
+.vg-table td.rownum:hover { color: var(--acc); }
+.vg-table th.rownum { left: 0; z-index: 3; cursor: default; padding: 6px 8px; }
+.vg-table th .vg-rz { position: absolute; right: 0; top: 0; width: 6px; height: 100%; cursor: col-resize; }
+.vg-table th .vg-rz:hover { background: var(--acc); }
+
+/* ---- 面板宽度 / 高度调节手柄 ---- */
+.vg-resizer { width: 5px; flex: none; cursor: col-resize; background: transparent; }
+.vg-resizer:hover { background: var(--acc); }
+.vg-hresizer {
+  height: 6px;
+  flex: none;
+  cursor: row-resize;
+  background: var(--surf-1);
+  border-bottom: 1px solid var(--line-c, var(--line));
+  position: relative;
+}
+.vg-hresizer::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 2px;
+  width: 30px;
+  height: 2px;
+  transform: translateX(-50%);
+  background: var(--fg3);
+  opacity: 0.4;
+  border-radius: 2px;
+}
+.vg-hresizer:hover { background: var(--bg3); }
+.vg-hresizer:hover::after { background: var(--acc); opacity: 1; }
 
 /* ---- 状态徽章 ---- */
 .vg-state { font-size: 11px; padding: 1px 8px; border-radius: var(--r-pill); }
@@ -298,6 +335,146 @@
 .vg-state.warn { border: 1px solid color-mix(in srgb, var(--acc) 55%, transparent); color: var(--acc-text); }
 .vg-state.err { background: var(--red-bg); color: var(--red-fg); }
 .vg-state.neu { border: 1px solid var(--line2-c, var(--line2)); color: var(--fg3); }
+
+/* ---- 徽章变体 ---- */
+.vg-badge.update {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg2);
+  color: var(--fg);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+.vg-badge.update:hover { background: var(--bg3); }
+.vg-update-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--acc); flex: none; }
+.vg-pill.on.prod, .vg-ep.on.prod { background: var(--red); border-color: var(--red); color: #fff; }
+
+/* ---- 状态栏 ---- */
+.vg-status {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 7px 14px;
+  background: var(--surf-1);
+  border-top: 1px solid var(--line-c, var(--line));
+  color: var(--fg2);
+  font-size: 12.5px;
+  flex: none;
+}
+.vg-status .vg-cu, .vg-status .vg-tr { color: var(--acc); }
+.vg-status .vg-lmbtn { color: var(--acc); background: none; border: none; padding: 0; font: inherit; cursor: pointer; text-decoration: underline; }
+.vg-status .vg-lmbtn:disabled { opacity: 0.6; cursor: default; }
+
+/* ---- 空态 / 错误态 / 提示条 ---- */
+.vg-empty { color: var(--fg3); padding: 22px; text-align: center; }
+.vg-err { color: var(--red-fg); padding: 14px; white-space: pre-wrap; font-family: var(--vg-mono); font-size: 12px; }
+.vg-toast {
+  position: fixed;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--red-bg);
+  color: var(--red-fg);
+  border: 1px solid var(--red);
+  padding: 8px 14px;
+  border-radius: var(--r-btn);
+  font-size: 12.5px;
+  max-width: 70%;
+  z-index: 50;
+}
+.vg-upgrade-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 7px 14px;
+  background: var(--fill-grad);
+  color: var(--fill-ink);
+  font-size: 12.5px;
+  font-weight: 500;
+}
+.vg-upgrade-banner button {
+  background: var(--fill-ink);
+  color: var(--acc);
+  border: 0;
+  border-radius: var(--r-btn);
+  padding: 3px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+@keyframes vg-spin-icon { to { transform: rotate(360deg); } }
+.vg-spin .ti-loader { display: inline-block; animation: vg-spin-icon 1s linear infinite; }
+
+/* ---- 弹层: 模态框 ---- */
+.vg-modal { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center; z-index: 60; }
+.vg-modal .vg-box {
+  background: var(--surf-1);
+  border: 1px solid var(--line2-c, var(--line2));
+  border-radius: var(--r-win);
+  max-width: 70%;
+  max-height: 70%;
+  overflow: auto;
+  padding: 16px;
+}
+.vg-modal pre { margin: 0; font-family: var(--vg-mono); font-size: 12.5px; white-space: pre-wrap; word-break: break-word; color: var(--fg); }
+.vg-modal .vg-mh { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; color: var(--fg2); font-size: 12px; }
+
+/* ---- 页签栏 ---- */
+.vg-tabs { display: flex; gap: 4px; padding: 6px 10px 0; background: var(--surf-1); flex: none; overflow-x: auto; }
+.vg-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-family: var(--vg-mono);
+  padding: 4px 10px;
+  border: 1px solid var(--line-c, var(--line));
+  border-bottom: 0;
+  border-radius: var(--r-btn) var(--r-btn) 0 0;
+  color: var(--fg3);
+  cursor: pointer;
+  white-space: nowrap;
+  background: var(--surf-1);
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.vg-tab.on { background: var(--bg2); color: var(--fg); border-color: var(--line2-c, var(--line2)); }
+.vg-tab .vg-x { color: var(--fg3); padding: 0 2px; border-radius: 3px; flex: none; }
+.vg-tab .vg-x:hover { color: var(--red-fg); background: var(--bg3); }
+.vg-tab.add { border-style: dashed; padding: 4px 9px; flex: none; }
+.vg-tab.add:hover { color: var(--acc); }
+.vg-tab.dragging { opacity: 0.4; }
+.vg-tab.dragover { border-left: 2px solid var(--acc); }
+.vg-tab .vg-lbl { overflow: hidden; text-overflow: ellipsis; }
+.vg-tab .vg-rn { background: var(--bg2); color: var(--fg); border: 1px solid var(--acc); border-radius: 4px; font: inherit; padding: 0 3px; width: 110px; }
+
+/* ---- 自动补全下拉 ---- */
+.vg-acbox {
+  position: fixed;
+  z-index: 80;
+  background: var(--surf-1);
+  border: 1px solid var(--line2-c, var(--line2));
+  border-radius: var(--r-btn);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+  max-height: 260px;
+  overflow: auto;
+  min-width: 196px;
+  padding: 4px;
+  font-family: var(--vg-mono);
+  font-size: 13.5px;
+  display: none;
+}
+.vg-acitem { display: flex; align-items: center; gap: 8px; padding: 4px 8px; border-radius: 5px; color: var(--fg); cursor: pointer; white-space: nowrap; }
+.vg-acitem.on { background: var(--fill-grad); color: var(--fill-ink); }
+.vg-acitem .vg-ack { font-size: 9px; opacity: 0.85; width: 24px; flex: none; text-transform: uppercase; }
+.vg-ack-tbl { color: var(--ts); }
+.vg-ack-col { color: var(--num); }
+.vg-ack-kw { color: var(--acc-hi); }
+.vg-acitem.on .vg-ack, .vg-acitem.on .vg-ack-tbl, .vg-acitem.on .vg-ack-col, .vg-acitem.on .vg-ack-kw { color: var(--fill-ink); }
 
 /* ---- 可访问性: 焦点环 (全组件统一) ---- */
 .vg :focus-visible {
@@ -323,6 +500,23 @@
 
 /* ---- 主题切换器 (VoyageSwitcher, @yiminlab/voyage/react) ---- */
 .vg-switcher { position: relative; display: inline-flex; align-items: center; gap: 2px; }
+.vg-switcher-mode { overflow: hidden; }
+.vg-switcher-mode:active .vg-mode-icon { transform: scale(0.82) rotate(-8deg); }
+/* 月亮/太阳每次挂载都重放一遍这个入场动效 (key 按 mode 切换触发 remount);
+   旋转 + 缩放 + 淡入, 让明暗切换有一点分量感, 而不是生硬的图标替换。 */
+@keyframes vg-mode-pop {
+  from { transform: scale(0.5) rotate(-50deg); opacity: 0; }
+  to { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+.vg-mode-icon {
+  display: block;
+  transition: transform 0.12s ease;
+  animation: vg-mode-pop 0.32s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .vg-mode-icon { animation: none; }
+  .vg-switcher-mode:active .vg-mode-icon { transform: none; }
+}
 /*
  * 面板用 position:fixed + JS 算好的 viewport 坐标 (见 voyage-switcher.tsx 的
  * updatePanelPosition), 不能用 position:absolute 依赖 .vg-switcher 作为包含块:

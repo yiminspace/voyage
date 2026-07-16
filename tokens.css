@@ -9,7 +9,9 @@
 
    规格血统: 色板公式与组件尺寸源自 quarry 的 Slate & Copper 主题
    (带色温的四级灰阶 + 一枚金属色 accent + 数据类型着色)。
-   quarry 本体不迁移, 保持它现有的 App.css。
+   quarry 是本规格的原始基准 (slate x dark x classic x normal), 任何
+   四轴取值都必须能还原出 quarry 现有视觉, 出现偏差以 quarry 为准修正
+   这里的 token / 组件层, 而不是反过来在这里加 quarry 特判。
 
    色彩三原则 (tone=quiet 的推导依据, 对齐 Radix / Primer 色阶实践):
      1. 实色保持全饱和但限量 — 只出现在小面积 (指示线 / logo);
@@ -25,7 +27,7 @@
   color-scheme: dark;
   --fg: #eef0f3;
   --fg2: #c4cbd6;
-  --fg3: #9aa3b0;
+  --fg3: #a3abb8;
   --on-fg: #ffffff;
   --red: #c0504a;
   --red-bg: #3a2222;
@@ -78,20 +80,20 @@
 .vg[data-theme='jade'][data-mode='light'] { --bg0:#f3f3f2; --bg1:#ffffff; --bg2:#ededec; --bg3:#e2e2e0; --line:#d2d2cf; --line2:#b9b9b5; --accent:#2e7d54; --accent-hi:#3d8d63; --accent-ink:#ffffff; }
 
 /* aurora 极光 — 渐变 紫 -> 青 */
-.vg[data-theme='aurora'][data-mode='dark'] { --bg0:#0e1020; --bg1:#171a30; --bg2:#1f2340; --bg3:#292e52; --line:#3d4470; --line2:#515a8e; --accent:#7d8ff4; --accent-hi:#9aa8ff; --accent-ink:#0d0f26; --acc-g1:#8b7cf8; --acc-g2:#4cc9f0; }
-.vg[data-theme='aurora'][data-mode='light'] { --bg0:#f3f3fa; --bg1:#ffffff; --bg2:#ededf7; --bg3:#e2e2f1; --line:#d2d3e8; --line2:#b6b8d6; --accent:#6a5cd8; --accent-hi:#7b6ee0; --accent-ink:#ffffff; --acc-g1:#6a5cd8; --acc-g2:#2aa8d8; }
+.vg[data-theme='aurora'][data-mode='dark'] { --bg0:#0e1020; --bg1:#171a30; --bg2:#1f2340; --bg3:#292e52; --line:#3d4470; --line2:#515a8e; --accent:#7d8ff4; --accent-hi:#9aa8ff; --accent-ink:#0d0f26; --acc-g1:#8b7cf8; --acc-g2:#4cc9f0; --acc-grad:linear-gradient(120deg,#8b7cf8,#4cc9f0); }
+.vg[data-theme='aurora'][data-mode='light'] { --bg0:#f3f3fa; --bg1:#ffffff; --bg2:#ededf7; --bg3:#e2e2f1; --line:#d2d3e8; --line2:#b6b8d6; --accent:#6a5cd8; --accent-hi:#7b6ee0; --accent-ink:#ffffff; --acc-g1:#6a5cd8; --acc-g2:#2aa8d8; --acc-grad:linear-gradient(120deg,#6a5cd8,#2aa8d8); }
 
 /* sunset 日暮 — 渐变 橙 -> 品红 */
-.vg[data-theme='sunset'][data-mode='dark'] { --bg0:#171015; --bg1:#221822; --bg2:#2c1f2b; --bg3:#382936; --line:#4f3c4c; --line2:#644d60; --accent:#f4737b; --accent-hi:#ff8a92; --accent-ink:#2b0a12; --acc-g1:#ff8a5c; --acc-g2:#f5548e; }
-.vg[data-theme='sunset'][data-mode='light'] { --bg0:#faf3f1; --bg1:#ffffff; --bg2:#f6ebe7; --bg3:#efdfd9; --line:#e2cfc7; --line2:#ccb2a8; --accent:#db5560; --accent-hi:#e56670; --accent-ink:#ffffff; --acc-g1:#e8643c; --acc-g2:#d8447e; }
+.vg[data-theme='sunset'][data-mode='dark'] { --bg0:#171015; --bg1:#221822; --bg2:#2c1f2b; --bg3:#382936; --line:#4f3c4c; --line2:#644d60; --accent:#f4737b; --accent-hi:#ff8a92; --accent-ink:#2b0a12; --acc-g1:#ff8a5c; --acc-g2:#f5548e; --acc-grad:linear-gradient(120deg,#ff8a5c,#f5548e); }
+.vg[data-theme='sunset'][data-mode='light'] { --bg0:#faf3f1; --bg1:#ffffff; --bg2:#f6ebe7; --bg3:#efdfd9; --line:#e2cfc7; --line2:#ccb2a8; --accent:#db5560; --accent-hi:#e56670; --accent-ink:#ffffff; --acc-g1:#e8643c; --acc-g2:#d8447e; --acc-grad:linear-gradient(120deg,#e8643c,#d8447e); }
 
 /* horizon 苍穹 — 渐变 蓝 -> 青绿 */
-.vg[data-theme='horizon'][data-mode='dark'] { --bg0:#0c1219; --bg1:#141d27; --bg2:#1b2634; --bg3:#243243; --line:#38495e; --line2:#4a5f79; --accent:#54a8dc; --accent-hi:#6cbce8; --accent-ink:#06121c; --acc-g1:#3f8ef0; --acc-g2:#2fd4b4; }
-.vg[data-theme='horizon'][data-mode='light'] { --bg0:#f0f4f6; --bg1:#ffffff; --bg2:#e9eff2; --bg3:#dde6ea; --line:#cbd8de; --line2:#afc2ca; --accent:#1f7ab8; --accent-hi:#2e89c6; --accent-ink:#ffffff; --acc-g1:#1f7ab8; --acc-g2:#159a80; }
+.vg[data-theme='horizon'][data-mode='dark'] { --bg0:#0c1219; --bg1:#141d27; --bg2:#1b2634; --bg3:#243243; --line:#38495e; --line2:#4a5f79; --accent:#54a8dc; --accent-hi:#6cbce8; --accent-ink:#06121c; --acc-g1:#3f8ef0; --acc-g2:#2fd4b4; --acc-grad:linear-gradient(120deg,#3f8ef0,#2fd4b4); }
+.vg[data-theme='horizon'][data-mode='light'] { --bg0:#f0f4f6; --bg1:#ffffff; --bg2:#e9eff2; --bg3:#dde6ea; --line:#cbd8de; --line2:#afc2ca; --accent:#1f7ab8; --accent-hi:#2e89c6; --accent-ink:#ffffff; --acc-g1:#1f7ab8; --acc-g2:#159a80; --acc-grad:linear-gradient(120deg,#1f7ab8,#159a80); }
 
 /* oolong 蜜桃乌龙 — 渐变 金 -> 玫瑰, 暖茶底 */
-.vg[data-theme='oolong'][data-mode='dark'] { --bg0:#141210; --bg1:#1f1b18; --bg2:#292420; --bg3:#342e28; --line:#4a423a; --line2:#5e544a; --accent:#e0a06a; --accent-hi:#edb37e; --accent-ink:#2a1608; --acc-g1:#eab465; --acc-g2:#e07a8a; }
-.vg[data-theme='oolong'][data-mode='light'] { --bg0:#f8f4ef; --bg1:#ffffff; --bg2:#f3ede5; --bg3:#ebe2d6; --line:#ddd1c1; --line2:#c6b6a2; --accent:#c07a3a; --accent-hi:#cd8a4a; --accent-ink:#ffffff; --acc-g1:#d29440; --acc-g2:#c25a70; }
+.vg[data-theme='oolong'][data-mode='dark'] { --bg0:#141210; --bg1:#1f1b18; --bg2:#292420; --bg3:#342e28; --line:#4a423a; --line2:#5e544a; --accent:#e0a06a; --accent-hi:#edb37e; --accent-ink:#2a1608; --acc-g1:#eab465; --acc-g2:#e07a8a; --acc-grad:linear-gradient(120deg,#eab465,#e07a8a); }
+.vg[data-theme='oolong'][data-mode='light'] { --bg0:#f8f4ef; --bg1:#ffffff; --bg2:#f3ede5; --bg3:#ebe2d6; --line:#ddd1c1; --line2:#c6b6a2; --accent:#c07a3a; --accent-hi:#cd8a4a; --accent-ink:#ffffff; --acc-g1:#d29440; --acc-g2:#c25a70; --acc-grad:linear-gradient(120deg,#d29440,#c25a70); }
 
 /* ---------------------------------------------------------------------------
    3. 有效变量层: 组件只消费这一层, tone / style 通过覆写它们生效
@@ -105,7 +107,10 @@
   --acc-ink: var(--accent-ink);
   --g1: var(--acc-g1, var(--accent));
   --g2: var(--acc-g2, var(--accent-hi));
-  --acc-grad: linear-gradient(120deg, var(--g1), var(--g2));
+  /* 纯色主题 (无 --acc-g1/2) 是实打实的实色, 不是双色渐变的退化态: 用一枚
+     纯色而不是 linear-gradient(), 这样 background-color 依旧可被读取 —
+     渐变主题 (aurora/sunset/horizon/oolong) 在各自的主题矩阵块里覆写此变量。 */
+  --acc-grad: var(--accent);
 
   /* step 11 彩色文字: 提亮不去色 (向正文靠拢, 保色相) */
   --acc-text: color-mix(in srgb, var(--accent-hi) 68%, var(--fg));
@@ -114,12 +119,13 @@
   --fill-grad: var(--acc-grad);
   --fill-ink: var(--acc-ink);
 
-  /* step 3-5 染色底 (半透明纯色) */
-  --sel-bg: color-mix(in srgb, var(--accent) 13%, transparent);
+  /* step 3-5 染色底: quarry 原版选中态是中性面 + 侧边强调线, 不染色 —
+     染色 (13%/8%) 是 quiet/演示态的覆写, 不是 normal 基线的默认。 */
+  --sel-bg: var(--bg2);
   --hl-bg: linear-gradient(transparent 64%, color-mix(in srgb, var(--accent) 35%, transparent) 0);
 
-  /* step 6-8 边框 */
-  --thline: color-mix(in srgb, var(--accent) 45%, var(--line));
+  /* step 6-8 边框: quarry 原版表头分隔线是中性 line2, 不带强调色 */
+  --thline: var(--line2);
 
   /* 表面 */
   --surf-1: var(--bg1);

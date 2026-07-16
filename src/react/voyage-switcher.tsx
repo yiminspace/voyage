@@ -41,6 +41,46 @@ function supportsPopover(el: Element | null): el is HTMLElement & {
   return !!el && typeof (el as HTMLElement).showPopover === 'function';
 }
 
+/** 描边风格, 与站内其余图标(tabler)同一视觉语言; 用 currentColor 跟随按钮色。 */
+function MoonIcon() {
+  return (
+    <svg
+      className="vg-mode-icon"
+      viewBox="0 0 24 24"
+      width="15"
+      height="15"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M20.5 14.5A8.5 8.5 0 1 1 9.5 3.5a7 7 0 0 0 11 11z" />
+    </svg>
+  );
+}
+
+function SunIcon() {
+  return (
+    <svg
+      className="vg-mode-icon"
+      viewBox="0 0 24 24"
+      width="15"
+      height="15"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <circle cx="12" cy="12" r="4.5" />
+      <path d="M12 2.5v2.2M12 19.3v2.2M4.4 4.4l1.55 1.55M18.05 18.05l1.55 1.55M2.5 12h2.2M19.3 12h2.2M4.4 19.6l1.55-1.55M18.05 5.95l1.55-1.55" />
+    </svg>
+  );
+}
+
 export interface VoyageSwitcherProps {
   className?: string;
 }
@@ -136,7 +176,7 @@ export function VoyageSwitcher({ className }: VoyageSwitcherProps = {}) {
         aria-label={prefs.mode === 'dark' ? '切换为亮色模式' : '切换为暗色模式'}
         onClick={toggleMode}
       >
-        {prefs.mode === 'dark' ? '☾' : '☀'}
+        {prefs.mode === 'dark' ? <MoonIcon key="moon" /> : <SunIcon key="sun" />}
       </button>
       <button
         type="button"
