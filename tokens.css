@@ -21,7 +21,11 @@
    ========================================================================== */
 
 /* ---------------------------------------------------------------------------
-   1. 明暗基座: 文字灰阶 / 语义色 / 数据类型色 (全主题共用)
+   1. 明暗基座: 文字灰阶 / 数据类型色 (全主题共用)
+
+      语义色 (ok / warn / red) 不在这里 —— 它们随主题走, 见第 2 段的种子色
+      与第 3 段的推导。全主题共用一枚 Primer 红会让 everforest / rosepine
+      这类有自己色相语言的主题出戏。
    -------------------------------------------------------------------------- */
 .vg[data-mode='dark'] {
   color-scheme: dark;
@@ -29,11 +33,6 @@
   --fg2: #c4cbd6;
   --fg3: #a3abb8;
   --on-fg: #ffffff;
-  --red: #c0504a;
-  --red-bg: #3a2222;
-  --red-fg: #e79a93;
-  --ok: #8fb48c;
-  --ok-bg: #232f24;
   --num: #8fbcea;
   --uuid: #c79fe2;
   --ts: #6fc8b6;
@@ -46,11 +45,6 @@
   --fg2: #54534b;
   --fg3: #7a7970;
   --on-fg: #000000;
-  --red: #b23b34;
-  --red-bg: #f6e3e1;
-  --red-fg: #8f2f29;
-  --ok: #4f7a48;
-  --ok-bg: #e6efe2;
   --num: #215da0;
   --uuid: #6a3fa0;
   --ts: #137a68;
@@ -59,17 +53,29 @@
 }
 
 /* ---------------------------------------------------------------------------
-   2. 主题矩阵: 每套只定义 bg0-bg3 / line / line2 / accent 三件套
+   2. 主题矩阵: 每套定义 bg0-bg3 / line / line2 / accent 三件套 + 语义种子色
       (渐变主题额外给 --acc-g1 / --acc-g2 两个端点)
+
+      语义种子色 (--ok / --warn / --red) 每套主题必须给全 dark 与 light 两档:
+      漏给不会回落到某个默认值, 而是让 .vg-badge / .vg-state 直接吃到裸变量
+      变透明。tokens-theme.test.ts 对 10 x 2 = 20 种组合逐一断言。
+
+      配套的染色底 (--*-bg) 与彩色文字 (--*-fg) 默认由第 3 段用 color-mix
+      从种子色推导, 不需逐主题手调; 只有 slate (quarry 基准) 与 github
+      (evolve GUI 基准) 在下面手写覆写, 因为这两套要逐值保真既有视觉。
    -------------------------------------------------------------------------- */
 
 /* slate 板岩铜 — quarry 原版基准 */
 .vg[data-theme='slate'][data-mode='dark'] { --bg0:#0e1116; --bg1:#1c2028; --bg2:#242a33; --bg3:#2f3641; --line:#404a58; --line2:#525d6e; --accent:#c0824f; --accent-hi:#d4966a; --accent-ink:#241407; }
 .vg[data-theme='slate'][data-mode='light'] { --bg0:#f4f3ee; --bg1:#ffffff; --bg2:#f0efe9; --bg3:#e7e5dd; --line:#d6d3c7; --line2:#bfbaa9; --accent:#b06a34; --accent-hi:#c17b43; --accent-ink:#ffffff; }
+/* 语义色: ok/red 是 quarry 原版实测值, 连同推导位一并写死; warn 为本次新增 */
+.vg[data-theme='slate'][data-mode='dark'] { --ok:#8fb48c; --ok-bg:#232f24; --warn:#c9a227; --red:#c0504a; --red-bg:#3a2222; --red-fg:#e79a93; }
+.vg[data-theme='slate'][data-mode='light'] { --ok:#4f7a48; --ok-bg:#e6efe2; --warn:#8a6a12; --red:#b23b34; --red-bg:#f6e3e1; --red-fg:#8f2f29; }
 
 /* ink 纸墨朱 — 暖墨 + 朱砂, 阅读应用主场 */
-.vg[data-theme='ink'][data-mode='dark'] { --bg0:#131211; --bg1:#1d1b19; --bg2:#262321; --bg3:#312d2a; --line:#46403b; --line2:#59524b; --accent:#c14b38; --accent-hi:#d4604c; --accent-ink:#ffffff; }
-.vg[data-theme='ink'][data-mode='light'] { --bg0:#f6f3ec; --bg1:#ffffff; --bg2:#f1ede3; --bg3:#e8e2d4; --line:#d9d2c2; --line2:#c1b8a3; --accent:#b23b2b; --accent-hi:#c24b3a; --accent-ink:#ffffff; }
+.vg[data-theme='ink'][data-mode='dark'] { --bg0:#131211; --bg1:#1d1b19; --bg2:#262321; --bg3:#312d2a; --line:#46403b; --line2:#59524b; --accent:#c14b38; --accent-hi:#d4604c; --accent-ink:#ffffff; --ok:#8fa876; --warn:#c99a3f; --red:#cc4f63; }
+.vg[data-theme='ink'][data-mode='light'] { --bg0:#f6f3ec; --bg1:#ffffff; --bg2:#f1ede3; --bg3:#e8e2d4; --line:#d9d2c2; --line2:#c1b8a3; --accent:#b23b2b; --accent-hi:#c24b3a; --accent-ink:#ffffff; --ok:#5a7040; --warn:#8a6414; --red:#a32f45; }
+/* ink 的 accent 本身就是朱红, 错误色若也走朱红会与主色糊在一起, 故偏玫红拉开 */
 
 /* --------------------------------------------------------------------------
    以下 8 套取自经过大规模使用检验的开源经典配色 (均 MIT), 只做两件事:
@@ -78,37 +84,53 @@
    压明度公式, 不使用原主题的语法高亮色。
    -------------------------------------------------------------------------- */
 
-/* github 石墨 — GitHub Primer (primer.style), 工具蓝 */
-.vg[data-theme='github'][data-mode='dark'] { --bg0:#0d1117; --bg1:#161b22; --bg2:#1c2128; --bg3:#262c36; --line:#30363d; --line2:#444c56; --accent:#1f6feb; --accent-hi:#4493f8; --accent-ink:#ffffff; }
-.vg[data-theme='github'][data-mode='light'] { --bg0:#f6f8fa; --bg1:#ffffff; --bg2:#f0f3f6; --bg3:#eaeef2; --line:#d0d7de; --line2:#afb8c1; --accent:#0969da; --accent-hi:#218bff; --accent-ink:#ffffff; }
+/* github 石墨 — GitHub Primer (primer.style), 工具蓝
+   accent 取 Primer 的链接蓝 (fg.accent #58a6ff) 而非按钮蓝 (#1f6feb): 本主题
+   同时是 evolve GUI 的基准, 逐值对齐它既有的 Primer 配色, 见 yiminlab#406。 */
+.vg[data-theme='github'][data-mode='dark'] { --bg0:#0d1117; --bg1:#161b22; --bg2:#1c2128; --bg3:#262c36; --line:#30363d; --line2:#444c56; --accent:#58a6ff; --accent-hi:#79c0ff; --accent-ink:#0a1220; }
+.vg[data-theme='github'][data-mode='light'] { --bg0:#f6f7f9; --bg1:#ffffff; --bg2:#eef0f3; --bg3:#eaeef2; --line:#dfe2e7; --line2:#afb8c1; --accent:#2563eb; --accent-hi:#3b82f6; --accent-ink:#ffffff; }
+/* 语义色: Primer 的 success / attention / danger, 染色底沿用 evolve 的半透明叠色 */
+.vg[data-theme='github'][data-mode='dark'] {
+  --ok:#3fb950;   --ok-bg:rgba(46, 160, 67, 0.18);   --ok-fg:#3fb950;
+  --warn:#d29922; --warn-bg:rgba(187, 128, 9, 0.18); --warn-fg:#d29922;
+  --red:#f85149;  --red-bg:rgba(248, 81, 73, 0.18);  --red-fg:#f85149;
+}
+.vg[data-theme='github'][data-mode='light'] {
+  --ok:#17803d;   --ok-bg:#e3f5e9;   --ok-fg:#17803d;
+  --warn:#92610a; --warn-bg:#fbf0d7; --warn-fg:#92610a;
+  --red:#b32d2d;  --red-bg:#fdeaea;  --red-fg:#b32d2d;
+}
 
-/* nord 北极 — Nord (nordtheme.com), 冷蓝灰 + Frost */
-.vg[data-theme='nord'][data-mode='dark'] { --bg0:#242933; --bg1:#2e3440; --bg2:#3b4252; --bg3:#434c5e; --line:#4c566a; --line2:#5d6a82; --accent:#88c0d0; --accent-hi:#9fd0de; --accent-ink:#10171e; }
-.vg[data-theme='nord'][data-mode='light'] { --bg0:#eceff4; --bg1:#f9fafc; --bg2:#e5e9f0; --bg3:#d8dee9; --line:#c5cede; --line2:#a9b6cb; --accent:#5e81ac; --accent-hi:#7093bc; --accent-ink:#ffffff; }
+/* nord 北极 — Nord (nordtheme.com), 冷蓝灰 + Frost; 语义色取 Aurora */
+.vg[data-theme='nord'][data-mode='dark'] { --bg0:#242933; --bg1:#2e3440; --bg2:#3b4252; --bg3:#434c5e; --line:#4c566a; --line2:#5d6a82; --accent:#88c0d0; --accent-hi:#9fd0de; --accent-ink:#10171e; --ok:#a3be8c; --warn:#ebcb8b; --red:#bf616a; }
+.vg[data-theme='nord'][data-mode='light'] { --bg0:#eceff4; --bg1:#f9fafc; --bg2:#e5e9f0; --bg3:#d8dee9; --line:#c5cede; --line2:#a9b6cb; --accent:#5e81ac; --accent-hi:#7093bc; --accent-ink:#ffffff; --ok:#5c7a45; --warn:#8a6a1f; --red:#a04751; }
 
-/* tokyo 东京夜 — Tokyo Night (enkia), 靛蓝夜航 */
-.vg[data-theme='tokyo'][data-mode='dark'] { --bg0:#16161e; --bg1:#1a1b26; --bg2:#24283b; --bg3:#2f334d; --line:#3b4261; --line2:#4e577d; --accent:#7aa2f7; --accent-hi:#94b5ff; --accent-ink:#0e1017; }
-.vg[data-theme='tokyo'][data-mode='light'] { --bg0:#e1e2e7; --bg1:#f2f3f7; --bg2:#e9e9ec; --bg3:#d5d6db; --line:#c4c8da; --line2:#a4aac6; --accent:#2e7de9; --accent-hi:#4a90f0; --accent-ink:#ffffff; }
+/* tokyo 东京夜 — Tokyo Night (enkia), 靛蓝夜航; 语义色取 night/day 官方档 */
+.vg[data-theme='tokyo'][data-mode='dark'] { --bg0:#16161e; --bg1:#1a1b26; --bg2:#24283b; --bg3:#2f334d; --line:#3b4261; --line2:#4e577d; --accent:#7aa2f7; --accent-hi:#94b5ff; --accent-ink:#0e1017; --ok:#9ece6a; --warn:#e0af68; --red:#f7768e; }
+.vg[data-theme='tokyo'][data-mode='light'] { --bg0:#e1e2e7; --bg1:#f2f3f7; --bg2:#e9e9ec; --bg3:#d5d6db; --line:#c4c8da; --line2:#a4aac6; --accent:#2e7de9; --accent-hi:#4a90f0; --accent-ink:#ffffff; --ok:#587539; --warn:#8c6c3e; --red:#c14459; }
 
 /* catppuccin 摩卡 — Catppuccin Mocha/Latte (catppuccin.com), 柔和粉彩紫 */
-.vg[data-theme='catppuccin'][data-mode='dark'] { --bg0:#181825; --bg1:#1e1e2e; --bg2:#313244; --bg3:#45475a; --line:#494d64; --line2:#585b70; --accent:#cba6f7; --accent-hi:#dabffa; --accent-ink:#171722; }
-.vg[data-theme='catppuccin'][data-mode='light'] { --bg0:#eff1f5; --bg1:#ffffff; --bg2:#e6e9ef; --bg3:#dce0e8; --line:#ccd0da; --line2:#9ca0b0; --accent:#8839ef; --accent-hi:#9a52f5; --accent-ink:#ffffff; }
+.vg[data-theme='catppuccin'][data-mode='dark'] { --bg0:#181825; --bg1:#1e1e2e; --bg2:#313244; --bg3:#45475a; --line:#494d64; --line2:#585b70; --accent:#cba6f7; --accent-hi:#dabffa; --accent-ink:#171722; --ok:#a6e3a1; --warn:#f9e2af; --red:#f38ba8; }
+.vg[data-theme='catppuccin'][data-mode='light'] { --bg0:#eff1f5; --bg1:#ffffff; --bg2:#e6e9ef; --bg3:#dce0e8; --line:#ccd0da; --line2:#9ca0b0; --accent:#8839ef; --accent-hi:#9a52f5; --accent-ink:#ffffff; --ok:#40a02b; --warn:#df8e1d; --red:#d20f39; }
 
 /* onedark 原子 — One Dark / One Light (Atom), 中性耐看 */
-.vg[data-theme='onedark'][data-mode='dark'] { --bg0:#21252b; --bg1:#282c34; --bg2:#2f343e; --bg3:#3a4048; --line:#464e5c; --line2:#575f6f; --accent:#61afef; --accent-hi:#7cbdf2; --accent-ink:#0c1a26; }
-.vg[data-theme='onedark'][data-mode='light'] { --bg0:#f0f0f1; --bg1:#fafafa; --bg2:#eaeaeb; --bg3:#dbdbdc; --line:#ccccce; --line2:#a9a9ab; --accent:#4078f2; --accent-hi:#5589f4; --accent-ink:#ffffff; }
+.vg[data-theme='onedark'][data-mode='dark'] { --bg0:#21252b; --bg1:#282c34; --bg2:#2f343e; --bg3:#3a4048; --line:#464e5c; --line2:#575f6f; --accent:#61afef; --accent-hi:#7cbdf2; --accent-ink:#0c1a26; --ok:#98c379; --warn:#e5c07b; --red:#e06c75; }
+.vg[data-theme='onedark'][data-mode='light'] { --bg0:#f0f0f1; --bg1:#fafafa; --bg2:#eaeaeb; --bg3:#dbdbdc; --line:#ccccce; --line2:#a9a9ab; --accent:#4078f2; --accent-hi:#5589f4; --accent-ink:#ffffff; --ok:#50a14f; --warn:#996a01; --red:#ca4a41; }
 
-/* solarized 日晒 — Solarized (Ethan Schoonover), 学院派经典 */
-.vg[data-theme='solarized'][data-mode='dark'] { --bg0:#00212b; --bg1:#002b36; --bg2:#073642; --bg3:#10414e; --line:#1d4c58; --line2:#2f6270; --accent:#268bd2; --accent-hi:#3f9fdf; --accent-ink:#ffffff; }
-.vg[data-theme='solarized'][data-mode='light'] { --bg0:#f7efd8; --bg1:#fdf6e3; --bg2:#f1e9d2; --bg3:#eee8d5; --line:#ddd4b8; --line2:#c4baa0; --accent:#268bd2; --accent-hi:#3f9fdf; --accent-ink:#ffffff; }
+/* solarized 日晒 — Solarized (Ethan Schoonover), 学院派经典
+   语义色 dark/light 同值: Solarized 的强调色本就设计为两档通用, 只换背景不换前景 */
+.vg[data-theme='solarized'][data-mode='dark'] { --bg0:#00212b; --bg1:#002b36; --bg2:#073642; --bg3:#10414e; --line:#1d4c58; --line2:#2f6270; --accent:#268bd2; --accent-hi:#3f9fdf; --accent-ink:#ffffff; --ok:#859900; --warn:#b58900; --red:#dc322f; }
+.vg[data-theme='solarized'][data-mode='light'] { --bg0:#f7efd8; --bg1:#fdf6e3; --bg2:#f1e9d2; --bg3:#eee8d5; --line:#ddd4b8; --line2:#c4baa0; --accent:#268bd2; --accent-hi:#3f9fdf; --accent-ink:#ffffff; --ok:#6b7a00; --warn:#94700a; --red:#c32b28; }
 
-/* rosepine 玫瑰松 — Rosé Pine main/dawn (rosepinetheme.com), 哑光玫瑰 */
-.vg[data-theme='rosepine'][data-mode='dark'] { --bg0:#191724; --bg1:#1f1d2e; --bg2:#26233a; --bg3:#312e48; --line:#403d52; --line2:#524f67; --accent:#ebbcba; --accent-hi:#f2cfce; --accent-ink:#291a19; }
-.vg[data-theme='rosepine'][data-mode='light'] { --bg0:#faf4ed; --bg1:#fffaf3; --bg2:#f2e9e1; --bg3:#e9dfd8; --line:#dfdad9; --line2:#c1bcbb; --accent:#b4637a; --accent-hi:#d7827e; --accent-ink:#ffffff; }
+/* rosepine 玫瑰松 — Rosé Pine main/dawn (rosepinetheme.com), 哑光玫瑰
+   ok 取 foam (青) 而非 pine: 该色板没有绿, foam 是其体系里承担"通过"语义的位 */
+.vg[data-theme='rosepine'][data-mode='dark'] { --bg0:#191724; --bg1:#1f1d2e; --bg2:#26233a; --bg3:#312e48; --line:#403d52; --line2:#524f67; --accent:#ebbcba; --accent-hi:#f2cfce; --accent-ink:#291a19; --ok:#9ccfd8; --warn:#f6c177; --red:#eb6f92; }
+.vg[data-theme='rosepine'][data-mode='light'] { --bg0:#faf4ed; --bg1:#fffaf3; --bg2:#f2e9e1; --bg3:#e9dfd8; --line:#dfdad9; --line2:#c1bcbb; --accent:#b4637a; --accent-hi:#d7827e; --accent-ink:#ffffff; --ok:#56949f; --warn:#a06a1a; --red:#b4405e; }
 
-/* everforest 常青林 — Everforest (sainnhe), 护眼绿低对比 */
-.vg[data-theme='everforest'][data-mode='dark'] { --bg0:#272e33; --bg1:#2d353b; --bg2:#343f44; --bg3:#3d484d; --line:#475258; --line2:#56635f; --accent:#a7c080; --accent-hi:#b7cf95; --accent-ink:#1c2418; }
-.vg[data-theme='everforest'][data-mode='light'] { --bg0:#f4f0d9; --bg1:#fdf6e3; --bg2:#efebd4; --bg3:#e6e2cc; --line:#d5d0b6; --line2:#bdb8a0; --accent:#8da101; --accent-hi:#a0b420; --accent-ink:#ffffff; }
+/* everforest 常青林 — Everforest (sainnhe), 护眼绿低对比
+   accent 本身是林绿, ok 若同用会与主色糊在一起, 故取色板里更黄的 aqua/green 区分 */
+.vg[data-theme='everforest'][data-mode='dark'] { --bg0:#272e33; --bg1:#2d353b; --bg2:#343f44; --bg3:#3d484d; --line:#475258; --line2:#56635f; --accent:#a7c080; --accent-hi:#b7cf95; --accent-ink:#1c2418; --ok:#83c092; --warn:#dbbc7f; --red:#e67e80; }
+.vg[data-theme='everforest'][data-mode='light'] { --bg0:#f4f0d9; --bg1:#fdf6e3; --bg2:#efebd4; --bg3:#e6e2cc; --line:#d5d0b6; --line2:#bdb8a0; --accent:#8da101; --accent-hi:#a0b420; --accent-ink:#ffffff; --ok:#35a77c; --warn:#bf7f18; --red:#f85552; }
 
 /* ---------------------------------------------------------------------------
    3. 有效变量层: 组件只消费这一层, tone / style 通过覆写它们生效
@@ -141,6 +163,22 @@
 
   /* step 6-8 边框: quarry 原版表头分隔线是中性 line2, 不带强调色 */
   --thline: var(--line2);
+
+  /* 语义色的染色底与彩色文字: 从主题种子色推导, 不逐主题手调。
+     slate 与 github 在主题矩阵里手写覆写这几位, 特异度更高。
+
+     浓度取值都是量出来的, 别凭手感调低:
+     - bg 18% —— 对齐 github 手写档的 0.18 alpha。更低 (试过 15%) 在 nord、
+       onedark 这类中灰底上根本看不出染色, 徽章和背景糊成一片。
+     - fg 82% —— 色彩三原则第 1 条"限量但不掺灰": 混进 --fg 的那一份只用来
+       把文字往正文靠, 比例一高就去饱和。试过 68%, 暗色下 ok/warn/red 三档
+       文字肉眼几乎同色 (都被稀释成灰白), 语义直接丢了。 */
+  --ok-bg: color-mix(in srgb, var(--ok) 18%, var(--bg1));
+  --ok-fg: color-mix(in srgb, var(--ok) 82%, var(--fg));
+  --warn-bg: color-mix(in srgb, var(--warn) 18%, var(--bg1));
+  --warn-fg: color-mix(in srgb, var(--warn) 82%, var(--fg));
+  --red-bg: color-mix(in srgb, var(--red) 18%, var(--bg1));
+  --red-fg: color-mix(in srgb, var(--red) 82%, var(--fg));
 
   /* 表面 */
   --surf-1: var(--bg1);

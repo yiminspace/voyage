@@ -65,6 +65,7 @@
 .vg-sp { flex: 1; }
 .vg-badge { font-size: 12px; padding: 3px 10px; border-radius: var(--r-btn); border: 1px solid var(--line2-c, var(--line2)); }
 .vg-badge.ok { background: var(--ok-bg); color: var(--ok); border-color: transparent; }
+.vg-badge.warn { background: var(--warn-bg); color: var(--warn-fg); border-color: transparent; }
 .vg-badge.err { background: var(--red-bg); color: var(--red-fg); border-color: var(--red); }
 /* 顶栏无框控件的统一盒子 (明暗钮 / 调色板钮 / 语言钮): 同高、同最小宽、
    同圆角、同悬停底 —— 一排控件的 hover 色块必须严丝合缝地对齐, 差异只允许
@@ -362,7 +363,9 @@
 /* ---- 状态徽章 ---- */
 .vg-state { font-size: 11px; padding: 1px 8px; border-radius: var(--r-pill); }
 .vg-state.ok { background: var(--ok-bg); color: var(--ok); }
-.vg-state.warn { border: 1px solid color-mix(in srgb, var(--acc) 55%, transparent); color: var(--acc-text); }
+/* warn 此前借用 accent 顶替 (当时无警告色 token), 会让"待处理"与主色动作混淆;
+   现走各主题自己的 --warn 种子色 */
+.vg-state.warn { background: var(--warn-bg); color: var(--warn-fg); }
 .vg-state.err { background: var(--red-bg); color: var(--red-fg); }
 .vg-state.neu { border: 1px solid var(--line2-c, var(--line2)); color: var(--fg3); }
 

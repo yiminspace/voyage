@@ -10,7 +10,7 @@ yiminlab 统一样式系统。**所有 GUI 应用的视觉基础**: 一套 quarr
 
 | 轴 | 取值 | 管什么 |
 |---|---|---|
-| `data-theme` | 自研: `slate` 板岩铜 (quarry 基准) / `ink` 纸墨朱; 经典采编 (MIT, 出处见 tokens.css): `github` 石墨 / `nord` 北极 / `tokyo` 东京夜 / `catppuccin` 摩卡 / `onedark` 原子 / `solarized` 日晒 / `rosepine` 玫瑰松 / `everforest` 常青林 | 颜色 |
+| `data-theme` | 自研: `slate` 板岩铜 (quarry 基准) / `ink` 纸墨朱; 经典采编 (MIT, 出处见 tokens.css): `github` 石墨 (兼 evolve GUI 基准, accent 取 Primer 链接蓝) / `nord` 北极 / `tokyo` 东京夜 / `catppuccin` 摩卡 / `onedark` 原子 / `solarized` 日晒 / `rosepine` 玫瑰松 / `everforest` 常青林 | 颜色 |
 | `data-mode` | `dark` / `light` | 底色深浅 |
 | `data-style` | `classic` / `glass` / `soft` / `sharp` | 结构: 圆角 / 密度 / 材质 / 阴影 |
 | `data-tone` | `normal` / `quiet` | 对比强度; **quiet (久航) 是日常默认**, normal 留给演示 / 截图 |
@@ -26,6 +26,10 @@ yiminlab 统一样式系统。**所有 GUI 应用的视觉基础**: 一套 quarr
 色阶语义 (12 级, 对齐 Radix / Primer): 1–2 底面 / 3–5 染色底 / 6–8 边框 / 9–10 实色 / 11 彩色文字 / 12 正文。
 
 **灰阶色温**: `--fg/fg2/fg3` 是全主题共用的中性灰 (偏冷), 绝大多数主题直接用。暖色主题下冷灰次级文字会发脏, 需在 tokens.css 第 6 段「主题微调层」按色温回调 (目前 `ink` 用暖灰 `#c4bcae` / `#a09a8e`)。该层必须排在对比层之后 —— 它与 `.vg[data-tone][data-mode]` 特异度相同, 靠源码顺序取胜, 上移会被 quiet+dark 静默盖掉。
+
+**语义色**: `--ok` / `--warn` / `--red` 三枚种子色**随主题走**, 每套主题在 tokens.css 第 2 段自报 dark 与 light 两档 —— 全主题共用一枚 Primer 红会让 everforest、rosepine 这类有自己色相语言的主题出戏。配套的染色底 `--*-bg` 与彩色文字 `--*-fg` 由第 3 段用 `color-mix` 从种子色推导, 不必逐主题手调; 只有 `slate` (quarry 基准) 与 `github` (evolve GUI 基准) 在主题矩阵里手写覆写这几位, 因为它们要逐值保真既有视觉。
+
+新增主题时**必须给全三枚种子色**: CSS 自定义属性没有继承兜底, 漏给会让 `.vg-badge` / `.vg-state` 吃到空值直接变透明 —— 表现为「徽章没了」而非「颜色不对」, 极难察觉。`tokens-theme.test.ts` 对 10 × 2 共 20 种组合逐一断言, 漏给即红。
 
 ## 用法
 

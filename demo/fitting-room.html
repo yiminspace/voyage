@@ -23,6 +23,11 @@
   .stage .vg-app { height: 580px; border: 1px solid var(--line-c, var(--line)); box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45); }
   .scale-cap { font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: #8e97a4; margin: 18px 0 8px; }
   .scale { display: grid; grid-template-columns: repeat(12, 1fr); gap: 6px; padding: 14px; border-radius: 10px; background: var(--bg0); border: 1px solid var(--line); }
+  /* 语义色尺是 9 格 (三档 x 种子/底/文), 不是色阶尺的 12 级 —— 列数跟着格数走,
+     否则末尾空出三列, 整块看着像渲染坏了 */
+  .scale.cols-9 { grid-template-columns: repeat(9, 1fr); }
+  /* 徽章展示区与色阶尺同一个容器规格, 免得一块有面色一块裸在外壳底色上 */
+  .swatch-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 14px; border-radius: 10px; background: var(--bg0); border: 1px solid var(--line); }
   @media (max-width: 720px) { .scale { grid-template-columns: repeat(6, 1fr); } }
   .st i { display: block; height: 38px; border-radius: 6px; border: 1px solid rgba(128, 140, 160, 0.18); background: var(--sc); }
   .st.txt i { display: flex; align-items: center; justify-content: center; background: var(--bg2); color: var(--sc); font-weight: 700; font-size: 15px; font-style: normal; }
@@ -160,12 +165,41 @@
       <div class="st txt"><i style="--sc:var(--acc-text)">文</i><s>11 彩文</s></div>
       <div class="st txt"><i style="--sc:var(--fg)">文</i><s>12 正文</s></div>
     </div>
+
+    <div class="scale-cap">语义色 · 每套主题自报 ok / warn / red 三枚种子, bg 与 fg 由种子推导</div>
+    <div class="scale cols-9 vg" id="semantic" data-theme="slate" data-mode="dark" data-style="classic" data-tone="quiet">
+      <div class="st"><i style="--sc:var(--ok)"></i><s>ok 种子</s></div>
+      <div class="st"><i style="--sc:var(--ok-bg)"></i><s>ok 底</s></div>
+      <div class="st txt"><i style="--sc:var(--ok-fg)">文</i><s>ok 文</s></div>
+      <div class="st"><i style="--sc:var(--warn)"></i><s>warn 种子</s></div>
+      <div class="st"><i style="--sc:var(--warn-bg)"></i><s>warn 底</s></div>
+      <div class="st txt"><i style="--sc:var(--warn-fg)">文</i><s>warn 文</s></div>
+      <div class="st"><i style="--sc:var(--red)"></i><s>red 种子</s></div>
+      <div class="st"><i style="--sc:var(--red-bg)"></i><s>red 底</s></div>
+      <div class="st txt"><i style="--sc:var(--red-fg)">文</i><s>red 文</s></div>
+    </div>
+
+    <div class="scale-cap">状态徽章 · 三档语义在当前主题下的实际观感</div>
+    <div class="swatch-row vg" id="semantic-badges" data-theme="slate" data-mode="dark" data-style="classic" data-tone="quiet">
+      <span class="vg-state ok">已通过</span>
+      <span class="vg-state warn">巩固中</span>
+      <span class="vg-state err">失败</span>
+      <span class="vg-state neu">未开始</span>
+      <span class="vg-badge ok">ok</span>
+      <span class="vg-badge warn">warn</span>
+      <span class="vg-badge err">err</span>
+    </div>
   </div>
 </div>
 
 <script>
 (function () {
-  var targets = [document.getElementById('fit'), document.getElementById('scale')];
+  var targets = [
+    document.getElementById('fit'),
+    document.getElementById('scale'),
+    document.getElementById('semantic'),
+    document.getElementById('semantic-badges'),
+  ];
 
   // 与 src/index.ts 的 VOYAGE_PRESETS 保持一致: 每个色系一个策展的 style/tone 组合
   var PRESETS = [
