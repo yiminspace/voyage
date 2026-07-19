@@ -66,11 +66,27 @@
 .vg-badge { font-size: 12px; padding: 3px 10px; border-radius: var(--r-btn); border: 1px solid var(--line2-c, var(--line2)); }
 .vg-badge.ok { background: var(--ok-bg); color: var(--ok); border-color: transparent; }
 .vg-badge.err { background: var(--red-bg); color: var(--red-fg); border-color: var(--red); }
-/* 无边框徽章: 与 .vg-iconbtn 一类无框控件同排时消除"有框/无框"的割裂。
-   padding 各补 1px 吃掉去掉的边框宽度, 外尺寸与普通 .vg-badge 保持一致,
-   同排混用不会矮 2px。 */
-.vg-badge-bare { border: 0; padding: 4px 11px; }
-.vg-iconbtn { background: none; border: 0; color: var(--fg3); cursor: pointer; font-size: 15px; padding: 3px; border-radius: 5px; }
+/* 顶栏无框控件的统一盒子 (明暗钮 / 调色板钮 / 语言钮): 同高、同最小宽、
+   同圆角、同悬停底 —— 一排控件的 hover 色块必须严丝合缝地对齐, 差异只允许
+   出现在内容本身 (矢量图标 vs 裸文字), 不允许出现在盒子上。
+   圆角走 --r-btn 而非写死的魔数, 才能跟着 style 轴 (soft/sharp 等) 一起变形。 */
+.vg-iconbtn {
+  --vg-ctl-h: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--vg-ctl-h);
+  min-width: var(--vg-ctl-h);
+  padding: 0 4px;
+  background: none;
+  border: 0;
+  border-radius: var(--r-btn);
+  color: var(--fg3);
+  font-family: inherit;
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+}
 .vg-iconbtn:hover { color: var(--fg); background: var(--hoverbg); }
 
 /* ---- 主体骨架 ---- */
@@ -653,14 +669,13 @@
 .vg-seg.on { background: var(--fill-grad); border-color: transparent; color: var(--fill-ink); }
 
 /* ---- 语言切换器 (VoyageLangSwitcher, @yiminlab/voyage/react) ---- */
-/* 只叠加交互态 (光标/描边色/悬停底), 圆角/内边距/字重全部继承自 .vg-badge
-   本体 (根节点同时带 vg-badge 类名), 不再另写一份魔数。 */
+/* 盒子 (高度/最小宽/圆角/配色/悬停底) 全部来自 .vg-iconbtn —— 根节点同时带
+   该类名, 这里只调内容排版: "中"/"EN" 是裸文字不是矢量图标, 按 15px 图标的
+   光学重量折算到 12.5px/600, 视觉分量才与两侧图标持平而不显轻。 */
 .vg-lang-switch {
   appearance: none;
-  background: none;
-  color: var(--fg3);
-  font-family: inherit;
-  line-height: 1;
-  cursor: pointer;
+  padding: 0 6px;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
 }
-.vg-lang-switch:hover { color: var(--fg); background: var(--hoverbg); }

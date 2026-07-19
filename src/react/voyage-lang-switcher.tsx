@@ -18,23 +18,21 @@ export interface VoyageLangSwitcherProps {
 }
 
 /**
- * 语言切换钮: "文字胶囊"风格, 复用 .vg-badge 的圆角/内边距/字重规范
- * (而不是套用 .vg-iconbtn 的圆形图标按钮尺寸) —— 裸文字 "中"/"EN" 本就不是
- * 矢量图标, 塞进图标按钮槽位会和周围图标风格冲突, 胶囊才是它的原生形态。
+ * 语言切换钮: 与 VoyageSwitcher 的明暗钮/调色板钮共用 .vg-iconbtn 这一个盒子
+ * (同高、同最小宽、同圆角、同悬停底), 只在内容排版上区分 —— 三颗钮在顶栏里
+ * 是一组同类控件, 盒子必须逐像素同规格, 否则悬停色块参差、间距节奏也被文字
+ * 胶囊多出来的横向内边距顶开。
  *
- * 根节点直接叠加 vg-badge 类名而非另写一份相同的圆角/内边距魔数, 保证与
- * .vg-badge 的视觉规范逐字节同源 (顶栏其余胶囊改规格时这里自动跟随)。
- *
- * 再叠 vg-badge-bare 去掉边框: 顶栏里它与 .vg-iconbtn (无框) 并排, 独一份的
- * 描边会显得突兀。走通用修饰类而不是在 .vg-lang-switch 里写一次性覆盖 ——
- * "无框徽章"是可复用规格, 不是这颗按钮的特例。
+ * 之前它走的是 .vg-badge 徽章规范 (12px 字 + 11px 横向内边距 + 独立圆角),
+ * 与旁边 15px 的图标钮既不等高也不等圆角, "EN" 还因为多出的内边距在视觉上
+ * 脱离了那两颗图标 —— 徽章是状态标签的规格, 不是按钮的规格。
  */
 export function VoyageLangSwitcher({ className, locale, onLocaleChange }: VoyageLangSwitcherProps) {
   const tr = STRINGS[locale];
   return (
     <button
       type="button"
-      className={['vg-badge', 'vg-badge-bare', 'vg-lang-switch', className].filter(Boolean).join(' ')}
+      className={['vg-iconbtn', 'vg-lang-switch', className].filter(Boolean).join(' ')}
       aria-label={tr.ariaLabel}
       onClick={() => onLocaleChange(tr.next)}
     >
