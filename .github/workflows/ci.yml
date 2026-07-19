@@ -1,0 +1,112 @@
+name: voyage CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'packages/voyage/**'
+      - '.github/workflows/voyage-ci.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'packages/voyage/**'
+      - '.github/workflows/voyage-ci.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  vitest:
+    name: TS lib | voyage (vitest)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/voyage
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+          cache-dependency-path: packages/voyage/pnpm-lock.yaml
+      - name: Install
+        run: pnpm install --frozen-lockfile
+      - name: Type check
+        run: pnpm typecheck
+      - name: Vitest
+        run: pnpm test
+
+  playwright:
+    name: TS lib | voyage (playwright geometry)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/voyage
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+          cache-dependency-path: packages/voyage/pnpm-lock.yaml
+      - name: Install
+        run: pnpm install --frozen-lockfile
+      - name: Get installed Playwright version
+        id: playwright-version
+        run: echo "version=$(node -p "require('@playwright/test/package.json').version")" >> "$GITHUB_OUTPUT"
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-chromium-${{ steps.playwright-version.outputs.version }}
+      - name: Install Playwright chromium
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: pnpm exec playwright install --with-deps chromium
+      - name: Install Playwright system deps
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: pnpm exec playwright install-deps chromium
+      - name: Playwright geometry assertions
+        run: pnpm run test:e2e
+      - name: Upload report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: voyage-playwright-report
+          path: packages/voyage/playwright-report/
+          retention-days: 7
+
+  success:
+    name: Result
+    needs: [vitest, playwright]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Check status
+        run: |
+          failures=()
+
+          check() {
+            local name="$1" status="$2"
+            if [ "$status" != "skipped" ] && [ "$status" != "success" ]; then
+              echo "❌ $name → $status"
+              failures+=("$name")
+            fi
+          }
+
+          check "vitest"     "${{ needs.vitest.result }}"
+          check "playwright" "${{ needs.playwright.result }}"
+
+          if [ ${#failures[@]} -gt 0 ]; then
+            echo ""
+            echo "${#failures[@]} job(s) failed."
+            exit 1
+          fi
+
+          echo "✅ All checks passed!"

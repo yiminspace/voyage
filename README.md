@@ -134,6 +134,14 @@ open demo/fitting-room.html
 
 被测样式全部来自 tokens.css / voyage.css 本体; 改 token 后先开这页对照四轴组合。页面顶栏内嵌了一个 `vg-toolbar` 静态实例 (原生 JS 驱动, 与 `VoyageToolbar` 组件同一份标记/样式), 兼作顶栏控件的视觉基准 —— 三颗钮的等高/同圆角、以及切换语言时右侧控件不位移, 都在这页上量。
 
+手工对照仍可用 (改 token 后开页肉眼核对四轴组合), 但上述尺寸契约已由 `e2e/` 下的 Playwright 用例自动守住: 真实浏览器排版引擎跑 `getBoundingClientRect()` / `getComputedStyle()`, 断言三颗钮等高等宽同圆角、语言钮在多种文案 (含明显更宽的文案) 下宽度恒定、切换语言不推动右侧控件、圆角随 `data-style` 轴变化、`--vg-lang-w` 覆盖生效且可回落默认。这类断言 jsdom 测不出来 (不解析 `var()`、无字体引擎、不跑 flex 布局), 只有真实渲染才能当场暴露。
+
+```
+pnpm test        # vitest — 组件行为/token 解析
+pnpm test:e2e    # playwright — 顶栏几何契约 (首次需 pnpm exec playwright install chromium)
+pnpm test:all    # 两者都跑
+```
+
 ## 发布
 
 改本包源码需要同步 bump `package.json` 的 `version`，否则 `voyage-publish.yml` 会判定「版本未变」静默跳过发布，npm 停留旧版本。PR 阶段有 `voyage-version-check.yml` 拦截漏 bump 的改动。
