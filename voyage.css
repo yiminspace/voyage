@@ -669,12 +669,13 @@
 .vg-seg.on { background: var(--fill-grad); border-color: transparent; color: var(--fill-ink); }
 
 /* ---- 语言切换器 (VoyageLangSwitcher, @yiminlab/voyage/react) ---- */
-/* 盒子 (高度/最小宽/圆角/配色/悬停底) 全部来自 .vg-iconbtn —— 根节点同时带
-   该类名, 这里只调内容排版: "中"/"EN" 是裸文字不是矢量图标, 按 15px 图标的
-   光学重量折算到 12.5px/600, 视觉分量才与两侧图标持平而不显轻。 */
+/* 盒子 (高度/最小宽/圆角/配色/悬停底/内边距) 全部来自 .vg-iconbtn —— 根节点同时带
+   该类名, 这里不再覆盖 padding (此前的 0 6px 比 .vg-iconbtn 的 0 4px 多出 2px,
+   实际外盒比明暗钮/调色板钮更宽, 与"逐像素同规格"的设计初衷相悖), 只调内容排版:
+   "中"/"EN" 是裸文字不是矢量图标, 按 15px 图标的光学重量折算到 12.5px/600,
+   视觉分量才与两侧图标持平而不显轻。 */
 .vg-lang-switch {
   appearance: none;
-  padding: 0 6px;
   font-size: 12.5px;
   font-weight: 600;
   letter-spacing: 0.2px;

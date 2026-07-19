@@ -75,12 +75,13 @@ describe('VoyageLangSwitcher', () => {
     }
   });
 
-  it('纵向内边距与图标钮一致, 只在横向多留一点给裸文字', () => {
+  it('内边距四向与图标钮逐像素一致 (不覆盖 padding, 外盒宽度才能真正相等)', () => {
     const { iconStyle, langStyle } = renderWithIconbtn();
     const px = (v: string) => parseFloat(v || '0');
     expect(px(langStyle.paddingTop)).toBe(px(iconStyle.paddingTop));
     expect(px(langStyle.paddingBottom)).toBe(px(iconStyle.paddingBottom));
-    expect(px(langStyle.paddingLeft)).toBeGreaterThanOrEqual(px(iconStyle.paddingLeft));
+    expect(px(langStyle.paddingLeft)).toBe(px(iconStyle.paddingLeft));
+    expect(px(langStyle.paddingRight)).toBe(px(iconStyle.paddingRight));
   });
 
   it('locale="zh" 显示"中", 点击后以目标 locale "en" 触发回调', () => {
