@@ -8,3 +8,4 @@
 
 export { VoyageProvider, useVoyage, type VoyageContextValue, type VoyageProviderProps } from './voyage-provider';
 export { VoyageSwitcher, type VoyageSwitcherProps } from './voyage-switcher';
+export { VoyageLangSwitcher, type VoyageLangSwitcherProps } from './voyage-lang-switcher';

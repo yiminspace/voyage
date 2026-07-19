@@ -96,6 +96,12 @@ function App() {
 />
 ```
 
+- **`VoyageLangSwitcher`** — 语言切换钮: "中"/"EN" 这类裸文字不是矢量图标, 不套 `.vg-iconbtn` 的圆形图标按钮尺寸, 而是复用 `.vg-badge` 的圆角/内边距/字重规范, 走"文字胶囊"风格, 与顶栏其余图标按钮并排也不突兀。受控组件: 传入当前 `locale` 与 `onLocaleChange`, 组件本身不持有语言状态。
+
+```tsx
+<VoyageLangSwitcher locale={locale} onLocaleChange={setLocale} />
+```
+
 ## 各应用默认组合
 
 | 应用 | theme | mode | style | tone |
@@ -118,7 +124,7 @@ open demo/fitting-room.html
 
 ## Roadmap
 
-- [x] react/ 薄封装: VoyageProvider / useVoyage / VoyageSwitcher (Popover API, 有支持时启用)
+- [x] react/ 薄封装: VoyageProvider / useVoyage / VoyageSwitcher (Popover API, 有支持时启用) / VoyageLangSwitcher
 - [x] quarry 接入 (slate x dark x classic x normal, 视觉基准)
 - [ ] react/ 其余薄封装: Dialog (原生 `<dialog>`) / Toast
 - [ ] engram 迁移 (首个宿主) → jsontailor → ai

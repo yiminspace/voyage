@@ -647,3 +647,16 @@
 }
 .vg-seg:hover { background: var(--bg3); color: var(--fg); }
 .vg-seg.on { background: var(--fill-grad); border-color: transparent; color: var(--fill-ink); }
+
+/* ---- 语言切换器 (VoyageLangSwitcher, @yiminlab/voyage/react) ---- */
+/* 只叠加交互态 (光标/描边色/悬停底), 圆角/内边距/字重全部继承自 .vg-badge
+   本体 (根节点同时带 vg-badge 类名), 不再另写一份魔数。 */
+.vg-lang-switch {
+  appearance: none;
+  background: none;
+  color: var(--fg3);
+  font-family: inherit;
+  line-height: 1;
+  cursor: pointer;
+}
+.vg-lang-switch:hover { color: var(--fg); background: var(--hoverbg); }
