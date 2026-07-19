@@ -122,6 +122,10 @@ open demo/fitting-room.html
 
 被测样式全部来自 tokens.css / voyage.css 本体; 改 token 后先开这页对照四轴组合。页面顶栏内嵌了一个 `vg-switcher` 静态实例 (原生 JS 驱动, 与 `VoyageSwitcher` 组件同一份标记/样式), 兼作切换器的视觉基准。
 
+## 发布
+
+改本包源码需要同步 bump `package.json` 的 `version`，否则 `voyage-publish.yml` 会判定「版本未变」静默跳过发布，npm 停留旧版本。PR 阶段有 `voyage-version-check.yml` 拦截漏 bump 的改动。
+
 ## Roadmap
 
 - [x] react/ 薄封装: VoyageProvider / useVoyage / VoyageSwitcher (Popover API, 有支持时启用) / VoyageLangSwitcher
