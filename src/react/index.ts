@@ -2,10 +2,13 @@
  * @yiminlab/voyage/react — React 薄封装
  *
  * 挂载时读取/应用四轴偏好 (VoyageProvider + useVoyage), 并提供开箱即用的
- * 顶栏切换器 (VoyageSwitcher)。样式仍来自 tokens.css / voyage.css, 本模块
- * 不引入任何字面量色值。
+ * 顶栏控件。样式仍来自 tokens.css / voyage.css, 本模块不引入任何字面量色值。
+ *
+ * 顶栏优先用 VoyageToolbar —— 它把语言/明暗/调色板三颗钮按固定顺序排好;
+ * 下面两个单品导出留给需要自定义排布的宿主, 用了就要自己对顺序负责。
  */
 
 export { VoyageProvider, useVoyage, type VoyageContextValue, type VoyageProviderProps } from './voyage-provider';
-export { VoyageSwitcher, type VoyageSwitcherProps } from './voyage-switcher';
+export { VoyageToolbar, type VoyageToolbarProps } from './voyage-toolbar';
+export { VoyageSwitcher, type VoyageSwitcherProps, type VoyageSwitcherIcons } from './voyage-switcher';
 export { VoyageLangSwitcher, type VoyageLangSwitcherProps } from './voyage-lang-switcher';

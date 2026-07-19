@@ -75,13 +75,22 @@ describe('VoyageLangSwitcher', () => {
     }
   });
 
-  it('内边距四向与图标钮逐像素一致 (不覆盖 padding, 外盒宽度才能真正相等)', () => {
+  it('外盒宽度锁死在与图标钮同一规格 (不随文案变化)', () => {
+    // 原先这里断言的是 padding 四向与图标钮逐像素相等 —— 那是「外盒等宽」的
+    // 一种实现手段。现在语言钮直接锁死 width (--vg-lang-w 缺省取 --vg-ctl-h),
+    // padding 归零把 26px 全留给文字, 于是改为断言意图本身: 宽度是确定值、
+    // 等于图标钮的最小宽、且与 box-sizing 无关。
+    // jsdom 不解析 var(), getComputedStyle 原样返回声明串, 所以这里比的是
+    // "宽度锚定到哪个变量"而非解析后的像素值 —— 真实像素在试衣间里量。
     const { iconStyle, langStyle } = renderWithIconbtn();
-    const px = (v: string) => parseFloat(v || '0');
-    expect(px(langStyle.paddingTop)).toBe(px(iconStyle.paddingTop));
-    expect(px(langStyle.paddingBottom)).toBe(px(iconStyle.paddingBottom));
-    expect(px(langStyle.paddingLeft)).toBe(px(iconStyle.paddingLeft));
-    expect(px(langStyle.paddingRight)).toBe(px(iconStyle.paddingRight));
+    expect(langStyle.width).not.toBe('');
+    expect(langStyle.width).not.toBe('auto');
+    // 缺省回退到 --vg-ctl-h: 与图标钮的 min-width 同源, 三颗钮才等宽
+    expect(langStyle.width).toContain('--vg-ctl-h');
+    expect(iconStyle.minWidth).toContain('--vg-ctl-h');
+    // 宿主可用 --vg-lang-w 覆盖 (文案更宽的语言), 但默认不生效
+    expect(langStyle.width).toContain('--vg-lang-w');
+    expect(langStyle.boxSizing).toBe('border-box');
   });
 
   it('locale="zh" 显示"中", 点击后以目标 locale "en" 触发回调', () => {

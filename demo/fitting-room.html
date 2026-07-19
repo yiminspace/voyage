@@ -68,10 +68,13 @@
         <span class="vg-logo">忆</span><span class="vg-brand">engram</span><span class="vg-ws">划词讲解 · local</span>
         <span class="vg-sp"></span><span class="vg-badge ok">rw</span>
         <!-- VoyageSwitcher (@yiminlab/voyage/react) 的静态视觉基准: 同款 vg-switcher / vg-preset-card / vg-seg 标记与样式, 用原生 JS 驱动而非 React, 但复用的是同一份 voyage.css。图标是 Tabler Icons 原始 path (24 网格 / stroke 2), 与组件内置默认一致。 -->
-        <div class="vg-switcher" id="switcher">
-          <!-- VoyageLangSwitcher 的静态视觉基准: 与右侧两颗同排图标钮共用 vg-iconbtn 盒子,
-               三者应等高、同圆角、hover 色块严丝合缝对齐, 只有内容 (裸文字 vs 图标) 不同。 -->
+        <!-- VoyageToolbar 的静态视觉基准: 工具条固化 语言 → 明暗 → 调色板 的顺序,
+             三颗钮共用 vg-iconbtn 盒子, 应等高、同圆角、hover 色块严丝合缝对齐,
+             只有内容 (裸文字 vs 矢量图标) 不同。语言钮宽度锁死, 切换语言时右侧
+             两颗钮不应发生任何横向位移。 -->
+        <div class="vg-toolbar" id="toolbar">
           <button class="vg-iconbtn vg-lang-switch" id="langSwitch" aria-label="切换为英文">中</button>
+          <div class="vg-switcher" id="switcher">
           <button class="vg-iconbtn vg-switcher-mode" id="switcherMode" aria-label="切换为亮色模式">
             <span class="vg-mode-wrap" id="modeWrapMoon"><svg class="vg-mode-icon" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z"/></svg></span>
             <span class="vg-mode-wrap" id="modeWrapSun" style="display:none"><svg class="vg-mode-icon" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 12m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0"/><path d="M3 12h1m8 -9v1m8 8h1m-9 8v1m-6.4 -15.4l.7 .7m12.1 -.7l-.7 .7m0 12.1l.7 .7m-12.1 -.7l-.7 .7"/></svg></span>
@@ -86,6 +89,7 @@
               <button class="vg-seg on" data-switch-mode="dark" role="radio" aria-checked="true">暗</button>
               <button class="vg-seg" data-switch-mode="light" role="radio" aria-checked="false">亮</button>
             </div>
+          </div>
           </div>
         </div>
       </div>

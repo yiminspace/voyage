@@ -72,9 +72,14 @@
    圆角走 --r-btn 而非写死的魔数, 才能跟着 style 轴 (soft/sharp 等) 一起变形。 */
 .vg-iconbtn {
   --vg-ctl-h: 26px;
+  /* 自带 border-box: 尺寸是这套控件对外承诺的规格, 不能取决于宿主有没有写
+     全局 reset —— content-box 下 height/min-width 只作用于内容区, 同一份声明
+     会渲染成 34px 的盒子。 */
+  box-sizing: border-box;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  flex: none;
   height: var(--vg-ctl-h);
   min-width: var(--vg-ctl-h);
   padding: 0 4px;
@@ -523,6 +528,11 @@
   .vg-dot.chk { animation: none; }
 }
 
+/* ---- 顶栏工具条 (VoyageToolbar, @yiminlab/voyage/react) ---- */
+/* 三颗控件的排列容器。顺序 (语言 → 明暗 → 调色板) 由组件的 DOM 结构固化,
+   这里只负责成行与间距节奏; gap 同样继承宿主, 让工具条内外一个节奏。 */
+.vg-toolbar { display: inline-flex; align-items: center; gap: inherit; }
+
 /* ---- 主题切换器 (VoyageSwitcher, @yiminlab/voyage/react) ---- */
 /* gap 继承宿主容器 (vg-header 为 11px): 明暗与调色板两钮之间的间距
    要与顶栏其余图标同一节奏, 不能自带更紧的分组间距 */
@@ -676,6 +686,13 @@
    视觉分量才与两侧图标持平而不显轻。 */
 .vg-lang-switch {
   appearance: none;
+  /* 锁死宽度, 而不是靠 .vg-iconbtn 的 min-width 兜着: "中" 与 "EN" 字宽本就
+     不等, min-width 只是恰好没被撑破 —— 一旦文案变宽 (新语言 / 换字体 / 用户
+     放大字号), 按钮就会在切换语言时变宽, 把同排右侧控件横向推走, 表现为切一次
+     语言抖一下 (0.7.0 之前的徽章规格实测差 4.27px)。锁死后"不抖"是结构保证,
+     不是巧合。文案确实更宽的宿主覆盖 --vg-lang-w, 而不是改回自适应。 */
+  width: var(--vg-lang-w, var(--vg-ctl-h));
+  padding: 0;
   font-size: 12.5px;
   font-weight: 600;
   letter-spacing: 0.2px;

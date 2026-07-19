@@ -67,15 +67,16 @@ pnpm add @yiminlab/voyage react react-dom
 ```
 
 ```tsx
-import { VoyageProvider, VoyageSwitcher } from '@yiminlab/voyage/react';
+import { VoyageProvider, VoyageToolbar } from '@yiminlab/voyage/react';
 import { VOYAGE_APP_DEFAULTS } from '@yiminlab/voyage';
 
 function App() {
+  const [locale, setLocale] = useState('zh');
   return (
     <VoyageProvider defaults={VOYAGE_APP_DEFAULTS.engram}>
       <header className="vg-header">
         {/* ... */}
-        <VoyageSwitcher />
+        <VoyageToolbar locale={locale} onLocaleChange={setLocale} />
       </header>
     </VoyageProvider>
   );
@@ -84,6 +85,9 @@ function App() {
 
 - **`VoyageProvider`** — 挂载时执行 `initVoyage`, 通过 context 分发偏好与 setter; 需要同时维护 tailwind `.dark` class 的应用传 `syncDarkClass`。SSR 场景仍需配合 `voyageInitScript` 防闪烁 (本组件只管挂载后的状态)。
 - **`useVoyage()`** — 返回 `{ prefs, setTheme, setMode, setStyle, setTone, setPrefs, reset }`, 每次调用写入 `localStorage('vg_prefs')` 并同步宿主元素属性。
+- **`VoyageToolbar`** — **顶栏首选**: 把语言钮与主题切换器按固定顺序排成一行, 顺序为 **语言 → 明暗 → 调色板**, 由组件的 DOM 结构固化。明暗与调色板同属主题外观、天然相邻; 语言是另一维度的设置, 整体靠边而非夹在主题族旁边。不传 `onLocaleChange` 则不渲染语言钮 (不做多语言的宿主直接省略)。`icons` 透传给内部的 `VoyageSwitcher`。
+
+  顺序之所以要由组件固化: 此前两个单品各自导出、谁左谁右无人约束, 两个宿主排成了相反的顺序 —— 设计系统管住了每颗钮"长什么样", 却没管"站哪儿"。需要自定义排布的宿主仍可直接用下面两个单品, 但那样顺序就是宿主自己的责任了。
 - **`VoyageSwitcher`** — 顶栏放一个即可: 月亮/太阳一键切明暗 + 调色板按钮弹出主题面板。面板是 **策展主题卡** (`VOYAGE_PRESETS`, 每个色系一个设计过的 style/tone 组合, 卡片用该主题自身 tokens 渲染 mini 预览) + 明暗分段; hover / 聚焦即时全页预览, 移出 / Esc 还原, 点击落定 —— VS Code 主题选择器的交互模型。style/tone 原始轴不再直接暴露给用户 (token 引擎不变, 仍可经 `useVoyage()` 编程设置)。浮层用原生 Popover API (支持时启用), 交互始终由 React state 兜底, 键盘可达 (Esc 关闭, 焦点环见 voyage.css)。
 - **图标插槽** — `VoyageSwitcher` 内置图标取 Tabler Icons 原始 path (24 网格 / stroke 2 / 1em 跟随字号); 宿主用图标字体时可整体替换, 与顶栏其余图标保持同一视觉语言:
 
@@ -98,9 +102,13 @@ function App() {
 />
 ```
 
-- **`VoyageLangSwitcher`** — 语言切换钮: "中"/"EN" 这类裸文字不是矢量图标, 不套 `.vg-iconbtn` 的圆形图标按钮尺寸, 而是复用 `.vg-badge` 的圆角/内边距/字重规范, 走"文字胶囊"风格; 再叠 `.vg-badge-bare` 去掉描边, 与顶栏其余无框图标按钮并排才不突兀。受控组件: 传入当前 `locale` 与 `onLocaleChange`, 组件本身不持有语言状态。
+- **`VoyageLangSwitcher`** — 语言切换钮 (单品导出; 顶栏一般经 `VoyageToolbar` 使用)。与明暗钮/调色板钮**共用 `.vg-iconbtn` 这一个盒子** —— 同高、同最小宽、同圆角、同悬停底, 只在内容排版上区分: "中"/"EN" 是裸文字不是矢量图标, 按 15px 图标的光学重量折算到 12.5px/600。受控组件: 传入当前 `locale` 与 `onLocaleChange`, 组件本身不持有语言状态。
 
-  其中 `.vg-badge-bare` 是通用修饰类, 任何 `.vg-badge` 都可叠加: 去掉边框并把 padding 各补 1px 吃掉边框宽度, 外尺寸与带框徽章保持一致, 同排混用不会矮 2px。
+  **宽度是锁死的** (`--vg-lang-w`, 缺省取控件高 `--vg-ctl-h`), 不随文案伸缩: "中" 与 "EN" 字宽本就不等, 若靠内容撑开, 切换语言时按钮会变宽并把同排右侧控件横向推走, 表现为切一次语言抖一下。锁死后"不抖"是结构保证而非巧合。文案确实更宽的宿主覆盖 `--vg-lang-w` 即可, 不要改回自适应:
+
+```css
+.vg-header { --vg-lang-w: 72px; }
+```
 
 ```tsx
 <VoyageLangSwitcher locale={locale} onLocaleChange={setLocale} />
@@ -124,7 +132,7 @@ function App() {
 open demo/fitting-room.html
 ```
 
-被测样式全部来自 tokens.css / voyage.css 本体; 改 token 后先开这页对照四轴组合。页面顶栏内嵌了一个 `vg-switcher` 静态实例 (原生 JS 驱动, 与 `VoyageSwitcher` 组件同一份标记/样式), 兼作切换器的视觉基准。
+被测样式全部来自 tokens.css / voyage.css 本体; 改 token 后先开这页对照四轴组合。页面顶栏内嵌了一个 `vg-toolbar` 静态实例 (原生 JS 驱动, 与 `VoyageToolbar` 组件同一份标记/样式), 兼作顶栏控件的视觉基准 —— 三颗钮的等高/同圆角、以及切换语言时右侧控件不位移, 都在这页上量。
 
 ## 发布
 
@@ -132,7 +140,7 @@ open demo/fitting-room.html
 
 ## Roadmap
 
-- [x] react/ 薄封装: VoyageProvider / useVoyage / VoyageSwitcher (Popover API, 有支持时启用) / VoyageLangSwitcher
+- [x] react/ 薄封装: VoyageProvider / useVoyage / VoyageToolbar / VoyageSwitcher (Popover API, 有支持时启用) / VoyageLangSwitcher
 - [x] quarry 接入 (slate x dark x classic x normal, 视觉基准)
 - [ ] react/ 其余薄封装: Dialog (原生 `<dialog>`) / Toast
 - [ ] engram 迁移 (首个宿主) → jsontailor → ai
