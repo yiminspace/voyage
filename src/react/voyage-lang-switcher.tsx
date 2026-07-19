@@ -24,13 +24,17 @@ export interface VoyageLangSwitcherProps {
  *
  * 根节点直接叠加 vg-badge 类名而非另写一份相同的圆角/内边距魔数, 保证与
  * .vg-badge 的视觉规范逐字节同源 (顶栏其余胶囊改规格时这里自动跟随)。
+ *
+ * 再叠 vg-badge-bare 去掉边框: 顶栏里它与 .vg-iconbtn (无框) 并排, 独一份的
+ * 描边会显得突兀。走通用修饰类而不是在 .vg-lang-switch 里写一次性覆盖 ——
+ * "无框徽章"是可复用规格, 不是这颗按钮的特例。
  */
 export function VoyageLangSwitcher({ className, locale, onLocaleChange }: VoyageLangSwitcherProps) {
   const tr = STRINGS[locale];
   return (
     <button
       type="button"
-      className={['vg-badge', 'vg-lang-switch', className].filter(Boolean).join(' ')}
+      className={['vg-badge', 'vg-badge-bare', 'vg-lang-switch', className].filter(Boolean).join(' ')}
       aria-label={tr.ariaLabel}
       onClick={() => onLocaleChange(tr.next)}
     >

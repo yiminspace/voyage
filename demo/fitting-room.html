@@ -69,6 +69,9 @@
         <span class="vg-sp"></span><span class="vg-badge ok">rw</span>
         <!-- VoyageSwitcher (@yiminlab/voyage/react) 的静态视觉基准: 同款 vg-switcher / vg-preset-card / vg-seg 标记与样式, 用原生 JS 驱动而非 React, 但复用的是同一份 voyage.css。图标是 Tabler Icons 原始 path (24 网格 / stroke 2), 与组件内置默认一致。 -->
         <div class="vg-switcher" id="switcher">
+          <!-- VoyageLangSwitcher 的静态视觉基准: vg-badge 定规格 + vg-badge-bare 去边框。
+               与右侧两颗 vg-iconbtn 同排, 三者都应无描边; 与左侧 "rw" 徽章外尺寸一致。 -->
+          <button class="vg-badge vg-badge-bare vg-lang-switch" id="langSwitch" aria-label="切换为英文">中</button>
           <button class="vg-iconbtn vg-switcher-mode" id="switcherMode" aria-label="切换为亮色模式">
             <span class="vg-mode-wrap" id="modeWrapMoon"><svg class="vg-mode-icon" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z"/></svg></span>
             <span class="vg-mode-wrap" id="modeWrapSun" style="display:none"><svg class="vg-mode-icon" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 12m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0"/><path d="M3 12h1m8 -9v1m8 8h1m-9 8v1m-6.4 -15.4l.7 .7m12.1 -.7l-.7 .7m0 12.1l.7 .7m-12.1 -.7l-.7 .7"/></svg></span>
@@ -319,6 +322,14 @@
   });
   document.addEventListener('keydown', function (event) {
     if (event.key === 'Escape' && !panel.hasAttribute('hidden')) closePanel();
+  });
+
+  // 语言切换器: 与 VoyageLangSwitcher 的 STRINGS 表一致 (zh -> 中, en -> EN)
+  var langBtn = document.getElementById('langSwitch');
+  langBtn.addEventListener('click', function () {
+    var toEn = langBtn.textContent === '中';
+    langBtn.textContent = toEn ? 'EN' : '中';
+    langBtn.setAttribute('aria-label', toEn ? 'Switch to Chinese' : '切换为英文');
   });
 })();
 </script>

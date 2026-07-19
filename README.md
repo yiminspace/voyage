@@ -25,6 +25,8 @@ yiminlab 统一样式系统。**所有 GUI 应用的视觉基础**: 一套 quarr
 
 色阶语义 (12 级, 对齐 Radix / Primer): 1–2 底面 / 3–5 染色底 / 6–8 边框 / 9–10 实色 / 11 彩色文字 / 12 正文。
 
+**灰阶色温**: `--fg/fg2/fg3` 是全主题共用的中性灰 (偏冷), 绝大多数主题直接用。暖色主题下冷灰次级文字会发脏, 需在 tokens.css 第 6 段「主题微调层」按色温回调 (目前 `ink` 用暖灰 `#c4bcae` / `#a09a8e`)。该层必须排在对比层之后 —— 它与 `.vg[data-tone][data-mode]` 特异度相同, 靠源码顺序取胜, 上移会被 quiet+dark 静默盖掉。
+
 ## 用法
 
 ```bash
@@ -96,7 +98,9 @@ function App() {
 />
 ```
 
-- **`VoyageLangSwitcher`** — 语言切换钮: "中"/"EN" 这类裸文字不是矢量图标, 不套 `.vg-iconbtn` 的圆形图标按钮尺寸, 而是复用 `.vg-badge` 的圆角/内边距/字重规范, 走"文字胶囊"风格, 与顶栏其余图标按钮并排也不突兀。受控组件: 传入当前 `locale` 与 `onLocaleChange`, 组件本身不持有语言状态。
+- **`VoyageLangSwitcher`** — 语言切换钮: "中"/"EN" 这类裸文字不是矢量图标, 不套 `.vg-iconbtn` 的圆形图标按钮尺寸, 而是复用 `.vg-badge` 的圆角/内边距/字重规范, 走"文字胶囊"风格; 再叠 `.vg-badge-bare` 去掉描边, 与顶栏其余无框图标按钮并排才不突兀。受控组件: 传入当前 `locale` 与 `onLocaleChange`, 组件本身不持有语言状态。
+
+  其中 `.vg-badge-bare` 是通用修饰类, 任何 `.vg-badge` 都可叠加: 去掉边框并把 padding 各补 1px 吃掉边框宽度, 外尺寸与带框徽章保持一致, 同排混用不会矮 2px。
 
 ```tsx
 <VoyageLangSwitcher locale={locale} onLocaleChange={setLocale} />

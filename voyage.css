@@ -66,6 +66,10 @@
 .vg-badge { font-size: 12px; padding: 3px 10px; border-radius: var(--r-btn); border: 1px solid var(--line2-c, var(--line2)); }
 .vg-badge.ok { background: var(--ok-bg); color: var(--ok); border-color: transparent; }
 .vg-badge.err { background: var(--red-bg); color: var(--red-fg); border-color: var(--red); }
+/* 无边框徽章: 与 .vg-iconbtn 一类无框控件同排时消除"有框/无框"的割裂。
+   padding 各补 1px 吃掉去掉的边框宽度, 外尺寸与普通 .vg-badge 保持一致,
+   同排混用不会矮 2px。 */
+.vg-badge-bare { border: 0; padding: 4px 11px; }
 .vg-iconbtn { background: none; border: 0; color: var(--fg3); cursor: pointer; font-size: 15px; padding: 3px; border-radius: 5px; }
 .vg-iconbtn:hover { color: var(--fg); background: var(--hoverbg); }
 
