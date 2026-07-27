@@ -30,8 +30,8 @@ afterEach(() => {
 
 /** 工具条里的按钮, 按 DOM 顺序返回 (面板等浮层不在此列)。 */
 function toolbarButtons(): HTMLButtonElement[] {
-  const toolbar = document.querySelector('.vg-toolbar');
-  if (!toolbar) throw new Error('未渲染 .vg-toolbar');
+  const toolbar = document.querySelector('.vg-topbar');
+  if (!toolbar) throw new Error('未渲染 .vg-topbar');
   return [...toolbar.querySelectorAll('button')] as HTMLButtonElement[];
 }
 
@@ -122,6 +122,6 @@ describe('VoyageToolbar', () => {
         <VoyageToolbar locale="zh" onLocaleChange={() => {}} className="host-extra" />
       </VoyageProvider>
     );
-    expect(document.querySelector('.vg-toolbar')!.className).toMatch(/\bhost-extra\b/);
+    expect(document.querySelector('.vg-topbar')!.className).toMatch(/\bhost-extra\b/);
   });
 });

@@ -236,6 +236,9 @@
 .vg-tok-var { color: var(--acc-text); font-weight: 700; background: color-mix(in srgb, var(--accent) 12%, transparent); border-radius: 3px; padding: 0 3px; }
 
 /* ---- 工具条 / 按钮 / 输入 ---- */
+/* 卡片内的一排按钮 (用在 .vg-section 内), 与下方「顶栏工具条」.vg-topbar 是
+   两个完全不同的语境 —— 历史上曾同名 .vg-toolbar 共用, 顶栏因此带上了本不
+   属于它的内边距/底色/底边框 (issue #428)。两者不再共用类名, 各自独立维护。 */
 .vg-toolbar {
   display: flex;
   align-items: center;
@@ -532,9 +535,12 @@
 }
 
 /* ---- 顶栏工具条 (VoyageToolbar, @yiminlab/voyage/react) ---- */
-/* 三颗控件的排列容器。顺序 (语言 → 明暗 → 调色板) 由组件的 DOM 结构固化,
-   这里只负责成行与间距节奏; gap 同样继承宿主, 让工具条内外一个节奏。 */
-.vg-toolbar { display: inline-flex; align-items: center; gap: inherit; }
+/* 三颗控件的排列容器, 独立类名 .vg-topbar (issue #428 前曾与卡片按钮行共用
+   .vg-toolbar, 导致顶栏被迫带上卡片按钮行的内边距/底色/底边框)。顺序
+   (语言 → 明暗 → 调色板) 由组件的 DOM 结构固化, 这里只负责成行与间距节奏;
+   不设 padding / background / border, 外观完全交给宿主的 .vg-header 等容器;
+   gap 继承宿主, 让工具条内外一个节奏。 */
+.vg-topbar { display: inline-flex; align-items: center; gap: inherit; }
 
 /* ---- 主题切换器 (VoyageSwitcher, @yiminlab/voyage/react) ---- */
 /* gap 继承宿主容器 (vg-header 为 11px): 明暗与调色板两钮之间的间距

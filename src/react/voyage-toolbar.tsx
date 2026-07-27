@@ -39,7 +39,7 @@ export function VoyageToolbar({
   icons,
 }: VoyageToolbarProps = {}) {
   return (
-    <div className={['vg-toolbar', className].filter(Boolean).join(' ')}>
+    <div className={['vg-topbar', className].filter(Boolean).join(' ')}>
       {onLocaleChange ? (
         <VoyageLangSwitcher locale={locale} onLocaleChange={onLocaleChange} />
       ) : null}

@@ -92,6 +92,8 @@ function App() {
 - **`VoyageToolbar`** — **顶栏首选**: 把语言钮与主题切换器按固定顺序排成一行, 顺序为 **语言 → 明暗 → 调色板**, 由组件的 DOM 结构固化。明暗与调色板同属主题外观、天然相邻; 语言是另一维度的设置, 整体靠边而非夹在主题族旁边。不传 `onLocaleChange` 则不渲染语言钮 (不做多语言的宿主直接省略)。`icons` 透传给内部的 `VoyageSwitcher`。
 
   顺序之所以要由组件固化: 此前两个单品各自导出、谁左谁右无人约束, 两个宿主排成了相反的顺序 —— 设计系统管住了每颗钮"长什么样", 却没管"站哪儿"。需要自定义排布的宿主仍可直接用下面两个单品, 但那样顺序就是宿主自己的责任了。
+
+  根节点类名是 **`.vg-topbar`**, 与卡片内一排按钮 (`.vg-section` 里的 `.vg-toolbar`, 见 `voyage.css` 「工具条 / 按钮 / 输入」段: `padding: 9px 14px; background: var(--surf-1); border-bottom: 1px solid`) 是两个独立的类名, 不再共用。`.vg-topbar` 只负责排列 (`display / align-items / gap`), 不带 padding / 背景 / 边框 —— 外观完全交给宿主的 `.vg-header` 等容器。
 - **`VoyageSwitcher`** — 顶栏放一个即可: 月亮/太阳一键切明暗 + 调色板按钮弹出主题面板。面板是 **策展主题卡** (`VOYAGE_PRESETS`, 每个色系一个设计过的 style/tone 组合, 卡片用该主题自身 tokens 渲染 mini 预览) + 明暗分段; hover / 聚焦即时全页预览, 移出 / Esc 还原, 点击落定 —— VS Code 主题选择器的交互模型。style/tone 原始轴不再直接暴露给用户 (token 引擎不变, 仍可经 `useVoyage()` 编程设置)。浮层用原生 Popover API (支持时启用), 交互始终由 React state 兜底, 键盘可达 (Esc 关闭, 焦点环见 voyage.css)。
 - **图标插槽** — `VoyageSwitcher` 内置图标取 Tabler Icons 原始 path (24 网格 / stroke 2 / 1em 跟随字号); 宿主用图标字体时可整体替换, 与顶栏其余图标保持同一视觉语言:
 
@@ -136,7 +138,7 @@ function App() {
 open demo/fitting-room.html
 ```
 
-被测样式全部来自 tokens.css / voyage.css 本体; 改 token 后先开这页对照四轴组合。页面顶栏内嵌了一个 `vg-toolbar` 静态实例 (原生 JS 驱动, 与 `VoyageToolbar` 组件同一份标记/样式), 兼作顶栏控件的视觉基准 —— 三颗钮的等高/同圆角、以及切换语言时右侧控件不位移, 都在这页上量。
+被测样式全部来自 tokens.css / voyage.css 本体; 改 token 后先开这页对照四轴组合。页面顶栏内嵌了一个 `vg-topbar` 静态实例 (原生 JS 驱动, 与 `VoyageToolbar` 组件同一份标记/样式), 兼作顶栏控件的视觉基准 —— 三颗钮的等高/同圆角、以及切换语言时右侧控件不位移, 都在这页上量。卡片内的 `.vg-toolbar` 按钮行 (「hysteresis」卡片下方) 是另一语境的静态实例, 两者不共用类名。
 
 手工对照仍可用 (改 token 后开页肉眼核对四轴组合), 但上述尺寸契约已由 `e2e/` 下的 Playwright 用例自动守住: 真实浏览器排版引擎跑 `getBoundingClientRect()` / `getComputedStyle()`, 断言三颗钮等高等宽同圆角、语言钮在多种文案 (含明显更宽的文案) 下宽度恒定、切换语言不推动右侧控件、圆角随 `data-style` 轴变化、`--vg-lang-w` 覆盖生效且可回落默认。这类断言 jsdom 测不出来 (不解析 `var()`、无字体引擎、不跑 flex 布局), 只有真实渲染才能当场暴露。
 

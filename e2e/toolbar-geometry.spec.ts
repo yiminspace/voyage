@@ -118,6 +118,50 @@ test.describe('圆角跟随 data-style 轴变化', () => {
   });
 });
 
+test.describe('顶栏工具条 (.vg-topbar) 与卡片按钮行 (.vg-toolbar) 语境互不串味', () => {
+  // issue #428: 两者曾同名共用 .vg-toolbar, 特异度相同的后一条规则只覆盖了
+  // display/align-items/gap, 卡片按钮行的 padding/背景/底边框原样落在了顶栏上。
+  test('顶栏工具条: 无内边距/底边框/底色, 外盒高度等于控件高度', async ({ page }) => {
+    const topbar = page.locator('#toolbar');
+    const { lang } = toolbarButtons(page);
+
+    await expect(topbar).toHaveClass(/\bvg-topbar\b/);
+
+    const style = await topbar.evaluate((el) => {
+      const s = getComputedStyle(el);
+      return {
+        padding: s.padding,
+        borderBottomWidth: s.borderBottomWidth,
+        backgroundColor: s.backgroundColor,
+      };
+    });
+    expect(style.padding).toBe('0px');
+    expect(style.borderBottomWidth).toBe('0px');
+
+    const headerBg = await page
+      .locator('.vg-header')
+      .evaluate((el) => getComputedStyle(el).backgroundColor);
+    const isTransparent = ['rgba(0, 0, 0, 0)', 'transparent'].includes(style.backgroundColor);
+    expect(isTransparent || style.backgroundColor === headerBg).toBe(true);
+
+    const [topbarBox, langBox] = await Promise.all([box(topbar), box(lang)]);
+    expect(topbarBox.height).toBeCloseTo(langBox.height, 1);
+  });
+
+  test('卡片按钮行: 内边距/底边框/间距保持原样', async ({ page }) => {
+    const cardToolbar = page.locator('#cardToolbar');
+    await expect(cardToolbar).toHaveClass(/\bvg-toolbar\b/);
+
+    const style = await cardToolbar.evaluate((el) => {
+      const s = getComputedStyle(el);
+      return { padding: s.padding, borderBottomWidth: s.borderBottomWidth, gap: s.gap };
+    });
+    expect(style.padding).toBe('9px 14px');
+    expect(style.borderBottomWidth).toBe('1px');
+    expect(style.gap).toBe('9px');
+  });
+});
+
 test.describe('--vg-lang-w 覆盖', () => {
   test('覆盖生效, 移除后回落默认宽度', async ({ page }) => {
     const { lang } = toolbarButtons(page);

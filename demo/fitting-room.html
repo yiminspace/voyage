@@ -76,8 +76,9 @@
         <!-- VoyageToolbar 的静态视觉基准: 工具条固化 语言 → 明暗 → 调色板 的顺序,
              三颗钮共用 vg-iconbtn 盒子, 应等高、同圆角、hover 色块严丝合缝对齐,
              只有内容 (裸文字 vs 矢量图标) 不同。语言钮宽度锁死, 切换语言时右侧
-             两颗钮不应发生任何横向位移。 -->
-        <div class="vg-toolbar" id="toolbar">
+             两颗钮不应发生任何横向位移。根节点用 vg-topbar (顶栏专属类名),
+             不与卡片按钮行的 vg-toolbar 共用, 因此不带 padding/背景/底边框。 -->
+        <div class="vg-topbar" id="toolbar">
           <button class="vg-iconbtn vg-lang-switch" id="langSwitch" aria-label="切换为英文">中</button>
           <div class="vg-switcher" id="switcher">
           <button class="vg-iconbtn vg-switcher-mode" id="switcherMode" aria-label="切换为亮色模式">
@@ -126,7 +127,7 @@
             <div style="height:7px"></div>
             <div class="vg-prose">滞后效应。系统的输出不只取决于当前输入, 还取决于它走过的路径 —— 恒温器上下各留一度的缓冲带, 就是为了制造滞后, 避免反复开关。</div>
           </div>
-          <div class="vg-toolbar">
+          <div class="vg-toolbar" id="cardToolbar">
             <button class="vg-btn primary">开始复习 · 24</button>
             <button class="vg-btn">标记掌握</button>
             <button class="vg-btn">导出</button>
