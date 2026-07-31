@@ -104,6 +104,6 @@ test.describe('VoyageIssueReporter 功能试驾', () => {
     );
     expect(report.targets[0].computedStyle).toBeTruthy();
     expect(report.targets[0].tokens).toBeTruthy();
-    expect(report.voyage.version).toBe('0.10.0');
+    expect(report.voyage.version).toBe('0.11.0');
   });
 });

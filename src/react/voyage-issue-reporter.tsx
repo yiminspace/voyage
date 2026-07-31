@@ -339,6 +339,14 @@ function responseResult(value: unknown): VoyageIssueSubmitResult {
   return { issueUrl, issueNumber, id, response: value };
 }
 
+function createReportId(): string {
+  if (typeof globalThis.crypto?.randomUUID === 'function') {
+    return globalThis.crypto.randomUUID();
+  }
+  const random = Math.random().toString(36).slice(2);
+  return `voyage-${Date.now().toString(36)}-${random}`;
+}
+
 export function VoyageIssueReporter({
   endpoint,
   app,
@@ -372,6 +380,7 @@ export function VoyageIssueReporter({
   const blockClickTimerRef = useRef<number | null>(null);
   const geometryFrameRef = useRef<number | null>(null);
   const descriptionRef = useRef<HTMLTextAreaElement>(null);
+  const reportIdRef = useRef<string | null>(null);
 
   const active = state !== 'idle';
 
@@ -386,6 +395,7 @@ export function VoyageIssueReporter({
     selectedElementsRef.current = [];
     appendSelectionRef.current = false;
     preservedSelectionRef.current = null;
+    reportIdRef.current = null;
   }, []);
 
   const capture = useCallback((element: Element, quote?: VoyageTextQuote) => {
@@ -641,8 +651,11 @@ export function VoyageIssueReporter({
     setState('submitting');
 
     const summary = description.trim().split(/\r?\n/, 1)[0].slice(0, 100);
+    const reportId = reportIdRef.current ?? createReportId();
+    reportIdRef.current = reportId;
     const report: VoyageIssueReport = {
       schema: VOYAGE_ISSUE_SCHEMA,
+      reportId,
       createdAt: new Date().toISOString(),
       title: `[${appInfo.name}] ${summary}`,
       description: description.trim(),

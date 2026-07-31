@@ -165,6 +165,7 @@ import { VoyageIssueReporter } from '@yiminlab/voyage/react';
 
 证据包 schema 是 `voyage-ui-issue/v1`，默认 `labels: ['intake']`、`destination.provider: 'github-issue'`，包含：
 
+- 一次反馈会话内稳定的 `reportId`，服务端可据此幂等创建 Issue；失败原地重试时 ID 不变，新反馈重新生成；
 - 问题主类型 `kind` 与完整多选类型 `kinds[]`；
 - 应用、Voyage 版本与四轴主题偏好；
 - 去掉 query 的页面地址、标题、viewport、设备像素比和系统偏好；
@@ -188,7 +189,7 @@ intake API 接收完整 JSON 报告。成功响应可以直接返回 GitHub 风�
 }
 ```
 
-服务端应验证 schema 与大小、鉴权/限流、把证据渲染进 Issue body、按应用路由到仓库，并强制补上 `intake` 标签。浏览器端的 `labels` 只是路由提示，不能代替服务端策略。
+服务端应验证 schema 与大小、鉴权/限流、以 `reportId` 幂等创建、把证据渲染进 Issue body、按应用路由到仓库，并强制补上 `intake` 标签。浏览器端的 `labels` 只是路由提示，不能代替服务端策略。
 
 ## 各应用默认组合
 
