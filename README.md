@@ -64,7 +64,7 @@ applyVoyagePrefs(document.documentElement, prefs);
 
 ## React: `@yiminlab/voyage/react`
 
-子路径导出开箱即用的主题切换 UI, 参照 [`@yiminlab/authkit`](../authkit) 的分发方式 (peerDependencies react, 不打进包体)。
+子路径导出开箱即用的主题切换 UI, 参照 [`@yiminlab/authkit`](https://www.npmjs.com/package/@yiminlab/authkit) 的分发方式 (peerDependencies react, 不打进包体)。
 
 ```bash
 pnpm add @yiminlab/voyage react react-dom
@@ -230,7 +230,21 @@ pnpm test:all    # 两者都跑
 
 ## 发布
 
-改本包源码需要同步 bump `package.json` 的 `version`，否则 `voyage-publish.yml` 会判定「版本未变」静默跳过发布，npm 停留旧版本。PR 阶段有 `voyage-version-check.yml` 拦截漏 bump 的改动。
+改可发布内容需要同步 bump `package.json` 的 `version`，否则 `publish.yml` 会判定「版本未变」并跳过发布。PR 阶段有 `version-check.yml` 拦截漏 bump 的改动。合入 `main` 后，GitHub Actions 使用 npm Trusted Publishing (OIDC) 自动发布并创建 `voyage-v<version>` tag。
+
+## 开发
+
+需要 Node.js 22+ 和 pnpm 10：
+
+```bash
+pnpm install --frozen-lockfile
+pnpm typecheck
+pnpm test
+pnpm test:e2e
+pnpm build
+```
+
+提交前至少运行 `pnpm typecheck && pnpm test && pnpm build`；涉及样式、布局或浏览器交互时还需运行 `pnpm test:e2e`。
 
 ## Roadmap
 

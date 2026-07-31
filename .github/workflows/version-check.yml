@@ -1,10 +1,17 @@
-name: voyage Version Check
+name: Version Check
 
 on:
   pull_request:
     branches: [main]
     paths:
-      - 'packages/voyage/**'
+      - 'src/**'
+      - 'index.css'
+      - 'tokens.css'
+      - 'voyage.css'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'tsconfig.json'
+      - 'tsup.config.ts'
 
 permissions:
   contents: read
@@ -22,14 +29,14 @@ jobs:
 
       - name: Compare package.json version against base branch
         run: |
-          BASE_VERSION=$(git show "${{ github.event.pull_request.base.sha }}:packages/voyage/package.json" | jq -r .version)
-          HEAD_VERSION=$(jq -r .version packages/voyage/package.json)
+          BASE_VERSION=$(git show "${{ github.event.pull_request.base.sha }}:package.json" | jq -r .version)
+          HEAD_VERSION=$(jq -r .version package.json)
 
           echo "Base version (${{ github.event.pull_request.base.ref }}): $BASE_VERSION"
           echo "Head version (this PR):     $HEAD_VERSION"
 
           if [ "$BASE_VERSION" == "$HEAD_VERSION" ]; then
-            echo "::error::本次 PR 改动了 packages/voyage/** 下的文件，但 package.json 的 version 字段未变化（仍为 $HEAD_VERSION）。请 bump 版本号，否则 voyage-publish.yml 会判定「版本未变」并静默跳过发布，改动无法发布到 npm。"
+            echo "::error::本次 PR 改动了 Voyage 的可发布内容，但 package.json 的 version 字段未变化（仍为 $HEAD_VERSION）。请 bump 版本号，否则 publish.yml 会判定「版本未变」并跳过发布。"
             exit 1
           fi
 

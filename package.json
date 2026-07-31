@@ -2,6 +2,10 @@
   "name": "@yiminlab/voyage",
   "version": "0.10.0",
   "description": "YiminLab 统一样式系统: 四轴 token 矩阵 (theme x mode x style x tone) + quarry 规格组件层",
+  "homepage": "https://github.com/yiminspace/voyage#readme",
+  "bugs": {
+    "url": "https://github.com/yiminspace/voyage/issues"
+  },
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
@@ -67,10 +71,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/yiminspace/yiminlab.git",
-    "directory": "packages/voyage"
+    "url": "git+https://github.com/yiminspace/voyage.git"
   },
   "license": "MIT",
+  "packageManager": "pnpm@10.14.0",
+  "engines": {
+    "node": ">=22"
+  },
   "publishConfig": {
     "access": "public"
   }
