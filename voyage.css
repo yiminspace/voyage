@@ -541,6 +541,329 @@
    不设 padding / background / border, 外观完全交给宿主的 .vg-header 等容器;
    gap 继承宿主, 让工具条内外一个节奏。 */
 .vg-topbar { display: inline-flex; align-items: center; gap: inherit; }
+.vg-topbar-separator {
+  width: 1px;
+  height: calc(var(--vg-ctl-h, 26px) - 8px);
+  flex: none;
+  background: var(--line2-c, var(--line2));
+}
+
+/* ---- 页面问题上报 (VoyageIssueReporter, @yiminlab/voyage/react) ---- */
+.vg-reporter-trigger { flex: none; }
+.vg-reporter-icon { display: block; }
+
+/*
+ * 整层以 manual popover 进入 top layer，避免选择器落到宿主 dialog / popover
+ * 后面；根节点不接管指针，只有 HUD / 表单自己恢复 pointer-events。
+ */
+.vg-reporter-layer {
+  position: absolute;
+  inset: 0 auto auto 0;
+  width: 100vw;
+  height: 0;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--fg);
+  overflow: visible;
+  pointer-events: none;
+  z-index: 2147483000;
+}
+.vg-reporter-highlight,
+.vg-reporter-component-highlight {
+  position: absolute;
+  box-sizing: border-box;
+  pointer-events: none;
+}
+.vg-reporter-highlight.viewport,
+.vg-reporter-component-highlight.viewport {
+  position: fixed;
+}
+.vg-reporter-component-highlight {
+  border: 1px dashed color-mix(in srgb, var(--acc) 64%, transparent);
+  background: color-mix(in srgb, var(--acc) 5%, transparent);
+}
+.vg-reporter-highlight {
+  border: 2px solid var(--acc);
+  background: color-mix(in srgb, var(--acc) 10%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--bg0) 72%, transparent);
+}
+.vg-reporter-highlight.saved {
+  border-style: dashed;
+  background: color-mix(in srgb, var(--acc) 6%, transparent);
+}
+.vg-reporter-highlight-label {
+  position: absolute;
+  left: -2px;
+  bottom: calc(100% + 4px);
+  max-width: min(360px, 80vw);
+  padding: 3px 7px;
+  border-radius: var(--r-btn);
+  background: var(--acc);
+  color: var(--acc-ink);
+  font-family: var(--vg-mono);
+  font-size: 11px;
+  line-height: 1.35;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-shadow: var(--btn-sh, none);
+}
+.vg-reporter-hud {
+  position: fixed;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: calc(100vw - 28px);
+  padding: 8px 10px 8px 14px;
+  border: 1px solid var(--line2-c, var(--line2));
+  border-radius: var(--r-win);
+  background: var(--surf-1);
+  color: var(--fg);
+  backdrop-filter: var(--blur, none);
+  -webkit-backdrop-filter: var(--blur, none);
+  box-shadow: var(--btn-sh, none);
+  font-size: 12.5px;
+  pointer-events: auto;
+}
+
+.vg-reporter-panel {
+  position: fixed;
+  inset: 16px 16px 16px auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-sizing: border-box;
+  width: min(390px, calc(100vw - 32px));
+  height: auto;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0 16px 16px;
+  overflow: auto;
+  border: 1px solid var(--line2-c, var(--line2));
+  border-radius: var(--r-win);
+  background: var(--surf-1);
+  color: var(--fg);
+  font-family: var(--vg-font-ui);
+  backdrop-filter: var(--blur, none);
+  -webkit-backdrop-filter: var(--blur, none);
+  box-shadow: var(--btn-sh, none);
+  pointer-events: auto;
+}
+.vg-reporter-panel::backdrop { background: transparent; }
+.vg-reporter-panel-head {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 48px;
+  margin: 0 -16px;
+  padding: 0 12px 0 16px;
+  border-bottom: 1px solid var(--line-c, var(--line));
+  background: var(--surf-1);
+  backdrop-filter: var(--blur, none);
+  -webkit-backdrop-filter: var(--blur, none);
+}
+.vg-reporter-panel-head strong { font-size: 14px; font-weight: 600; }
+
+.vg-reporter-targets {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.vg-reporter-targets-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.vg-reporter-targets-head > div {
+  display: flex;
+  gap: 6px;
+}
+.vg-reporter-target-list {
+  display: flex;
+  max-height: 230px;
+  flex-direction: column;
+  gap: 7px;
+  overflow: auto;
+}
+.vg-reporter-target {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px;
+  border: 1px solid var(--line2-c, var(--line2));
+  border-radius: var(--r-btn);
+  background: var(--bg2);
+}
+.vg-reporter-target > div {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 5px;
+}
+.vg-reporter-target strong {
+  overflow: hidden;
+  font-family: var(--vg-mono);
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.vg-reporter-target small {
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--fg2);
+  font-size: 12px;
+  line-height: 1.45;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+.vg-reporter-target blockquote {
+  max-height: 88px;
+  margin: 0;
+  overflow: auto;
+  color: var(--fg2);
+  font-size: 12px;
+  line-height: 1.45;
+}
+.vg-reporter-eyebrow {
+  color: var(--fg3);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.vg-reporter-kinds {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+.vg-reporter-kind {
+  margin: 0;
+  padding: 5px 9px;
+  border: 1px solid var(--line2-c, var(--line2));
+  border-radius: var(--r-pill);
+  background: transparent;
+  color: var(--fg2);
+  font-family: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+.vg-reporter-kind:hover { background: var(--hoverbg); color: var(--fg); }
+.vg-reporter-kind.on {
+  border-color: var(--acc);
+  background: var(--sel-bg);
+  color: var(--fg);
+}
+
+.vg-reporter-field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  color: var(--fg2);
+  font-size: 12px;
+  font-weight: 500;
+}
+.vg-reporter-field textarea {
+  box-sizing: border-box;
+  width: 100%;
+  resize: vertical;
+  min-height: 104px;
+  padding: 9px 10px;
+  border: 1px solid var(--line2-c, var(--line2));
+  border-radius: var(--r-btn);
+  outline: none;
+  background: var(--bg2);
+  color: var(--fg);
+  font: 400 13px/1.5 var(--vg-font-ui);
+}
+.vg-reporter-field textarea::placeholder { color: var(--fg3); }
+.vg-reporter-field textarea:focus {
+  border-color: var(--acc);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--acc) 18%, transparent);
+}
+
+.vg-reporter-privacy {
+  color: var(--fg2);
+  font-size: 11.5px;
+  line-height: 1.5;
+}
+.vg-reporter-privacy summary {
+  color: var(--fg2);
+  cursor: pointer;
+  user-select: none;
+}
+.vg-reporter-privacy p { margin: 8px 0 4px; }
+.vg-reporter-privacy ul { margin: 4px 0 0; padding-left: 18px; }
+.vg-reporter-error {
+  margin: 0;
+  padding: 8px 10px;
+  border-radius: var(--r-btn);
+  background: var(--red-bg);
+  color: var(--red-fg);
+  font-size: 12px;
+  line-height: 1.45;
+}
+.vg-reporter-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: auto;
+}
+.vg-reporter-actions a { text-decoration: none; }
+.vg-reporter-success {
+  display: flex;
+  min-height: 220px;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  color: var(--fg2);
+}
+.vg-reporter-success-mark {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border-radius: var(--r-pill);
+  background: var(--ok-bg);
+  color: var(--ok-fg);
+  font-size: 22px;
+}
+.vg-reporter-success code {
+  color: var(--fg);
+  font-family: var(--vg-mono);
+  font-size: 13px;
+}
+
+@media (max-width: 640px) {
+  .vg-reporter-hud {
+    top: 8px;
+    width: calc(100vw - 16px);
+    box-sizing: border-box;
+    justify-content: space-between;
+  }
+  .vg-reporter-panel {
+    inset: auto 8px 8px;
+    width: calc(100vw - 16px);
+    max-height: min(72vh, 620px);
+  }
+  .vg-reporter-highlight-label { max-width: 70vw; }
+}
 
 /* ---- 主题切换器 (VoyageSwitcher, @yiminlab/voyage/react) ---- */
 /* gap 继承宿主容器 (vg-header 为 11px): 明暗与调色板两钮之间的间距

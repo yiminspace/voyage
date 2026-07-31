@@ -89,7 +89,7 @@ function App() {
 
 - **`VoyageProvider`** — 挂载时执行 `initVoyage`, 通过 context 分发偏好与 setter; 需要同时维护 tailwind `.dark` class 的应用传 `syncDarkClass`。SSR 场景仍需配合 `voyageInitScript` 防闪烁 (本组件只管挂载后的状态)。
 - **`useVoyage()`** — 返回 `{ prefs, setTheme, setMode, setStyle, setTone, setPrefs, reset }`, 每次调用写入 `localStorage('vg_prefs')` 并同步宿主元素属性。
-- **`VoyageToolbar`** — **顶栏首选**: 把语言钮与主题切换器按固定顺序排成一行, 顺序为 **语言 → 明暗 → 调色板**, 由组件的 DOM 结构固化。明暗与调色板同属主题外观、天然相邻; 语言是另一维度的设置, 整体靠边而非夹在主题族旁边。不传 `onLocaleChange` 则不渲染语言钮 (不做多语言的宿主直接省略)。`icons` 透传给内部的 `VoyageSwitcher`。
+- **`VoyageToolbar`** — **顶栏首选**: 把反馈入口、语言钮与主题切换器按固定顺序排成一行。缺省仍是 **语言 → 明暗 → 调色板**；传 `reporter` 后是 **反馈 | 语言 → 明暗 → 调色板**。明暗与调色板同属主题外观、天然相邻; 语言是另一维度的设置, 整体靠边而非夹在主题族旁边。不传 `onLocaleChange` 则不渲染语言钮 (不做多语言的宿主直接省略)。`icons` 透传给内部的 `VoyageSwitcher`。
 
   顺序之所以要由组件固化: 此前两个单品各自导出、谁左谁右无人约束, 两个宿主排成了相反的顺序 —— 设计系统管住了每颗钮"长什么样", 却没管"站哪儿"。需要自定义排布的宿主仍可直接用下面两个单品, 但那样顺序就是宿主自己的责任了。
 
@@ -120,6 +120,76 @@ function App() {
 <VoyageLangSwitcher locale={locale} onLocaleChange={setLocale} />
 ```
 
+## 页面问题上报
+
+`VoyageIssueReporter` 让用户直接点选有问题的界面或文字，比只附截图多一层可机器读取的定位证据。它只负责浏览器端的选择、脱敏、取证与 `POST`；GitHub token、仓库路由和 Issue 创建必须留在服务端。
+
+顶栏接入只需要配置 intake 地址与应用身份：
+
+```tsx
+<VoyageToolbar
+  locale={locale}
+  onLocaleChange={setLocale}
+  reporter={{
+    endpoint: '/api/ui-issue-intake',
+    app: {
+      name: 'quarry',
+      release: process.env.NEXT_PUBLIC_APP_VERSION,
+    },
+  }}
+/>
+```
+
+也可以单独摆放：
+
+```tsx
+import { VoyageIssueReporter } from '@yiminlab/voyage/react';
+
+<VoyageIssueReporter
+  endpoint="https://intake.example.com/v1/ui-issues"
+  app="engram"
+  labels={['intake']}
+  metadata={{ routeName: 'reader' }}
+  headers={{ 'x-csrf-token': csrfToken }}
+/>
+```
+
+交互约定：
+
+- 顶栏按钮进入选择模式，页面仍可滚动；点击目标只完成选择，不会触发原业务按钮或链接。`Esc` 随时退出。
+- 如果触发前已有划词，直接以文字引用进入「内容有误」，保留上下文前后缀。
+- 一个问题涉及多个位置时，选完第一个后点「添加区域」继续选择；已有区域保持高亮，可在表单中逐个移除，最终一起进入 `targets[]`。
+- 问题类型支持多选且至少保留一项；协议同时发送完整 `kinds[]`，并用 `kind: kinds[0]` 兼容旧 intake。
+- `Cmd/Ctrl + Shift + .` 可从当前指针位置直接取目标；不需要快捷键的宿主传 `shortcut={false}`。
+- 选中后冻结当时证据，再在侧边表单补充类型与期望；失败保留现场和描述，成功时 intake API 可返回 GitHub Issue 链接。
+
+证据包 schema 是 `voyage-ui-issue/v1`，默认 `labels: ['intake']`、`destination.provider: 'github-issue'`，包含：
+
+- 问题主类型 `kind` 与完整多选类型 `kinds[]`；
+- 应用、Voyage 版本与四轴主题偏好；
+- 去掉 query 的页面地址、标题、viewport、设备像素比和系统偏好；
+- 目标 selector、`vg-*` 组件血统、语义标识、ARIA 角色/名称、采集时间，以及标明坐标系的 viewport/document 双份几何位置；
+- 一组有限的 computed styles 与 Voyage tokens；
+- 最多 4 层、140 个节点、12,000 字符的局部 DOM，或精确划词与前后文。
+
+隐私边界：
+
+- `password` / `email` / `tel` 输入、`textarea`、可编辑区域和任何 `[data-vg-private]` 子树都会遮蔽；公共父节点的文本摘要也会跳过这些后代。
+- 不读取 input value、cookie、localStorage、token、网络请求或页面 query。
+- 动态内容区域应主动标记 `data-vg-private`；希望 selector 长期稳定的组件可标 `data-vg-id` 或 `data-vg-component`。
+- `metadata` 与自定义 headers 由宿主负责，禁止放 GitHub token 或用户输入。
+
+intake API 接收完整 JSON 报告。成功响应可以直接返回 GitHub 风格字段，也可以包在 `issue` 下：
+
+```json
+{
+  "issueUrl": "https://github.com/yiminspace/yiminlab/issues/501",
+  "issueNumber": 501
+}
+```
+
+服务端应验证 schema 与大小、鉴权/限流、把证据渲染进 Issue body、按应用路由到仓库，并强制补上 `intake` 标签。浏览器端的 `labels` 只是路由提示，不能代替服务端策略。
+
 ## 各应用默认组合
 
 | 应用 | theme | mode | style | tone |
@@ -134,17 +204,27 @@ function App() {
 
 ## 试衣间 (视觉回归基准)
 
+功能试驾（会打开浏览器，加载真实 React 组件）：
+
+```bash
+pnpm demo
+```
+
+页面右上角会出现反馈图标。可直接点选任意元素，或先划选正文再点反馈；提交由本地 mock intake 拦截，不会创建真实 GitHub Issue。提交后左侧自动展示完整 `voyage-ui-issue/v1` JSON，可检查 selector、局部 DOM、computed styles、Voyage tokens、运行环境和隐私遮蔽结果。
+
+只查看零构建静态视觉基准：
+
 ```
 open demo/fitting-room.html
 ```
 
-被测样式全部来自 tokens.css / voyage.css 本体; 改 token 后先开这页对照四轴组合。页面顶栏内嵌了一个 `vg-topbar` 静态实例 (原生 JS 驱动, 与 `VoyageToolbar` 组件同一份标记/样式), 兼作顶栏控件的视觉基准 —— 三颗钮的等高/同圆角、以及切换语言时右侧控件不位移, 都在这页上量。卡片内的 `.vg-toolbar` 按钮行 (「hysteresis」卡片下方) 是另一语境的静态实例, 两者不共用类名。
+被测样式全部来自 tokens.css / voyage.css 本体; 改 token 后先开这页对照四轴组合。`file://` 模式不加载 React，页面顶栏内嵌一个 `vg-topbar` 静态实例 (原生 JS 驱动, 与 `VoyageToolbar` 组件同一份标记/样式), 兼作顶栏控件的视觉基准 —— 三颗钮的等高/同圆角、以及切换语言时右侧控件不位移, 都在这页上量。卡片内的 `.vg-toolbar` 按钮行 (「hysteresis」卡片下方) 是另一语境的静态实例, 两者不共用类名。
 
 手工对照仍可用 (改 token 后开页肉眼核对四轴组合), 但上述尺寸契约已由 `e2e/` 下的 Playwright 用例自动守住: 真实浏览器排版引擎跑 `getBoundingClientRect()` / `getComputedStyle()`, 断言三颗钮等高等宽同圆角、语言钮在多种文案 (含明显更宽的文案) 下宽度恒定、切换语言不推动右侧控件、圆角随 `data-style` 轴变化、`--vg-lang-w` 覆盖生效且可回落默认。这类断言 jsdom 测不出来 (不解析 `var()`、无字体引擎、不跑 flex 布局), 只有真实渲染才能当场暴露。
 
 ```
 pnpm test        # vitest — 组件行为/token 解析
-pnpm test:e2e    # playwright — 顶栏几何契约 (首次需 pnpm exec playwright install chromium)
+pnpm test:e2e    # playwright — 视觉几何契约 + Reporter 真实浏览器功能试驾
 pnpm test:all    # 两者都跑
 ```
 
@@ -155,6 +235,7 @@ pnpm test:all    # 两者都跑
 ## Roadmap
 
 - [x] react/ 薄封装: VoyageProvider / useVoyage / VoyageToolbar / VoyageSwitcher (Popover API, 有支持时启用) / VoyageLangSwitcher
+- [x] 页面问题上报: 元素/划词选择、脱敏证据包、可配置 intake endpoint
 - [x] quarry 接入 (slate x dark x classic x normal, 视觉基准)
 - [ ] react/ 其余薄封装: Dialog (原生 `<dialog>`) / Toast
 - [ ] engram 迁移 (首个宿主) → jsontailor → ai

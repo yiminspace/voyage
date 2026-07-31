@@ -1,6 +1,6 @@
 {
   "name": "@yiminlab/voyage",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "description": "YiminLab 统一样式系统: 四轴 token 矩阵 (theme x mode x style x tone) + quarry 规格组件层",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -29,6 +29,7 @@
   "scripts": {
     "build": "rimraf dist && tsup",
     "dev": "tsup --watch",
+    "demo": "vite --host 127.0.0.1 --port 4173 --open /demo/fitting-room.html",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -61,6 +62,7 @@
     "rimraf": "^6.0.0",
     "tsup": "^8.0.0",
     "typescript": "^5",
+    "vite": "^7.3.6",
     "vitest": "^3.0.0"
   },
   "repository": {

@@ -32,6 +32,49 @@
   .st i { display: block; height: 38px; border-radius: 6px; border: 1px solid rgba(128, 140, 160, 0.18); background: var(--sc); }
   .st.txt i { display: flex; align-items: center; justify-content: center; background: var(--bg2); color: var(--sc); font-weight: 700; font-size: 15px; font-style: normal; }
   .st s { text-decoration: none; display: block; font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 8.5px; color: var(--fg3); text-align: center; margin-top: 5px; white-space: nowrap; }
+  .vg-demo-evidence {
+    inset: 16px auto 16px 16px;
+    z-index: 2147482000;
+    width: min(520px, calc(100vw - 32px));
+  }
+  .vg-demo-evidence-copy {
+    display: flex;
+    min-height: 0;
+    flex: 1;
+    flex-direction: column;
+    gap: 10px;
+    overflow: hidden;
+  }
+  .vg-demo-evidence-copy p {
+    margin: 0;
+    color: var(--fg2);
+    font-size: 12px;
+    line-height: 1.5;
+  }
+  .vg-demo-evidence-copy pre {
+    min-height: 0;
+    flex: 1;
+    margin: 0;
+    padding: 12px;
+    overflow: auto;
+    border: 1px solid var(--line2-c, var(--line2));
+    border-radius: var(--r-btn);
+    background: var(--bg0);
+    color: var(--fg2);
+    font: 11px/1.5 var(--vg-mono);
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .vg-demo-evidence-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .vg-demo-evidence-actions small { color: var(--fg3); }
+  @media (max-width: 900px) {
+    .vg-demo-evidence { inset: 8px; width: calc(100vw - 16px); }
+  }
 </style>
 </head>
 <body>
@@ -219,6 +262,17 @@
   // 已落定的四轴状态 (bind 的 after 回调里维护), 预览还原时以它为准
   var committed = { theme: 'slate', mode: 'dark', style: 'classic', tone: 'quiet' };
 
+  function notifyReporterPrefs() {
+    window.dispatchEvent(new CustomEvent('voyage-demo-prefs', {
+      detail: {
+        theme: committed.theme,
+        mode: committed.mode,
+        style: committed.style,
+        tone: committed.tone
+      }
+    }));
+  }
+
   function applyAxes(theme, mode, style, tone) {
     targets.forEach(function (t) {
       t.setAttribute('data-theme', theme);
@@ -260,7 +314,11 @@
   bind(
     [{ sel: '[data-pick]', attr: 'data-pick' }],
     'data-theme',
-    function (v) { committed.theme = v; refreshPresetSelection(); }
+    function (v) {
+      committed.theme = v;
+      refreshPresetSelection();
+      notifyReporterPrefs();
+    }
   );
   bind(
     [{ sel: '[data-mode-pick]', attr: 'data-mode-pick' }, { sel: '[data-switch-mode]', attr: 'data-switch-mode' }],
@@ -273,17 +331,18 @@
       switcherMode.setAttribute('aria-label', v === 'dark' ? '切换为亮色模式' : '切换为暗色模式');
       // 主题卡缩略图按当前明暗刷新色板 (每套主题的 dark/light 取值不同)
       document.querySelectorAll('.vg-preset-thumb').forEach(function (d) { d.setAttribute('data-mode', v); });
+      notifyReporterPrefs();
     }
   );
   bind(
     [{ sel: '[data-style-pick]', attr: 'data-style-pick' }],
     'data-style',
-    function (v) { committed.style = v; }
+    function (v) { committed.style = v; notifyReporterPrefs(); }
   );
   bind(
     [{ sel: '[data-tone-pick]', attr: 'data-tone-pick' }],
     'data-tone',
-    function (v) { committed.tone = v; }
+    function (v) { committed.tone = v; notifyReporterPrefs(); }
   );
 
   // 策展主题卡: 生成 + hover 即时预览 (移出还原, 点击落定 —— 落定通过点 bench
@@ -369,8 +428,17 @@
     var toEn = langBtn.textContent === '中';
     langBtn.textContent = toEn ? 'EN' : '中';
     langBtn.setAttribute('aria-label', toEn ? 'Switch to Chinese' : '切换为英文');
+    window.dispatchEvent(new CustomEvent('voyage-demo-locale', {
+      detail: toEn ? 'en' : 'zh'
+    }));
   });
 })();
+</script>
+<script type="module">
+  // file:// 仍是零构建视觉基准；pnpm demo 经 Vite 加载真实 React Reporter。
+  if (window.location.protocol !== 'file:') {
+    import('./fitting-room-reporter.tsx');
+  }
 </script>
 </body>
 </html>

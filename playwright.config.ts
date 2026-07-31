@@ -1,7 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 
-// 被测页是 demo/fitting-room.html —— 已经是视觉回归基准, 不依赖 React 运行时,
-// 用 file:// 直接打开即可, 不需要额外起静态服务器。
+// 纯视觉契约继续用 file:// 打开 fitting-room，保证零构建基准不被破坏；
+// Reporter 功能试驾经 Vite 加载真实 React 组件，因此测试时同时启动本地 demo server。
 export default defineConfig({
   testDir: './e2e',
   fullyParallel: true,
@@ -9,6 +9,11 @@ export default defineConfig({
   // 不靠重试掩盖不稳定: 用例本身必须确定性通过。
   retries: 0,
   reporter: process.env.CI ? 'github' : 'list',
+  webServer: {
+    command: 'pnpm exec vite --host 127.0.0.1 --port 4173',
+    url: 'http://127.0.0.1:4173/demo/fitting-room.html',
+    reuseExistingServer: !process.env.CI,
+  },
   use: {
     trace: 'retain-on-failure',
   },

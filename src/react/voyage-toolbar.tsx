@@ -1,6 +1,10 @@
 'use client';
 
 import type { VoyageLocale } from '../index';
+import {
+  VoyageIssueReporter,
+  type VoyageIssueReporterProps,
+} from './voyage-issue-reporter';
 import { VoyageLangSwitcher } from './voyage-lang-switcher';
 import { VoyageSwitcher, type VoyageSwitcherIcons } from './voyage-switcher';
 
@@ -15,6 +19,11 @@ export interface VoyageToolbarProps {
   onLocaleChange?: (locale: VoyageLocale) => void;
   /** 宿主用自家图标体系时传入 (如 quarry 传 tabler webfont 的 <i>) */
   icons?: VoyageSwitcherIcons;
+  /**
+   * 可选 UI 问题上报。传入后顺序为 反馈 | 语言 → 明暗 → 调色板；
+   * endpoint 接收证据包并由服务端创建带 intake 标签的 GitHub Issue。
+   */
+  reporter?: Omit<VoyageIssueReporterProps, 'locale' | 'className'>;
 }
 
 /**
@@ -37,9 +46,16 @@ export function VoyageToolbar({
   locale = 'zh',
   onLocaleChange,
   icons,
+  reporter,
 }: VoyageToolbarProps = {}) {
   return (
     <div className={['vg-topbar', className].filter(Boolean).join(' ')}>
+      {reporter ? (
+        <>
+          <VoyageIssueReporter {...reporter} locale={locale} />
+          <span className="vg-topbar-separator" aria-hidden="true" />
+        </>
+      ) : null}
       {onLocaleChange ? (
         <VoyageLangSwitcher locale={locale} onLocaleChange={onLocaleChange} />
       ) : null}

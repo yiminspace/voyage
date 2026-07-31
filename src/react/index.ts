@@ -12,3 +12,8 @@ export { VoyageProvider, useVoyage, type VoyageContextValue, type VoyageProvider
 export { VoyageToolbar, type VoyageToolbarProps } from './voyage-toolbar';
 export { VoyageSwitcher, type VoyageSwitcherProps, type VoyageSwitcherIcons } from './voyage-switcher';
 export { VoyageLangSwitcher, type VoyageLangSwitcherProps } from './voyage-lang-switcher';
+export {
+  VoyageIssueReporter,
+  type VoyageIssueReporterProps,
+  type VoyageIssueSubmitResult,
+} from './voyage-issue-reporter';

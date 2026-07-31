@@ -124,4 +124,24 @@ describe('VoyageToolbar', () => {
     );
     expect(document.querySelector('.vg-topbar')!.className).toMatch(/\bhost-extra\b/);
   });
+
+  it('配置 reporter 时把反馈入口放在设置族之前，并用分隔线划组', () => {
+    render(
+      <VoyageProvider>
+        <VoyageToolbar
+          locale="zh"
+          onLocaleChange={() => {}}
+          reporter={{ endpoint: '/api/intake', app: 'quarry' }}
+        />
+      </VoyageProvider>
+    );
+
+    const classNames = toolbarButtons().map((button) => button.className);
+    expect(classNames).toHaveLength(4);
+    expect(classNames[0]).toMatch(/\bvg-reporter-trigger\b/);
+    expect(classNames[1]).toMatch(/\bvg-lang-switch\b/);
+    expect(classNames[2]).toMatch(/\bvg-switcher-mode\b/);
+    expect(classNames[3]).toMatch(/\bvg-switcher-trigger\b/);
+    expect(document.querySelector('.vg-topbar-separator')).not.toBeNull();
+  });
 });
