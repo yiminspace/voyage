@@ -89,6 +89,7 @@ describe('VoyageIssueReporter', () => {
     expect(init).toMatchObject({ method: 'POST', credentials: 'same-origin' });
     expect(report).toMatchObject({
       schema: 'voyage-ui-issue/v1',
+      reportId: expect.any(String),
       title: '[quarry] 结果少了一行，应该显示全部记录',
       description: '结果少了一行，应该显示全部记录',
       kind: 'appearance',
@@ -104,7 +105,7 @@ describe('VoyageIssueReporter', () => {
     expect(report.page.url).not.toContain('token');
     expect(report.targets[0].html).toContain('[masked]');
     expect(report.targets[0].html).not.toContain('不应上传的草稿');
-    expect(report.voyage.version).toBe('0.10.0');
+    expect(report.voyage.version).toBe('0.11.0');
 
     expect(await screen.findByText('问题已提交')).not.toBeNull();
     expect(document.querySelectorAll('.vg-reporter-highlight.saved')).toHaveLength(0);
@@ -167,6 +168,10 @@ describe('VoyageIssueReporter', () => {
 
     expect(await screen.findByText('问题已提交')).not.toBeNull();
     expect(fetchMock).toHaveBeenCalledTimes(2);
+    const reports = fetchMock.mock.calls.map((call) =>
+      JSON.parse(String((call[1] as RequestInit).body))
+    );
+    expect(reports[0].reportId).toBe(reports[1].reportId);
   });
 
   it('可继续添加多个区域，并把所有目标放进同一份报告', async () => {

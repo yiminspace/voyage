@@ -58,6 +58,8 @@ export interface VoyageIssueTarget {
 
 export interface VoyageIssueReport {
   schema: typeof VOYAGE_ISSUE_SCHEMA;
+  /** 一次反馈会话的稳定幂等键；原地重试保持不变，新反馈重新生成。 */
+  reportId: string;
   createdAt: string;
   title: string;
   description: string;
