@@ -320,7 +320,7 @@ pnpm exec playwright test --project=chromium-visual
 - 等待 `document.fonts.ready`，并用 Arial / Courier New 覆盖系统字体差异
 - 基线只在 `chromium-visual` 生成；Firefox / WebKit 不维护像素快照
 
-本地核对：
+本地核对（须 Linux Chromium，与 CI 同构；macOS 上默认跳过，可用 `VOYAGE_VISUAL_FORCE=1` 强制）：
 
 ```
 pnpm exec playwright test --project=chromium-visual

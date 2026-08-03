@@ -55,6 +55,12 @@ const SCREENSHOT = {
 };
 
 test.describe('代表性四轴视觉回归', () => {
+  // 基线以 Linux Chromium（CI）为真源；macOS 抗锯齿会分叉，本地请用 Docker / Actions 更新。
+  test.skip(
+    process.platform !== 'linux' && !process.env.CI && !process.env.VOYAGE_VISUAL_FORCE,
+    '视觉基线仅在 Linux Chromium 核对；设置 VOYAGE_VISUAL_FORCE=1 可强制本地跑'
+  );
+
   test.beforeEach(async ({ page }) => {
     await page.goto(DEMO_URL);
     // 零构建静态认证组件展示（Vite React 挂载会藏掉它）
