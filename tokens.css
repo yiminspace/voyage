@@ -209,7 +209,14 @@
   --vg-color-border: var(--line2-c, var(--line2));
   --vg-radius-control: var(--r-btn);
   --vg-radius-surface: var(--r-win);
-  --vg-shadow-popover: 0 12px 36px color-mix(in srgb, var(--bg0) 55%, transparent);
+  /* 遮罩随底色走; 浮层阴影用正文色推导, 相对 --bg0/--bg1 承载面才有明暗差 */
+  --vg-color-overlay: color-mix(in srgb, var(--bg0) 62%, transparent);
+  --vg-shadow-popover: 0 12px 36px color-mix(in srgb, var(--fg) 28%, transparent);
+}
+
+/* 暗色下 --fg 是浅色, 不能当阴影; 改为向纯黑混合, 仍相对主题底色更深 */
+.vg[data-mode='dark'] {
+  --vg-shadow-popover: 0 12px 36px color-mix(in srgb, #000 50%, transparent);
 }
 
 /* ---------------------------------------------------------------------------

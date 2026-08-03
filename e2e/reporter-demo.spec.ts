@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import packageJson from '../package.json';
 
 const DEMO_URL =
   'http://127.0.0.1:4173/demo/fitting-room.html?token=must-not-leak#reporter-demo';
@@ -104,6 +105,6 @@ test.describe('VoyageIssueReporter 功能试驾', () => {
     );
     expect(report.targets[0].computedStyle).toBeTruthy();
     expect(report.targets[0].tokens).toBeTruthy();
-    expect(report.voyage.version).toBe('0.12.0');
+    expect(report.voyage.version).toBe(packageJson.version);
   });
 });
