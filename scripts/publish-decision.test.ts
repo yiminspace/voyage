@@ -10,18 +10,18 @@ import { checkPackEntries, REQUIRED_PACK_PATHS } from './check-pack-contents.mjs
 describe('parseSemVer', () => {
   it('parses release versions', () => {
     expect(parseSemVer('1.2.3')).toEqual({
-      major: 1,
-      minor: 2,
-      patch: 3,
+      major: '1',
+      minor: '2',
+      patch: '3',
       prerelease: [],
     });
   });
 
   it('parses prerelease versions', () => {
     expect(parseSemVer('1.2.3-beta.1')).toEqual({
-      major: 1,
-      minor: 2,
-      patch: 3,
+      major: '1',
+      minor: '2',
+      patch: '3',
       prerelease: ['beta', '1'],
     });
   });
@@ -32,6 +32,12 @@ describe('parseSemVer', () => {
     expect(parseSemVer('v1.2.3')).toBeNull();
     expect(parseSemVer('01.2.3')).toBeNull();
     expect(parseSemVer('not-a-version')).toBeNull();
+  });
+
+  it('rejects surrounding whitespace', () => {
+    expect(parseSemVer(' 1.2.3')).toBeNull();
+    expect(parseSemVer('1.2.3 ')).toBeNull();
+    expect(parseSemVer('\t1.2.3\n')).toBeNull();
   });
 });
 
@@ -51,6 +57,17 @@ describe('compareSemVer', () => {
     expect(compareSemVer(parseSemVer('1.0.0-alpha')!, parseSemVer('1.0.0-alpha.1')!)).toBe(-1);
     expect(compareSemVer(parseSemVer('1.0.0-alpha.1')!, parseSemVer('1.0.0-beta')!)).toBe(-1);
     expect(compareSemVer(parseSemVer('1.0.0-beta.2')!, parseSemVer('1.0.0-beta.11')!)).toBe(-1);
+  });
+
+  it('compares numeric identifiers beyond Number.MAX_SAFE_INTEGER', () => {
+    const high = parseSemVer('9007199254740993.0.0')!;
+    const low = parseSemVer('9007199254740992.0.0')!;
+    expect(high).not.toBeNull();
+    expect(low).not.toBeNull();
+    expect(compareSemVer(high, low)).toBe(1);
+    expect(decidePublish('9007199254740993.0.0', '9007199254740992.0.0').action).toBe(
+      'publish',
+    );
   });
 });
 

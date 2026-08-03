@@ -19,39 +19,55 @@ const SEMVER_RE =
   /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/;
 
 /**
+ * Compare two non-negative integer strings without Number precision loss.
+ * Inputs must already match SemVer numeric identifiers (no leading zeros except "0").
+ *
+ * @param {string} a
+ * @param {string} b
+ * @returns {-1 | 0 | 1}
+ */
+export function compareNumericId(a, b) {
+  if (a === b) return 0;
+  if (a.length !== b.length) return a.length < b.length ? -1 : 1;
+  return a < b ? -1 : 1;
+}
+
+/**
  * @param {string} version
- * @returns {{ major: number, minor: number, patch: number, prerelease: string[] } | null}
+ * @returns {{ major: string, minor: string, patch: string, prerelease: string[] } | null}
  */
 export function parseSemVer(version) {
   if (typeof version !== 'string') return null;
-  const m = SEMVER_RE.exec(version.trim());
+  // Reject surrounding whitespace; SemVer strings must match exactly.
+  if (version !== version.trim()) return null;
+  const m = SEMVER_RE.exec(version);
   if (!m) return null;
   return {
-    major: Number(m[1]),
-    minor: Number(m[2]),
-    patch: Number(m[3]),
+    major: m[1],
+    minor: m[2],
+    patch: m[3],
     prerelease: m[4] ? m[4].split('.') : [],
   };
 }
 
 /**
  * @param {string} id
- * @returns {number | string}
+ * @returns {{ kind: 'num', value: string } | { kind: 'str', value: string }}
  */
 function prereleaseId(id) {
-  if (/^(0|[1-9]\d*)$/.test(id)) return Number(id);
-  return id;
+  if (/^(0|[1-9]\d*)$/.test(id)) return { kind: 'num', value: id };
+  return { kind: 'str', value: id };
 }
 
 /**
- * @param {{ major: number, minor: number, patch: number, prerelease: string[] }} a
- * @param {{ major: number, minor: number, patch: number, prerelease: string[] }} b
+ * @param {{ major: string, minor: string, patch: string, prerelease: string[] }} a
+ * @param {{ major: string, minor: string, patch: string, prerelease: string[] }} b
  * @returns {-1 | 0 | 1}
  */
 export function compareSemVer(a, b) {
   for (const key of /** @type {const} */ (['major', 'minor', 'patch'])) {
-    if (a[key] < b[key]) return -1;
-    if (a[key] > b[key]) return 1;
+    const cmp = compareNumericId(a[key], b[key]);
+    if (cmp !== 0) return cmp;
   }
 
   const aPre = a.prerelease;
@@ -67,13 +83,15 @@ export function compareSemVer(a, b) {
     if (i >= bPre.length) return 1;
     const ai = prereleaseId(aPre[i]);
     const bi = prereleaseId(bPre[i]);
-    if (ai === bi) continue;
-    if (typeof ai === 'number' && typeof bi === 'number') {
-      return ai < bi ? -1 : 1;
+    if (ai.kind === 'num' && bi.kind === 'num') {
+      const cmp = compareNumericId(ai.value, bi.value);
+      if (cmp !== 0) return cmp;
+      continue;
     }
-    if (typeof ai === 'number') return -1;
-    if (typeof bi === 'number') return 1;
-    return String(ai) < String(bi) ? -1 : 1;
+    if (ai.kind === 'num') return -1;
+    if (bi.kind === 'num') return 1;
+    if (ai.value === bi.value) continue;
+    return ai.value < bi.value ? -1 : 1;
   }
   return 0;
 }

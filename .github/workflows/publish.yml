@@ -8,7 +8,9 @@ on:
     branches: [main]
 
 concurrency:
-  group: publish-${{ github.event.workflow_run.head_sha || github.sha }}
+  # One publish critical section for main across SHAs, so version checks see
+  # a serialized registry state (cancel-in-progress:false queues, never races).
+  group: publish-main
   cancel-in-progress: false
 
 permissions:
@@ -116,8 +118,11 @@ jobs:
         if: steps.check.outputs.should_publish == 'true'
         run: pnpm publish --access public --provenance --no-git-checks
 
-      - name: Create Git tag
-        if: steps.check.outputs.should_publish == 'true'
+      - name: Ensure Git tag
+        # Also runs on skip so a successful npm publish + failed tag can be healed
+        # on rerun without republishing (never move an existing tag).
+        if: steps.check.outputs.should_publish == 'true' || steps.check.outputs.decision == 'skip'
+        id: tag
         env:
           VERSION: ${{ steps.check.outputs.version }}
           PUBLISH_SHA: ${{ steps.meta.outputs.sha }}
@@ -133,6 +138,7 @@ jobs:
             EXISTING=$(git rev-list -n 1 "${TAG}")
             if [ "$EXISTING" = "$PUBLISH_SHA" ]; then
               echo "Tag ${TAG} already points at ${PUBLISH_SHA}; leaving it unchanged"
+              echo "tag_action=unchanged" >> "$GITHUB_OUTPUT"
               exit 0
             fi
             echo "::error::Tag ${TAG} already exists at ${EXISTING}, refusing to move it (wanted ${PUBLISH_SHA})"
@@ -141,6 +147,7 @@ jobs:
 
           git tag -a "${TAG}" -m "Release @yiminlab/voyage v${VERSION}" "${PUBLISH_SHA}"
           git push origin "refs/tags/${TAG}"
+          echo "tag_action=created" >> "$GITHUB_OUTPUT"
 
       - name: Summary (published)
         if: steps.check.outputs.should_publish == 'true'
@@ -149,11 +156,12 @@ jobs:
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "- Commit: \`${{ steps.meta.outputs.sha }}\`" >> "$GITHUB_STEP_SUMMARY"
           echo "- NPM: https://www.npmjs.com/package/@yiminlab/voyage" >> "$GITHUB_STEP_SUMMARY"
-          echo "- Tag: \`voyage-v${{ steps.check.outputs.version }}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Tag: \`voyage-v${{ steps.check.outputs.version }}\` (${{ steps.tag.outputs.tag_action }})" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Summary (skipped)
         if: steps.check.outputs.decision == 'skip'
         run: |
-          echo "## Skipped publishing" >> "$GITHUB_STEP_SUMMARY"
+          echo "## Skipped npm publish" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "Version \`${{ steps.check.outputs.version }}\` is already on npm; no tag changes." >> "$GITHUB_STEP_SUMMARY"
+          echo "Version \`${{ steps.check.outputs.version }}\` is already on npm." >> "$GITHUB_STEP_SUMMARY"
+          echo "Tag \`voyage-v${{ steps.check.outputs.version }}\`: ${{ steps.tag.outputs.tag_action }} (commit \`${{ steps.meta.outputs.sha }}\`)." >> "$GITHUB_STEP_SUMMARY"
