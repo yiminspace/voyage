@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { VOYAGE_VERSION } from '../index';
 import { VoyageProvider } from './voyage-provider';
 import { VoyageIssueReporter } from './voyage-issue-reporter';
 
@@ -105,7 +106,7 @@ describe('VoyageIssueReporter', () => {
     expect(report.page.url).not.toContain('token');
     expect(report.targets[0].html).toContain('[masked]');
     expect(report.targets[0].html).not.toContain('不应上传的草稿');
-    expect(report.voyage.version).toBe('0.12.0');
+    expect(report.voyage.version).toBe(VOYAGE_VERSION);
 
     expect(await screen.findByText('问题已提交')).not.toBeNull();
     expect(document.querySelectorAll('.vg-reporter-highlight.saved')).toHaveLength(0);
