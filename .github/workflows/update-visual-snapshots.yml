@@ -30,7 +30,8 @@ jobs:
         id: playwright-cache
         with:
           path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-chromium-firefox-webkit-${{ steps.playwright-version.outputs.version }}
+          # 仅 Chromium：勿复用 ci.yml 的三引擎键，避免写入残缺缓存拖垮后续 CI
+          key: playwright-${{ runner.os }}-chromium-only-${{ steps.playwright-version.outputs.version }}
       - name: Install Playwright browsers
         if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: pnpm exec playwright install --with-deps chromium

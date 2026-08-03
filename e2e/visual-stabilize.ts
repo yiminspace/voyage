@@ -38,6 +38,8 @@ export async function stabilizeForVisual(page: Page) {
         animation: none !important;
         transition: none !important;
       }
+      /* 视觉基线只盯顶栏三颗控件，藏掉 Vite 注入的 Reporter 入口 */
+      #reporterDemoRoot { display: none !important; }
     `,
   });
 
@@ -101,6 +103,17 @@ export async function applyAndAssertAxes(page: Page, axes: VisualAxes) {
           mode === 'dark' ? '切换为亮色模式' : '切换为暗色模式'
         );
       }
+      // 通知 Vite 挂载的 VoyageProvider 同步四轴（否则 React 认证组件仍停在旧 prefs）
+      window.dispatchEvent(
+        new CustomEvent('voyage-demo-prefs', {
+          detail: {
+            theme: next.theme,
+            mode: next.mode,
+            style: next.style,
+            tone: next.tone,
+          },
+        })
+      );
     },
     { hosts: AXIS_HOSTS as unknown as string[], axes }
   );

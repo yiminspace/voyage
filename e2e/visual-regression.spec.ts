@@ -9,14 +9,11 @@
  *
  * Firefox / WebKit 继续承担几何、交互与 a11y 门禁，不维护像素基线。
  */
-import { test, expect } from '@playwright/test';
-import { pathToFileURL } from 'node:url';
-import path from 'node:path';
+import { test, expect, type Page } from '@playwright/test';
 import { applyAndAssertAxes, stabilizeForVisual, type VisualAxes } from './visual-stabilize';
 
-const DEMO_URL = pathToFileURL(
-  path.resolve(__dirname, '../demo/fitting-room.html')
-).href;
+/** Vite 试衣间：加载真实 React StateView / Spinner / AccountMenu */
+const DEMO_URL = 'http://127.0.0.1:4173/demo/fitting-room.html';
 
 /** 与 README / VOYAGE_APP_DEFAULTS 对齐的四组代表组合 */
 const BASELINES: ReadonlyArray<{
@@ -54,6 +51,36 @@ const SCREENSHOT = {
   threshold: 0.05,
 };
 
+/** 打开真实 AccountMenu，并算出包含 #component-demo 与浮层的联合裁剪框。 */
+async function openAccountMenuAndAuthClip(page: Page) {
+  const trigger = page.getByRole('button', { name: '用户菜单' });
+  await expect(trigger).toBeVisible();
+  await trigger.click();
+  const menu = page.getByRole('menu', { name: '用户菜单' });
+  await expect(menu).toBeVisible();
+  await expect(menu.getByRole('menuitem', { name: '退出登录' })).toBeVisible();
+
+  const clip = await page.evaluate(() => {
+    const demo = document.getElementById('component-demo');
+    const panel = document.querySelector<HTMLElement>('[role="menu"][aria-label="用户菜单"]');
+    if (!demo || !panel) throw new Error('缺少 #component-demo 或 AccountMenu 浮层');
+    const a = demo.getBoundingClientRect();
+    const b = panel.getBoundingClientRect();
+    const left = Math.min(a.left, b.left);
+    const top = Math.min(a.top, b.top);
+    const right = Math.max(a.right, b.right);
+    const bottom = Math.max(a.bottom, b.bottom);
+    return {
+      x: Math.max(0, Math.floor(left)),
+      y: Math.max(0, Math.floor(top)),
+      width: Math.ceil(right - left),
+      height: Math.ceil(bottom - top),
+    };
+  });
+
+  return clip;
+}
+
 test.describe('代表性四轴视觉回归', () => {
   // 基线以 Linux Chromium（CI）为真源；macOS 抗锯齿会分叉，本地请用 Docker / Actions 更新。
   test.skip(
@@ -63,8 +90,10 @@ test.describe('代表性四轴视觉回归', () => {
 
   test.beforeEach(async ({ page }) => {
     await page.goto(DEMO_URL);
-    // 零构建静态认证组件展示（Vite React 挂载会藏掉它）
-    await expect(page.locator('#componentStatic')).toBeVisible();
+    // 真实 React 认证组件（Vite 会隐藏 #componentStatic）
+    await expect(page.locator('#componentStatic')).toBeHidden();
+    await expect(page.locator('#componentDemoRoot .vg-state-view-loading')).toBeVisible();
+    await expect(page.getByRole('button', { name: '用户菜单' })).toBeVisible();
     await stabilizeForVisual(page);
   });
 
@@ -77,15 +106,20 @@ test.describe('代表性四轴视觉回归', () => {
         await expect.soft(page.locator(selector)).toHaveScreenshot(name, SCREENSHOT);
       };
 
-      // 顶栏控件（语言 / 明暗 / 调色板）
+      // 顶栏控件（语言 / 明暗 / 调色板；Reporter 入口在 stabilize 里藏掉）
       await shot('#toolbar', `${baseline.id}-toolbar.png`);
       // 关键内容容器（含顶栏 + 侧栏 + 编辑区，高度由 .vg-app 固定）
       await shot('#fit', `${baseline.id}-app.png`);
       // 语义色标尺 + 状态徽章
       await shot('#semantic', `${baseline.id}-semantic.png`);
       await shot('#semantic-badges', `${baseline.id}-semantic-badges.png`);
-      // StateView / Spinner / AccountMenu 静态展示
-      await shot('#component-demo', `${baseline.id}-auth-components.png`);
+
+      // 真实 StateView / Spinner / AccountMenu（打开菜单后联合裁剪，含 fixed 浮层）
+      const authClip = await openAccountMenuAndAuthClip(page);
+      await expect.soft(page).toHaveScreenshot(`${baseline.id}-auth-components.png`, {
+        ...SCREENSHOT,
+        clip: authClip,
+      });
     });
   }
 });
