@@ -316,12 +316,12 @@ export function VoyageSwitcher({ className, icons, locale = 'zh' }: VoyageSwitch
             ))}
           </div>
 
-          <div className="vg-switcher-row" role="radiogroup" aria-label={tr.modeGroup}>
+          <div className="vg-switcher-row" role="group" aria-label={tr.modeGroup}>
             {VOYAGE_MODES.map((mode) => (
               <button
                 key={mode}
                 type="button"
-                role="radio"
+                role="menuitemradio"
                 aria-checked={prefs.mode === mode}
                 className={`vg-seg${prefs.mode === mode ? ' on' : ''}`}
                 onClick={() => setMode(mode)}

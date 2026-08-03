@@ -141,7 +141,7 @@ describe('VoyageSwitcher', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Theme settings' }));
     expect(screen.getByRole('menuitemradio', { name: 'Slate & Copper' })).toBeTruthy();
     expect(screen.getByRole('menuitemradio', { name: 'Tokyo Night' })).toBeTruthy();
-    expect(screen.getByRole('radio', { name: 'Light' })).toBeTruthy();
+    expect(screen.getByRole('menuitemradio', { name: 'Light' })).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Switch to light mode' })).toBeTruthy();
   });
 
@@ -180,7 +180,7 @@ describe('VoyageSwitcher', () => {
     );
 
     openPanel();
-    fireEvent.click(screen.getByRole('radio', { name: '亮' }));
+    fireEvent.click(screen.getByRole('menuitemradio', { name: '亮' }));
 
     expect(document.documentElement.getAttribute('data-mode')).toBe('light');
     expect(screen.getByRole('button', { name: '切换为暗色模式' })).toBeTruthy();

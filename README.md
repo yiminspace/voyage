@@ -276,8 +276,27 @@ open demo/fitting-room.html
 
 ```
 pnpm test        # vitest — 组件行为/token 解析
-pnpm test:e2e    # playwright — 视觉几何契约 + Reporter 真实浏览器功能试驾
+pnpm test:e2e    # playwright — Chromium / Firefox / WebKit 三引擎几何 + 交互 + a11y
 pnpm test:all    # 两者都跑
+```
+
+### 多引擎与可访问性
+
+`playwright.config.ts` 定义三个 project：`chromium`、`firefox`、`webkit`。`pnpm test:e2e` 会在三引擎各跑一遍；`retries: 0`，不靠重试掩盖不稳定。本地首次需要安装浏览器：
+
+```
+pnpm exec playwright install --with-deps chromium firefox webkit
+```
+
+CI（`.github/workflows/ci.yml`）同样安装三种引擎与系统依赖；缓存 key 含 `runner.os`、Playwright 版本与引擎范围 `chromium-firefox-webkit`。失败时上传 `playwright-report/` 与 `test-results/`（含 trace）。CI Result job 会在任一引擎失败时失败。
+
+可访问性门禁用 `@axe-core/playwright`，覆盖试衣间主界面、主题菜单、AccountMenu 退出项与 Reporter 表单；只拦截 serious/critical。认证组件另有键盘契约（AccountMenu Enter 打开、方向键/Home/End、Esc 归还焦点）与 StateView role/live region/busy 断言。Popover 相关用例在引擎支持原生 API 时校验 `:popover-open`，否则校验 React fallback 可见性，两者焦点与可见行为一致。
+
+跑单引擎或单文件时可用 Playwright 项目过滤，例如：
+
+```
+pnpm exec playwright test --project=chromium e2e/auth-components.spec.ts
+pnpm exec playwright test --project=webkit e2e/accessibility.spec.ts
 ```
 
 ## 发布

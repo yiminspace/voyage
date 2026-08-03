@@ -195,6 +195,14 @@ function ReporterDemo() {
           </div>
           <div className="vg-component-demo-card">
             <VoyageStateView
+              variant="info"
+              heading={locale === 'zh' ? '需要登录' : 'Sign in required'}
+              description={locale === 'zh' ? '继续前请先完成身份验证' : 'Authenticate before continuing'}
+              action={<button type="button" className="vg-btn">{locale === 'zh' ? '去登录' : 'Sign in'}</button>}
+            />
+          </div>
+          <div className="vg-component-demo-card">
+            <VoyageStateView
               variant="error"
               heading={locale === 'zh' ? '登录失败' : 'Sign in failed'}
               description={locale === 'zh' ? '认证信息无效或已经过期' : 'Authentication is invalid or expired'}
