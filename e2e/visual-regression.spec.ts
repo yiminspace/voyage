@@ -9,7 +9,7 @@
  *
  * Firefox / WebKit 继续承担几何、交互与 a11y 门禁，不维护像素基线。
  */
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 import { applyAndAssertAxes, stabilizeForVisual, type VisualAxes } from './visual-stabilize';
 
 /** Vite 试衣间：加载真实 React StateView / Spinner / AccountMenu */
@@ -51,36 +51,6 @@ const SCREENSHOT = {
   threshold: 0.05,
 };
 
-/** 打开真实 AccountMenu，并算出包含 #component-demo 与浮层的联合裁剪框。 */
-async function openAccountMenuAndAuthClip(page: Page) {
-  const trigger = page.getByRole('button', { name: '用户菜单' });
-  await expect(trigger).toBeVisible();
-  await trigger.click();
-  const menu = page.getByRole('menu', { name: '用户菜单' });
-  await expect(menu).toBeVisible();
-  await expect(menu.getByRole('menuitem', { name: '退出登录' })).toBeVisible();
-
-  const clip = await page.evaluate(() => {
-    const demo = document.getElementById('component-demo');
-    const panel = document.querySelector<HTMLElement>('[role="menu"][aria-label="用户菜单"]');
-    if (!demo || !panel) throw new Error('缺少 #component-demo 或 AccountMenu 浮层');
-    const a = demo.getBoundingClientRect();
-    const b = panel.getBoundingClientRect();
-    const left = Math.min(a.left, b.left);
-    const top = Math.min(a.top, b.top);
-    const right = Math.max(a.right, b.right);
-    const bottom = Math.max(a.bottom, b.bottom);
-    return {
-      x: Math.max(0, Math.floor(left)),
-      y: Math.max(0, Math.floor(top)),
-      width: Math.ceil(right - left),
-      height: Math.ceil(bottom - top),
-    };
-  });
-
-  return clip;
-}
-
 test.describe('代表性四轴视觉回归', () => {
   // 基线以 Linux Chromium（CI）为真源；macOS 抗锯齿会分叉，本地请用 Docker / Actions 更新。
   test.skip(
@@ -94,6 +64,11 @@ test.describe('代表性四轴视觉回归', () => {
     await expect(page.locator('#componentStatic')).toBeHidden();
     await expect(page.locator('#componentDemoRoot .vg-state-view-loading')).toBeVisible();
     await expect(page.getByRole('button', { name: '用户菜单' })).toBeVisible();
+    // 触发器几何门禁：真实 .vg-account-trigger，而非静态替身
+    const triggerBox = await page.getByRole('button', { name: '用户菜单' }).boundingBox();
+    expect(triggerBox).not.toBeNull();
+    expect(triggerBox!.width).toBeGreaterThanOrEqual(24);
+    expect(triggerBox!.height).toBeGreaterThanOrEqual(24);
     await stabilizeForVisual(page);
   });
 
@@ -114,12 +89,16 @@ test.describe('代表性四轴视觉回归', () => {
       await shot('#semantic', `${baseline.id}-semantic.png`);
       await shot('#semantic-badges', `${baseline.id}-semantic-badges.png`);
 
-      // 真实 StateView / Spinner / AccountMenu（打开菜单后联合裁剪，含 fixed 浮层）
-      const authClip = await openAccountMenuAndAuthClip(page);
-      await expect.soft(page).toHaveScreenshot(`${baseline.id}-auth-components.png`, {
-        ...SCREENSHOT,
-        clip: authClip,
-      });
+      // 真实 StateView / Spinner / AccountMenu 触发器（Vite React）
+      await shot('#component-demo', `${baseline.id}-auth-components.png`);
+
+      // 打开真实 AccountMenu，单独截浮层（top-layer / fixed 不影响元素截图）
+      const trigger = page.getByRole('button', { name: '用户菜单' });
+      await trigger.click();
+      const menu = page.getByRole('menu', { name: '用户菜单' });
+      await expect(menu).toBeVisible();
+      await expect(menu.getByRole('menuitem', { name: '退出登录' })).toBeVisible();
+      await expect.soft(menu).toHaveScreenshot(`${baseline.id}-account-menu.png`, SCREENSHOT);
     });
   }
 });

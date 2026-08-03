@@ -311,7 +311,7 @@ pnpm exec playwright test --project=chromium-visual
 | jsontailor | `tokyo × dark × glass × quiet` | JsonTailor 默认 |
 | ai | `everforest × dark × classic × quiet` | AI 预定默认 |
 
-每组截取稳定局部容器：`#toolbar`（顶栏控件）、`#fit`（应用内容）、`#semantic` / `#semantic-badges`（语义色）、以及经 Vite 渲染的真实 StateView / Spinner / AccountMenu（打开菜单后联合裁剪，含 fixed 浮层）。截图前机械断言各宿主 `data-theme` / `data-mode` / `data-style` / `data-tone` 与目标一致。
+每组截取稳定局部容器：`#toolbar`（顶栏控件）、`#fit`（应用内容）、`#semantic` / `#semantic-badges`（语义色）、经 Vite 渲染的 `#component-demo`（真实 StateView / Spinner / AccountMenu 触发器），以及打开后的 AccountMenu 浮层。截图前机械断言各宿主 `data-theme` / `data-mode` / `data-style` / `data-tone` 与目标一致。
 
 稳定化约定（本地与 CI 共用）：
 
