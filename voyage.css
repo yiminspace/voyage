@@ -531,6 +531,7 @@
 
 /* ---- 动效收敛 ---- */
 @media (prefers-reduced-motion: reduce) {
+  .vg-dot { transition: none; }
   .vg-dot.chk { animation: none; }
 }
 
@@ -886,7 +887,7 @@
 }
 .vg-mode-icon { display: block; }
 @media (prefers-reduced-motion: reduce) {
-  .vg-mode-wrap { animation: none; }
+  .vg-mode-wrap { animation: none; transition: none; }
   .vg-switcher-mode:active .vg-mode-wrap { transform: none; }
 }
 /*

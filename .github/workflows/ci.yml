@@ -49,21 +49,24 @@ jobs:
         id: playwright-cache
         with:
           path: ~/.cache/ms-playwright
-          key: playwright-chromium-${{ steps.playwright-version.outputs.version }}
-      - name: Install Playwright chromium
+          # OS + Playwright 版本 + 引擎范围，避免跨平台/半缓存撞 key
+          key: playwright-${{ runner.os }}-chromium-firefox-webkit-${{ steps.playwright-version.outputs.version }}
+      - name: Install Playwright browsers
         if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: pnpm exec playwright install --with-deps chromium
+        run: pnpm exec playwright install --with-deps chromium firefox webkit
       - name: Install Playwright system deps
         if: steps.playwright-cache.outputs.cache-hit == 'true'
-        run: pnpm exec playwright install-deps chromium
+        run: pnpm exec playwright install-deps chromium firefox webkit
       - name: Playwright geometry assertions
         run: pnpm run test:e2e
-      - name: Upload report on failure
+      - name: Upload report and traces on failure
         if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: voyage-playwright-report
-          path: playwright-report/
+          path: |
+            playwright-report/
+            test-results/
           retention-days: 7
 
   success:
