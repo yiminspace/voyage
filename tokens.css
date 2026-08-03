@@ -209,6 +209,8 @@
   --vg-color-border: var(--line2-c, var(--line2));
   --vg-radius-control: var(--r-btn);
   --vg-radius-surface: var(--r-win);
+  /* 遮罩 / 浮层阴影从主题底色推导, 随 theme×mode 变化且不透明 */
+  --vg-color-overlay: color-mix(in srgb, var(--bg0) 62%, transparent);
   --vg-shadow-popover: 0 12px 36px color-mix(in srgb, var(--bg0) 55%, transparent);
 }
 
