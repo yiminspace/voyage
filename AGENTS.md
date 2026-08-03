@@ -19,5 +19,8 @@ This repository is the source of truth for `@yiminlab/voyage`.
 ## Releases
 
 - Bump `package.json` for every change to publishable source or package output.
-- Merging to `main` publishes through `.github/workflows/publish.yml` using npm Trusted Publishing.
-- Release tags use `voyage-v<version>`.
+- Publish runs only after the same `main` commit’s CI Result succeeds (`workflow_run` on `CI`, or manual dispatch that re-checks that SHA).
+- Version gate is strict SemVer (`scripts/publish-decision.mjs`): higher → publish, equal → skip, lower / invalid / registry failure → fail closed.
+- Before npm publish, `scripts/check-pack-contents.mjs` asserts pack contains root / React / React primitives entries and the three CSS files.
+- Main publishes share concurrency group `publish-main` so registry checks are serialized across SHAs.
+- npm Trusted Publishing (OIDC) publishes first; `voyage-v<version>` is ensured after publish (and on equal/skip reruns) and is never moved.

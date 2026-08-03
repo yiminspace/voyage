@@ -36,7 +36,7 @@ jobs:
           echo "Head version (this PR):     $HEAD_VERSION"
 
           if [ "$BASE_VERSION" == "$HEAD_VERSION" ]; then
-            echo "::error::本次 PR 改动了 Voyage 的可发布内容，但 package.json 的 version 字段未变化（仍为 $HEAD_VERSION）。请 bump 版本号，否则 publish.yml 会判定「版本未变」并跳过发布。"
+            echo "::error::本次 PR 改动了 Voyage 的可发布内容，但 package.json 的 version 字段未变化（仍为 $HEAD_VERSION）。请 bump 版本号，否则 publish.yml 会判定版本未递增并跳过发布。"
             exit 1
           fi
 
