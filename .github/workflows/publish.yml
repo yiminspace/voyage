@@ -2,24 +2,81 @@ name: Publish
 
 on:
   workflow_dispatch:
-  push:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
     branches: [main]
 
 concurrency:
-  group: publish-${{ github.ref }}
+  group: publish-${{ github.event.workflow_run.head_sha || github.sha }}
   cancel-in-progress: false
 
 permissions:
   contents: write
   id-token: write
+  actions: read
 
 jobs:
   publish:
     runs-on: ubuntu-latest
+    # Automatic publish only after the same-commit CI workflow succeeds.
+    # Manual dispatch still runs version/pack checks and verifies CI for the SHA.
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.event == 'push')
 
     steps:
+      - name: Resolve publish SHA
+        id: meta
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_run" ]; then
+            SHA="${{ github.event.workflow_run.head_sha }}"
+          else
+            SHA="${{ github.sha }}"
+          fi
+          echo "sha=$SHA" >> "$GITHUB_OUTPUT"
+          echo "Publish SHA: $SHA"
+
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.meta.outputs.sha }}
+
+      - name: Verify branch is main
+        run: |
+          REF="${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_branch || github.ref_name }}"
+          echo "Head ref: $REF"
+          if [ "$REF" != "main" ]; then
+            echo "::error::Publish only runs for main (got $REF)"
+            exit 1
+          fi
+
+      - name: Verify CI Result for this SHA
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          SHA="${{ steps.meta.outputs.sha }}"
+          # Require a completed successful CI run for this exact commit.
+          # Fail closed when CI is missing, still running, cancelled, or failed.
+          RUN_JSON=$(gh api \
+            "repos/${{ github.repository }}/actions/workflows/ci.yml/runs?head_sha=${SHA}&event=push&per_page=20")
+          CONCLUSION=$(echo "$RUN_JSON" | jq -r '
+            [.workflow_runs[] | select(.status == "completed")]
+            | sort_by(.updated_at) | reverse
+            | .[0].conclusion // empty
+          ')
+          if [ -z "$CONCLUSION" ]; then
+            echo "::error::No completed CI run found for ${SHA}; refusing to publish"
+            exit 1
+          fi
+          if [ "$CONCLUSION" != "success" ]; then
+            echo "::error::CI Result for ${SHA} is '${CONCLUSION}', not success; refusing to publish"
+            exit 1
+          fi
+          echo "CI succeeded for ${SHA}"
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -29,27 +86,15 @@ jobs:
         with:
           node-version: '22'
           registry-url: 'https://registry.npmjs.org'
+          cache: 'pnpm'
+          cache-dependency-path: pnpm-lock.yaml
 
       - name: Update npm for trusted publishing
         run: npm install -g npm@latest
 
-      - name: Check if should publish
+      - name: Decide whether to publish
         id: check
-        run: |
-          CURRENT_VERSION=$(node -p "require('./package.json').version")
-          echo "Current version: $CURRENT_VERSION"
-
-          NPM_VERSION=$(npm view @yiminlab/voyage version 2>/dev/null || echo "0.0.0")
-          echo "NPM version: $NPM_VERSION"
-
-          if [ "$CURRENT_VERSION" != "$NPM_VERSION" ]; then
-            echo "New version detected: $CURRENT_VERSION"
-            echo "should_publish=true" >> $GITHUB_OUTPUT
-            echo "version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
-          else
-            echo "Version $CURRENT_VERSION already published"
-            echo "should_publish=false" >> $GITHUB_OUTPUT
-          fi
+        run: node scripts/publish-decision.mjs decide --from-registry
 
       - name: Install dependencies
         if: steps.check.outputs.should_publish == 'true'
@@ -63,29 +108,52 @@ jobs:
         if: steps.check.outputs.should_publish == 'true'
         run: pnpm build
 
+      - name: Verify pack contents
+        if: steps.check.outputs.should_publish == 'true'
+        run: node scripts/check-pack-contents.mjs --pack
+
       - name: Publish to npm
         if: steps.check.outputs.should_publish == 'true'
-        run: pnpm publish --access public --provenance
+        run: pnpm publish --access public --provenance --no-git-checks
 
       - name: Create Git tag
         if: steps.check.outputs.should_publish == 'true'
+        env:
+          VERSION: ${{ steps.check.outputs.version }}
+          PUBLISH_SHA: ${{ steps.meta.outputs.sha }}
         run: |
+          set -euo pipefail
+          TAG="voyage-v${VERSION}"
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git tag -a "voyage-v${{ steps.check.outputs.version }}" -m "Release @yiminlab/voyage v${{ steps.check.outputs.version }}"
-          git push origin "voyage-v${{ steps.check.outputs.version }}"
 
-      - name: Summary
+          # Annotated tags: resolve to the peeled commit, never move an existing tag.
+          if git ls-remote --tags origin "refs/tags/${TAG}" | grep -q .; then
+            git fetch --no-tags origin "refs/tags/${TAG}:refs/tags/${TAG}"
+            EXISTING=$(git rev-list -n 1 "${TAG}")
+            if [ "$EXISTING" = "$PUBLISH_SHA" ]; then
+              echo "Tag ${TAG} already points at ${PUBLISH_SHA}; leaving it unchanged"
+              exit 0
+            fi
+            echo "::error::Tag ${TAG} already exists at ${EXISTING}, refusing to move it (wanted ${PUBLISH_SHA})"
+            exit 1
+          fi
+
+          git tag -a "${TAG}" -m "Release @yiminlab/voyage v${VERSION}" "${PUBLISH_SHA}"
+          git push origin "refs/tags/${TAG}"
+
+      - name: Summary (published)
         if: steps.check.outputs.should_publish == 'true'
         run: |
-          echo "## 🚀 Published @yiminlab/voyage v${{ steps.check.outputs.version }}" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- NPM: https://www.npmjs.com/package/@yiminlab/voyage" >> $GITHUB_STEP_SUMMARY
-          echo "- Tag: voyage-v${{ steps.check.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "## Published @yiminlab/voyage v${{ steps.check.outputs.version }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Commit: \`${{ steps.meta.outputs.sha }}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- NPM: https://www.npmjs.com/package/@yiminlab/voyage" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Tag: \`voyage-v${{ steps.check.outputs.version }}\`" >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Skip publish
-        if: steps.check.outputs.should_publish != 'true'
+      - name: Summary (skipped)
+        if: steps.check.outputs.decision == 'skip'
         run: |
-          echo "## ⏭️ Skipped publishing" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Version already published or no changes detected." >> $GITHUB_STEP_SUMMARY
+          echo "## Skipped publishing" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "Version \`${{ steps.check.outputs.version }}\` is already on npm; no tag changes." >> "$GITHUB_STEP_SUMMARY"

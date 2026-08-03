@@ -282,7 +282,21 @@ pnpm test:all    # 两者都跑
 
 ## 发布
 
-改可发布内容需要同步 bump `package.json` 的 `version`，否则 `publish.yml` 会判定「版本未变」并跳过发布。PR 阶段有 `version-check.yml` 拦截漏 bump 的改动。合入 `main` 后，GitHub Actions 使用 npm Trusted Publishing (OIDC) 自动发布并创建 `voyage-v<version>` tag。
+改可发布内容需要同步 bump `package.json` 的 `version`，否则发布流程会判定版本未递增并跳过。PR 阶段有 `version-check.yml` 拦截漏 bump 的改动。
+
+合入 `main` 后不会立刻与 CI 并行发布：`publish.yml` 只在同一 commit 的 **CI Result** 成功后启动（`workflow_run`）。手动 `workflow_dispatch` 也会先确认该 SHA 的 CI 已成功，再跑同一套检查。
+
+版本判定由 `scripts/publish-decision.mjs` 执行严格 SemVer 比较：
+
+| 当前 `package.json` vs npm | 结果 |
+| --- | --- |
+| 更高 | 继续发布 |
+| 相等 | 成功跳过（不重复 publish、不改 tag） |
+| 更低 / 非法 SemVer / registry 查询失败 | workflow 失败（fail closed，不再回落 `0.0.0`） |
+
+真正 `pnpm publish` 前会 `pnpm install --frozen-lockfile`、typecheck、build，并用 `scripts/check-pack-contents.mjs` 检查 pack 清单必须包含根入口、React 入口、React primitives 入口以及 `tokens.css` / `voyage.css` / `index.css`。npm Trusted Publishing (OIDC) 发布成功后才创建指向该 `main` commit 的 `voyage-v<version>` tag。
+
+发布判定逻辑有 Vitest 覆盖（`scripts/publish-decision.test.ts`）。更细的维护说明见 [docs/publishing.md](docs/publishing.md)。
 
 ## 开发
 
