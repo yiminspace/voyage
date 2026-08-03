@@ -57,17 +57,19 @@ jobs:
       - name: Install Playwright system deps
         if: steps.playwright-cache.outputs.cache-hit == 'true'
         run: pnpm exec playwright install-deps chromium firefox webkit
-      - name: Playwright geometry assertions
+      - name: Playwright geometry + visual assertions
         run: pnpm run test:e2e
-      - name: Upload report and traces on failure
+      - name: Upload report, traces, and visual diffs on failure
         if: failure()
         uses: actions/upload-artifact@v4
         with:
+          # test-results/ 含 toHaveScreenshot 失败时的 expected / actual / diff
           name: voyage-playwright-report
           path: |
             playwright-report/
             test-results/
           retention-days: 7
+          if-no-files-found: ignore
 
   success:
     name: Result

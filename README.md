@@ -276,19 +276,19 @@ open demo/fitting-room.html
 
 ```
 pnpm test        # vitest — 组件行为/token 解析
-pnpm test:e2e    # playwright — Chromium / Firefox / WebKit 三引擎几何 + 交互 + a11y
+pnpm test:e2e    # playwright — 三引擎几何/交互/a11y + Chromium 视觉基线
 pnpm test:all    # 两者都跑
 ```
 
 ### 多引擎与可访问性
 
-`playwright.config.ts` 定义三个 project：`chromium`、`firefox`、`webkit`。`pnpm test:e2e` 会在三引擎各跑一遍；`retries: 0`，不靠重试掩盖不稳定。本地首次需要安装浏览器：
+`playwright.config.ts` 定义四个 project：`chromium`、`firefox`、`webkit`（几何 / 交互 / a11y）以及 `chromium-visual`（像素基线）。`pnpm test:e2e` 会跑完全部；`retries: 0`，不靠重试掩盖不稳定。本地首次需要安装浏览器：
 
 ```
 pnpm exec playwright install --with-deps chromium firefox webkit
 ```
 
-CI（`.github/workflows/ci.yml`）同样安装三种引擎与系统依赖；缓存 key 含 `runner.os`、Playwright 版本与引擎范围 `chromium-firefox-webkit`。失败时上传 `playwright-report/` 与 `test-results/`（含 trace）。CI Result job 会在任一引擎失败时失败。
+CI（`.github/workflows/ci.yml`）同样安装三种引擎与系统依赖；缓存 key 含 `runner.os`、Playwright 版本与引擎范围 `chromium-firefox-webkit`。失败时上传 `playwright-report/` 与 `test-results/`（含 trace，以及视觉失败时的 expected / actual / diff 图像）。CI Result job 会在任一引擎失败时失败。
 
 可访问性门禁用 `@axe-core/playwright`，覆盖试衣间主界面、主题菜单、AccountMenu 退出项与 Reporter 表单；只拦截 serious/critical。认证组件另有键盘契约（AccountMenu Enter 打开、方向键/Home/End、Esc 归还焦点）与 StateView role/live region/busy 断言。Popover 相关用例在引擎支持原生 API 时校验 `:popover-open`，否则校验 React fallback 可见性，两者焦点与可见行为一致。
 
@@ -297,7 +297,55 @@ CI（`.github/workflows/ci.yml`）同样安装三种引擎与系统依赖；缓�
 ```
 pnpm exec playwright test --project=chromium e2e/auth-components.spec.ts
 pnpm exec playwright test --project=webkit e2e/accessibility.spec.ts
+pnpm exec playwright test --project=chromium-visual
 ```
+
+### 视觉回归基线
+
+只维护四组代表性宿主默认组合，不穷举四轴矩阵：
+
+| 基线 | theme × mode × style × tone | 覆盖意图 |
+|---|---|---|
+| quarry | `slate × dark × classic × normal` | Quarry 兼容基准 |
+| engram | `ink × light × soft × quiet` | Engram 默认 |
+| jsontailor | `tokyo × dark × glass × quiet` | JsonTailor 默认 |
+| ai | `everforest × dark × classic × quiet` | AI 预定默认 |
+
+每组截取稳定局部容器：`#toolbar`（顶栏控件）、`#fit`（应用内容）、`#semantic` / `#semantic-badges`（语义色）、经 Vite 渲染的 `#component-demo`（真实 StateView / Spinner / AccountMenu 触发器），以及打开后的 AccountMenu 浮层。截图前机械断言各宿主 `data-theme` / `data-mode` / `data-style` / `data-tone` 与目标一致。
+
+稳定化约定（本地与 CI 共用）：
+
+- 固定 viewport `1280×800`、`deviceScaleFactor: 1`
+- `prefers-reduced-motion: reduce`，禁用 caret，spinner 钉在 `rotate(90deg)`
+- 等待 `document.fonts.ready`，并用 Arial / Courier New 覆盖系统字体差异
+- 基线只在 `chromium-visual` 生成；Firefox / WebKit 不维护像素快照
+
+本地核对（须 Linux Chromium，与 CI 同构；macOS 上默认跳过，可用 `VOYAGE_VISUAL_FORCE=1` 强制）：
+
+```
+pnpm exec playwright test --project=chromium-visual
+```
+
+同一 commit 连续跑两次应无像素差异。更新基线**仅在明确的视觉变更审查通过后**执行，且应在与 CI 同构的 Linux Chromium 环境生成（推荐 Playwright 官方镜像或下方 workflow），避免 macOS / Linux 抗锯齿分叉：
+
+```
+# 与 CI 同构更新（Playwright 版本须与 package.json 一致）
+docker run --rm -it \
+  -v "$PWD":/work -w /work \
+  -e CI=1 \
+  mcr.microsoft.com/playwright:v1.61.1-jammy \
+  bash -lc 'corepack enable && pnpm install --frozen-lockfile && pnpm exec playwright test --project=chromium-visual --update-snapshots'
+```
+
+无本地 Docker 时，可在当前分支触发 GitHub Actions 生成 Linux 基线并下载 artifact：
+
+```
+gh workflow run "Update visual snapshots" --ref "$(git branch --show-current)"
+# 等待跑完后:
+gh run download --name voyage-visual-snapshots --dir e2e/visual-regression.spec.ts-snapshots
+```
+
+审查要求：PR 若改 token、标题排版、账户菜单尺寸或状态图标颜色，对应快照用例应失败；合入前核对 `test-results/` 中的 expected / actual / diff，确认差异即预期视觉变更后再更新并提交 `e2e/visual-regression.spec.ts-snapshots/`。
 
 ## 发布
 

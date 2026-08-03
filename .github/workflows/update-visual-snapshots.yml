@@ -1,0 +1,48 @@
+name: Update visual snapshots
+
+# 在与 CI 同构的 Linux Chromium 上生成像素基线，上传为 artifact 供合入。
+# 触发: gh workflow run "Update visual snapshots" --ref <branch>
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  snapshots:
+    name: Generate chromium-visual baselines
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+          cache-dependency-path: pnpm-lock.yaml
+      - name: Install
+        run: pnpm install --frozen-lockfile
+      - name: Get installed Playwright version
+        id: playwright-version
+        run: echo "version=$(node -p "require('@playwright/test/package.json').version")" >> "$GITHUB_OUTPUT"
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          # 仅 Chromium：勿复用 ci.yml 的三引擎键，避免写入残缺缓存拖垮后续 CI
+          key: playwright-${{ runner.os }}-chromium-only-${{ steps.playwright-version.outputs.version }}
+      - name: Install Playwright browsers
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: pnpm exec playwright install --with-deps chromium
+      - name: Install Playwright system deps
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: pnpm exec playwright install-deps chromium
+      - name: Update visual snapshots
+        run: pnpm exec playwright test --project=chromium-visual --update-snapshots
+      - name: Upload baselines
+        uses: actions/upload-artifact@v4
+        with:
+          name: voyage-visual-snapshots
+          path: e2e/visual-regression.spec.ts-snapshots/
+          retention-days: 7
