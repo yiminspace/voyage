@@ -1,4 +1,4 @@
-import type { HTMLAttributes, ReactNode } from 'react';
+import { useId, type HTMLAttributes, type ReactNode } from 'react';
 import { VoyageSpinner } from './voyage-spinner';
 
 export type VoyageStateViewVariant = 'loading' | 'info' | 'error';
@@ -50,11 +50,22 @@ export function VoyageStateView({
   className,
   ...props
 }: VoyageStateViewProps) {
+  const headingId = useId();
   const defaultRole = variant === 'error' ? 'alert' : 'status';
   const defaultIcon = variant === 'loading'
     ? <VoyageSpinner size="lg" decorative />
     : <StateIcon variant={variant} />;
   const hasVisibleCopy = heading != null || description != null;
+  // status/alert 的可访问名称来自 author，不能靠内部 heading 自动命名。
+  const labelledBy =
+    props['aria-labelledby'] ?? (heading != null ? headingId : undefined);
+  const ariaLabel =
+    props['aria-label'] ??
+    (labelledBy
+      ? undefined
+      : variant === 'loading' && !hasVisibleCopy
+        ? loadingLabel
+        : undefined);
 
   return (
     <div
@@ -68,7 +79,8 @@ export function VoyageStateView({
       role={props.role ?? defaultRole}
       aria-live={props['aria-live'] ?? (variant === 'error' ? 'assertive' : 'polite')}
       aria-busy={props['aria-busy'] ?? (variant === 'loading' ? true : undefined)}
-      aria-label={props['aria-label'] ?? (variant === 'loading' && !hasVisibleCopy ? loadingLabel : undefined)}
+      aria-labelledby={labelledBy}
+      aria-label={ariaLabel}
     >
       <div className="vg-state-view-content">
         {icon === null ? null : (
@@ -76,7 +88,11 @@ export function VoyageStateView({
             {icon === undefined ? defaultIcon : icon}
           </div>
         )}
-        {heading == null ? null : <h2 className="vg-state-view-heading">{heading}</h2>}
+        {heading == null ? null : (
+          <h2 id={headingId} className="vg-state-view-heading">
+            {heading}
+          </h2>
+        )}
         {description == null ? null : <div className="vg-state-view-description">{description}</div>}
         {action == null ? null : <div className="vg-state-view-action">{action}</div>}
       </div>

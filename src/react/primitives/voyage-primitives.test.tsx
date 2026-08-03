@@ -29,8 +29,9 @@ describe('VoyageStateView', () => {
         description="即将返回应用"
       />
     );
-    const state = screen.getByRole('status');
+    const state = screen.getByRole('status', { name: '正在处理登录' });
     expect(state.getAttribute('aria-busy')).toBe('true');
+    expect(state.getAttribute('aria-labelledby')).toBeTruthy();
     expect(state.className).toContain('vg-state-view-page');
     expect(screen.getByRole('heading', { name: '正在处理登录' })).not.toBeNull();
     expect(screen.getByText('即将返回应用')).not.toBeNull();
@@ -45,8 +46,17 @@ describe('VoyageStateView', () => {
         action={<button type="button">重试</button>}
       />
     );
-    expect(screen.getByRole('alert').getAttribute('aria-live')).toBe('assertive');
+    const alert = screen.getByRole('alert', { name: '登录失败' });
+    expect(alert.getAttribute('aria-live')).toBe('assertive');
+    expect(alert.getAttribute('aria-labelledby')).toBeTruthy();
     expect(screen.getByRole('button', { name: '重试' })).not.toBeNull();
+  });
+
+  it('无可见文案的 loading 用 loadingLabel 作为可访问名称', () => {
+    render(<VoyageStateView variant="loading" loadingLabel="正在同步会话" />);
+    expect(screen.getByRole('status', { name: '正在同步会话' }).getAttribute('aria-busy')).toBe(
+      'true'
+    );
   });
 
   it('允许隐藏默认图标并保留宿主 class 与原生属性', () => {

@@ -8,7 +8,9 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   // 不靠重试掩盖不稳定: 用例本身必须确定性通过。
   retries: 0,
-  reporter: process.env.CI ? 'github' : 'list',
+  reporter: process.env.CI
+    ? [['github'], ['html', { open: 'never' }]]
+    : 'list',
   webServer: {
     command: 'pnpm exec vite --host 127.0.0.1 --port 4173',
     url: 'http://127.0.0.1:4173/demo/fitting-room.html',
