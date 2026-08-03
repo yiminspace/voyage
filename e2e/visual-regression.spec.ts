@@ -66,33 +66,20 @@ test.describe('代表性四轴视觉回归', () => {
     test(`${baseline.label} (${baseline.id})`, async ({ page }) => {
       await applyAndAssertAxes(page, baseline.axes);
 
+      // soft：一次跑齐所有局部图，CI 失败产物里能一次拿到完整 actual/diff 集
+      const shot = async (selector: string, name: string) => {
+        await expect.soft(page.locator(selector)).toHaveScreenshot(name, SCREENSHOT);
+      };
+
       // 顶栏控件（语言 / 明暗 / 调色板）
-      await expect(page.locator('#toolbar')).toHaveScreenshot(
-        `${baseline.id}-toolbar.png`,
-        SCREENSHOT
-      );
-
+      await shot('#toolbar', `${baseline.id}-toolbar.png`);
       // 关键内容容器（含顶栏 + 侧栏 + 编辑区，高度由 .vg-app 固定）
-      await expect(page.locator('#fit')).toHaveScreenshot(
-        `${baseline.id}-app.png`,
-        SCREENSHOT
-      );
-
+      await shot('#fit', `${baseline.id}-app.png`);
       // 语义色标尺 + 状态徽章
-      await expect(page.locator('#semantic')).toHaveScreenshot(
-        `${baseline.id}-semantic.png`,
-        SCREENSHOT
-      );
-      await expect(page.locator('#semantic-badges')).toHaveScreenshot(
-        `${baseline.id}-semantic-badges.png`,
-        SCREENSHOT
-      );
-
+      await shot('#semantic', `${baseline.id}-semantic.png`);
+      await shot('#semantic-badges', `${baseline.id}-semantic-badges.png`);
       // StateView / Spinner / AccountMenu 静态展示
-      await expect(page.locator('#component-demo')).toHaveScreenshot(
-        `${baseline.id}-auth-components.png`,
-        SCREENSHOT
-      );
+      await shot('#component-demo', `${baseline.id}-auth-components.png`);
     });
   }
 });
