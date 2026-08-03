@@ -326,7 +326,7 @@ pnpm exec playwright test --project=chromium-visual
 pnpm exec playwright test --project=chromium-visual
 ```
 
-同一 commit 连续跑两次应无像素差异。更新基线**仅在明确的视觉变更审查通过后**执行，且应在与 CI 同构的 Linux Chromium 环境生成（推荐 Playwright 官方镜像），避免 macOS / Linux 抗锯齿分叉：
+同一 commit 连续跑两次应无像素差异。更新基线**仅在明确的视觉变更审查通过后**执行，且应在与 CI 同构的 Linux Chromium 环境生成（推荐 Playwright 官方镜像或下方 workflow），避免 macOS / Linux 抗锯齿分叉：
 
 ```
 # 与 CI 同构更新（Playwright 版本须与 package.json 一致）
@@ -335,6 +335,14 @@ docker run --rm -it \
   -e CI=1 \
   mcr.microsoft.com/playwright:v1.61.1-jammy \
   bash -lc 'corepack enable && pnpm install --frozen-lockfile && pnpm exec playwright test --project=chromium-visual --update-snapshots'
+```
+
+无本地 Docker 时，可在当前分支触发 GitHub Actions 生成 Linux 基线并下载 artifact：
+
+```
+gh workflow run "Update visual snapshots" --ref "$(git branch --show-current)"
+# 等待跑完后:
+gh run download --name voyage-visual-snapshots --dir e2e/visual-regression.spec.ts-snapshots
 ```
 
 审查要求：PR 若改 token、标题排版、账户菜单尺寸或状态图标颜色，对应快照用例应失败；合入前核对 `test-results/` 中的 expected / actual / diff，确认差异即预期视觉变更后再更新并提交 `e2e/visual-regression.spec.ts-snapshots/`。
