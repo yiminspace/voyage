@@ -1029,3 +1029,143 @@
   font-weight: 600;
   letter-spacing: 0.2px;
 }
+
+/* ---- 通用加载指示 / 状态视图 (@yiminlab/voyage/react/primitives) ---- */
+@keyframes vg-spinner-rotate { to { transform: rotate(360deg); } }
+.vg-spinner {
+  display: inline-block;
+  box-sizing: border-box;
+  width: var(--vg-spinner-size);
+  height: var(--vg-spinner-size);
+  flex: none;
+  border: var(--vg-spinner-stroke) solid color-mix(in srgb, var(--vg-color-text-subtle) 28%, transparent);
+  border-block-start-color: var(--vg-color-accent);
+  border-radius: 50%;
+  animation: vg-spinner-rotate 0.8s linear infinite;
+}
+.vg-spinner-sm { --vg-spinner-size: 16px; --vg-spinner-stroke: 2px; }
+.vg-spinner-md { --vg-spinner-size: 24px; --vg-spinner-stroke: 2.5px; }
+.vg-spinner-lg { --vg-spinner-size: 36px; --vg-spinner-stroke: 3px; }
+
+.vg-state-view {
+  box-sizing: border-box;
+  display: grid;
+  width: 100%;
+  place-items: center;
+  padding: clamp(24px, 6vw, 64px);
+  color: var(--vg-color-text);
+  font-family: var(--vg-font-ui);
+}
+.vg-state-view-section { min-height: 50vh; }
+.vg-state-view-page { min-height: 100vh; min-height: 100dvh; }
+.vg-state-view-content {
+  display: flex;
+  width: min(100%, 480px);
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+}
+.vg-state-view-icon {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  color: var(--vg-color-accent-text);
+  font-size: 36px;
+}
+.vg-state-view-error .vg-state-view-icon { color: var(--vg-color-danger); }
+.vg-state-view-heading { margin: 0; color: var(--vg-color-text); font-size: 22px; line-height: 1.25; font-weight: 600; }
+.vg-state-view-description { color: var(--vg-color-text-muted); font-size: 14px; line-height: 1.65; }
+.vg-state-view-description > :first-child { margin-top: 0; }
+.vg-state-view-description > :last-child { margin-bottom: 0; }
+.vg-state-view-action { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 4px; }
+
+/* ---- 账户菜单 (VoyageAccountMenu, @yiminlab/voyage/react) ---- */
+.vg-account-menu { display: inline-flex; align-items: center; font-family: var(--vg-font-ui); }
+.vg-account-login { min-height: 32px; }
+.vg-account-trigger {
+  appearance: none;
+  display: inline-grid;
+  width: var(--vg-account-trigger-size, 32px);
+  height: var(--vg-account-trigger-size, 32px);
+  place-items: center;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--vg-color-text-muted);
+  cursor: pointer;
+  font: inherit;
+}
+.vg-account-trigger:hover:not(:disabled),
+.vg-account-trigger[aria-expanded='true'] { background: var(--vg-color-control-hover); color: var(--vg-color-text); }
+.vg-account-trigger:disabled { cursor: wait; opacity: 0.7; }
+.vg-account-avatar {
+  position: relative;
+  display: inline-grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid var(--vg-color-border);
+  border-radius: 50%;
+  background: var(--vg-color-control);
+  color: var(--vg-color-accent-text);
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1;
+}
+.vg-account-avatar-lg { width: 36px; height: 36px; font-size: 14px; }
+.vg-account-avatar img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.vg-account-avatar-fallback { user-select: none; }
+.vg-account-panel[hidden] { display: none; }
+.vg-account-panel {
+  position: fixed;
+  inset: auto;
+  z-index: 50;
+  display: flex;
+  box-sizing: border-box;
+  width: min(232px, calc(100vw - 16px));
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding: 6px;
+  border: 1px solid var(--vg-color-border);
+  border-radius: var(--vg-radius-surface);
+  background: var(--vg-color-surface);
+  color: var(--vg-color-text);
+  box-shadow: var(--vg-shadow-popover);
+  backdrop-filter: var(--blur, none);
+  -webkit-backdrop-filter: var(--blur, none);
+}
+.vg-account-summary { display: flex; min-width: 0; align-items: center; gap: 10px; padding: 8px; }
+.vg-account-copy { display: flex; min-width: 0; flex: 1; flex-direction: column; gap: 4px; text-align: start; }
+.vg-account-copy strong,
+.vg-account-copy small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.vg-account-copy strong { color: var(--vg-color-text); font-size: 13px; font-weight: 600; }
+.vg-account-copy small { color: var(--vg-color-text-muted); font-size: 11.5px; }
+.vg-account-separator { height: 1px; margin: 2px 4px; background: var(--vg-color-border); }
+.vg-account-item {
+  appearance: none;
+  display: flex;
+  min-height: 32px;
+  width: 100%;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 9px;
+  border: 0;
+  border-radius: var(--vg-radius-control);
+  background: transparent;
+  color: var(--vg-color-text);
+  cursor: pointer;
+  font: inherit;
+  font-size: 12.5px;
+  text-align: start;
+}
+.vg-account-item:hover { background: var(--vg-color-control-hover); color: var(--vg-color-danger); }
+.vg-account-action-icon { display: inline-grid; width: 1em; height: 1em; place-items: center; flex: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .vg-spinner { animation: none; }
+}

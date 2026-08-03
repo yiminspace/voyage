@@ -72,8 +72,35 @@
     gap: 8px;
   }
   .vg-demo-evidence-actions small { color: var(--fg3); }
+  .vg-component-demo-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .vg-component-demo-grid[hidden] { display: none; }
+  .vg-component-demo-card {
+    min-width: 0;
+    min-height: 270px;
+    overflow: hidden;
+    border: 1px solid var(--vg-color-border);
+    border-radius: var(--vg-radius-surface);
+    background: var(--vg-color-surface);
+  }
+  .vg-component-demo-card .vg-state-view { min-height: 270px; padding: 24px; }
+  .vg-component-demo-account {
+    display: flex;
+    min-height: 270px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 24px;
+  }
+  .vg-component-demo-account > p { margin: 0; color: var(--vg-color-text-muted); font-size: 12px; text-align: center; }
+  .vg-component-demo-static-panel { position: static; }
   @media (max-width: 900px) {
     .vg-demo-evidence { inset: 8px; width: calc(100vw - 16px); }
+    .vg-component-demo-grid { grid-template-columns: 1fr; }
   }
 </style>
 </head>
@@ -233,6 +260,44 @@
       <span class="vg-badge warn">warn</span>
       <span class="vg-badge err">err</span>
     </div>
+
+    <div class="scale-cap">认证组件地基 · StateView / Spinner / AccountMenu</div>
+    <div class="vg" id="component-demo" data-theme="slate" data-mode="dark" data-style="classic" data-tone="quiet">
+      <!-- file:// 下保留零构建静态视觉基准；pnpm demo 会隐藏它并挂载真实 React 组件。 -->
+      <div class="vg-component-demo-grid" id="componentStatic">
+        <div class="vg-component-demo-card">
+          <div class="vg-state-view vg-state-view-loading vg-state-view-section" role="status" aria-busy="true">
+            <div class="vg-state-view-content">
+              <div class="vg-state-view-icon" aria-hidden="true"><span class="vg-spinner vg-spinner-lg"></span></div>
+              <h2 class="vg-state-view-heading">正在处理登录</h2>
+              <div class="vg-state-view-description">即将安全地返回应用</div>
+            </div>
+          </div>
+        </div>
+        <div class="vg-component-demo-card">
+          <div class="vg-state-view vg-state-view-error vg-state-view-section" role="alert">
+            <div class="vg-state-view-content">
+              <div class="vg-state-view-icon" aria-hidden="true">!</div>
+              <h2 class="vg-state-view-heading">登录失败</h2>
+              <div class="vg-state-view-description">认证信息无效或已经过期</div>
+              <div class="vg-state-view-action"><button type="button" class="vg-btn primary">重试</button></div>
+            </div>
+          </div>
+        </div>
+        <div class="vg-component-demo-card vg-component-demo-account">
+          <span class="vg-account-avatar vg-account-avatar-lg"><span class="vg-account-avatar-fallback">忆</span></span>
+          <div class="vg-account-panel vg-component-demo-static-panel" role="menu" aria-label="用户菜单">
+            <div class="vg-account-summary" role="presentation">
+              <span class="vg-account-avatar vg-account-avatar-lg"><span class="vg-account-avatar-fallback">忆</span></span>
+              <span class="vg-account-copy"><strong>Voyage 用户</strong><small>voyage@example.com</small></span>
+            </div>
+            <span class="vg-account-separator" role="separator"></span>
+            <button type="button" class="vg-account-item" role="menuitem">退出登录</button>
+          </div>
+        </div>
+      </div>
+      <div id="componentDemoRoot"></div>
+    </div>
   </div>
 </div>
 
@@ -243,6 +308,7 @@
     document.getElementById('scale'),
     document.getElementById('semantic'),
     document.getElementById('semantic-badges'),
+    document.getElementById('component-demo'),
   ];
 
   // 与 src/index.ts 的 VOYAGE_PRESETS 保持一致: 每个色系一个策展的 style/tone 组合

@@ -120,6 +120,57 @@ function App() {
 <VoyageLangSwitcher locale={locale} onLocaleChange={setLocale} />
 ```
 
+### 认证界面基础组件
+
+Voyage 只提供展示与交互契约，不读取 session/token，也不依赖任何认证 SDK。`Spinner` 和 `StateView` 可从 SSR-safe 子路径导入：
+
+```tsx
+import {
+  VoyageSpinner,
+  VoyageStateView,
+} from '@yiminlab/voyage/react/primitives';
+
+<VoyageStateView
+  variant="loading"
+  size="section"
+  heading="正在确认登录状态"
+  description="请稍候…"
+/>
+
+<VoyageStateView
+  variant="error"
+  size="page"
+  heading="登录失败"
+  description="授权回调没有完成。"
+  action={<button className="vg-btn">重试</button>}
+/>
+```
+
+`VoyageAccountMenu` 是 client component，由宿主或 AuthKit 适配层传入已归一化的用户信息和登录/退出回调：
+
+```tsx
+import { VoyageAccountMenu } from '@yiminlab/voyage/react';
+
+<VoyageAccountMenu
+  locale="zh"
+  isLoading={auth.isLoading}
+  isAuthenticated={auth.isAuthenticated}
+  identity={auth.user && {
+    name: auth.user.name,
+    secondary: auth.user.email,
+    imageUrl: auth.user.avatarUrl,
+  }}
+  onLogin={auth.login}
+  onLogout={auth.logout}
+/>
+```
+
+- **`VoyageSpinner`** — `sm` / `md` / `lg` 三档；独立使用时提供 `role="status"`，嵌入已有文案的状态组件时传 `decorative`。系统开启 reduced motion 时停止旋转。
+- **`VoyageStateView`** — `section` / `page` 布局和 `loading` / `info` / `error` 语义，可替换图标与 action，默认补齐 ARIA live region。
+- **`VoyageAccountMenu`** — 受控账户菜单；未登录显示登录动作，已登录显示头像和原生 Popover 菜单，并包含键盘导航与焦点恢复。
+
+推荐由 `@yiminlab/authkit/voyage` 这类适配入口负责把 AuthKit 的 session/user 映射为上述 props，避免 Voyage 与 AuthKit 双向依赖。
+
 ## 页面问题上报
 
 `VoyageIssueReporter` 让用户直接点选有问题的界面或文字，比只附截图多一层可机器读取的定位证据。它只负责浏览器端的选择、脱敏、取证与 `POST`；GitHub token、仓库路由和 Issue 创建必须留在服务端。
@@ -250,6 +301,7 @@ pnpm build
 ## Roadmap
 
 - [x] react/ 薄封装: VoyageProvider / useVoyage / VoyageToolbar / VoyageSwitcher (Popover API, 有支持时启用) / VoyageLangSwitcher
+- [x] 认证界面基础组件: VoyageSpinner / VoyageStateView / VoyageAccountMenu
 - [x] 页面问题上报: 元素/划词选择、脱敏证据包、可配置 intake endpoint
 - [x] quarry 接入 (slate x dark x classic x normal, 视觉基准)
 - [ ] react/ 其余薄封装: Dialog (原生 `<dialog>`) / Toast

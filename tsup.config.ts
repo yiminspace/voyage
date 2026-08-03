@@ -23,4 +23,13 @@ export default defineConfig([
     // (esbuild 不认识这个指令, 会当普通字符串字面量丢弃, 需要用 banner 补)
     banner: { js: "'use client';" },
   },
+  {
+    entry: { 'react/primitives/index': 'src/react/primitives/index.ts' },
+    format: ['cjs', 'esm'],
+    dts: true,
+    splitting: false,
+    sourcemap: true,
+    clean: false,
+    external: ['react', 'react-dom'],
+  },
 ]);

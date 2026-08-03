@@ -11,7 +11,7 @@ test.describe('VoyageIssueReporter 功能试驾', () => {
     await expect(fittingRoom).toHaveAttribute('data-mode', 'dark');
 
     await page.getByRole('button', { name: '反馈当前页面' }).click();
-    await expect(page.getByRole('status')).toContainText('选择有问题的内容');
+    await expect(page.locator('.vg-reporter-hud[role="status"]')).toContainText('选择有问题的内容');
 
     // 选择本来会切换明暗的业务按钮；Reporter 应吞掉这次 click。
     await page.locator('#switcherMode').click();
@@ -38,7 +38,7 @@ test.describe('VoyageIssueReporter 功能试驾', () => {
     ).toBe(highlightDocumentTop);
 
     await page.getByRole('button', { name: '添加区域' }).click();
-    await expect(page.getByRole('status')).toContainText('已选择 1 个区域');
+    await expect(page.locator('.vg-reporter-hud[role="status"]')).toContainText('已选择 1 个区域');
     await page.locator('#switcherTrigger').click();
     await expect(page.locator('#switcherPanel')).toBeHidden();
     await expect(page.getByText('已选择 2 个区域')).toBeVisible();
@@ -104,6 +104,6 @@ test.describe('VoyageIssueReporter 功能试驾', () => {
     );
     expect(report.targets[0].computedStyle).toBeTruthy();
     expect(report.targets[0].tokens).toBeTruthy();
-    expect(report.voyage.version).toBe('0.11.0');
+    expect(report.voyage.version).toBe('0.12.0');
   });
 });
