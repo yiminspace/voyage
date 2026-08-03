@@ -20,6 +20,27 @@ type Matrix = {
 const SLATE_DARK: Matrix = { theme: 'slate', mode: 'dark', style: 'classic', tone: 'normal' };
 const INK_LIGHT: Matrix = { theme: 'ink', mode: 'light', style: 'soft', tone: 'quiet' };
 
+/** 把 chromium 的计算值解析成 0-255 三元组 */
+function toRgb(value: string): [number, number, number] {
+  const nums = value.match(/[\d.]+/g);
+  if (!nums || nums.length < 3) throw new Error(`解析不了颜色: "${value}"`);
+  const [r, g, b] = nums.slice(0, 3).map(Number);
+  return value.startsWith('color(') ? [r * 255, g * 255, b * 255] : [r, g, b];
+}
+
+function distance(a: string, b: string): number {
+  const [r1, g1, b1] = toRgb(a);
+  const [r2, g2, b2] = toRgb(b);
+  return Math.hypot(r1 - r2, g1 - g2, b1 - b2);
+}
+
+/** 从 box-shadow 计算值里抽出颜色段 (忽略偏移/模糊) */
+function shadowColor(boxShadow: string): string {
+  const match = boxShadow.match(/(rgba?\([^)]+\)|color\([^)]+\)|#[0-9a-fA-F]{3,8})/);
+  if (!match) throw new Error(`box-shadow 里没有颜色: "${boxShadow}"`);
+  return match[1];
+}
+
 async function mountProbe(page: Page, matrix: Matrix) {
   return page.evaluate((attrs) => {
     document.getElementById('vg-color-probe')?.remove();
@@ -30,7 +51,8 @@ async function mountProbe(page: Page, matrix: Matrix) {
     root.dataset.mode = attrs.mode;
     root.dataset.style = attrs.style;
     root.dataset.tone = attrs.tone;
-    root.style.cssText = 'position:fixed;inset:0;pointer-events:none;';
+    // 承载面用 --bg0, 模拟浮层外侧的页面底色
+    root.style.cssText = 'position:fixed;inset:0;pointer-events:none;background:var(--bg0);';
 
     root.innerHTML = `
       <span class="vg-dot ok" data-probe="dot-ok"></span>
@@ -62,7 +84,7 @@ async function readProbe(page: Page) {
     const transparent = new Set(['transparent', 'rgba(0, 0, 0, 0)', 'none']);
     const modalBg = styleOf('[data-probe="modal"]').backgroundColor;
     const shadow = styleOf('[data-probe="acbox"]').boxShadow;
-    // 状态点读 background, token 探针读 color —— 两者都是同一 token 的计算色
+    const hostBg = getComputedStyle(root).backgroundColor;
     const tokenColor = (sel: string) => styleOf(sel).color;
     return {
       dotOk: styleOf('[data-probe="dot-ok"]').backgroundColor,
@@ -73,6 +95,7 @@ async function readProbe(page: Page) {
       tokenOnFg: tokenColor('[data-probe="token-on-fg"]'),
       modalBg,
       shadow,
+      hostBg,
       modalOk: !transparent.has(modalBg.trim()),
       shadowOk: shadow.trim() !== 'none' && !transparent.has(shadow.trim()),
     };
@@ -101,7 +124,7 @@ test.describe('组件可见色来自 token 求值', () => {
     });
   }
 
-  test('modal 遮罩与浮层阴影在代表性矩阵下有效且可区分', async ({ page }) => {
+  test('modal 遮罩与浮层阴影在代表性矩阵下有效、可区分且相对背景有对比', async ({ page }) => {
     await mountProbe(page, SLATE_DARK);
     const dark = await readProbe(page);
     await clearProbe(page);
@@ -116,5 +139,12 @@ test.describe('组件可见色来自 token 求值', () => {
     expect(light.shadowOk, 'ink light 浮层阴影不应无效').toBe(true);
     expect(dark.modalBg, '两套矩阵的遮罩求值应可区分').not.toBe(light.modalBg);
     expect(dark.shadow, '两套矩阵的阴影求值应可区分').not.toBe(light.shadow);
+
+    // 阴影色必须相对承载底 (--bg0) 有可见色差, 避免同色半透明“假阴影”
+    // 阈值 20: 同色叠底距离为 0; 暗色纯黑对 slate bg0 约 31, 浅色正文色混合约 300+
+    expect(distance(shadowColor(dark.shadow), dark.hostBg),
+      'slate dark 阴影相对 --bg0 应有可见对比').toBeGreaterThan(20);
+    expect(distance(shadowColor(light.shadow), light.hostBg),
+      'ink light 阴影相对 --bg0 应有可见对比').toBeGreaterThan(20);
   });
 });
