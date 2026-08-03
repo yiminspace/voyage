@@ -12,13 +12,16 @@ const LITERAL_COLOR = /#[0-9a-fA-F]{3,8}\b|rgba?\(/;
 
 describe('VoyageSwitcher 样式约束: 可见颜色只能引用 tokens 变量', () => {
   it('src/react 源码不出现字面量色值', () => {
-    const files = readdirSync(REACT_SRC_DIR).filter(
-      (file) => /\.(ts|tsx)$/.test(file) && !file.endsWith('.test.ts') && !file.endsWith('.test.tsx')
-    );
+    const sourceFiles = (directory: string): string[] => readdirSync(directory, { withFileTypes: true })
+      .flatMap((entry) => entry.isDirectory()
+        ? sourceFiles(path.join(directory, entry.name))
+        : [path.join(directory, entry.name)])
+      .filter((file) => /\.(ts|tsx)$/.test(file) && !file.endsWith('.test.ts') && !file.endsWith('.test.tsx'));
+    const files = sourceFiles(REACT_SRC_DIR);
     expect(files.length).toBeGreaterThan(0);
     for (const file of files) {
-      const content = readFileSync(path.join(REACT_SRC_DIR, file), 'utf-8');
-      expect(content, `${file} 不应包含字面量色值 (#xxx / rgb())`).not.toMatch(LITERAL_COLOR);
+      const content = readFileSync(file, 'utf-8');
+      expect(content, `${path.relative(REACT_SRC_DIR, file)} 不应包含字面量色值 (#xxx / rgb())`).not.toMatch(LITERAL_COLOR);
     }
   });
 

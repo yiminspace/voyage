@@ -9,7 +9,9 @@ import {
 } from '../src/index';
 import {
   VoyageIssueReporter,
+  VoyageAccountMenu,
   VoyageProvider,
+  VoyageStateView,
   useVoyage,
   type VoyageIssueSubmitResult,
 } from '../src/react/index';
@@ -145,6 +147,7 @@ function ReporterDemo() {
   const [locale, setLocale] = useState<VoyageLocale>('zh');
   const [lastReport, setLastReport] = useState<VoyageIssueReport | null>(null);
   const [showEvidence, setShowEvidence] = useState(false);
+  const [demoAuthenticated, setDemoAuthenticated] = useState(true);
 
   useEffect(() => {
     const updateLocale = (event: Event) => {
@@ -181,6 +184,36 @@ function ReporterDemo() {
       {lastReport && showEvidence ? (
         <EvidencePanel report={lastReport} onClose={() => setShowEvidence(false)} />
       ) : null}
+      {componentDemoHost ? createPortal(
+        <div className="vg-component-demo-grid">
+          <div className="vg-component-demo-card">
+            <VoyageStateView
+              variant="loading"
+              heading={locale === 'zh' ? '正在处理登录' : 'Completing sign in'}
+              description={locale === 'zh' ? '即将安全地返回应用' : 'Returning to the app securely'}
+            />
+          </div>
+          <div className="vg-component-demo-card">
+            <VoyageStateView
+              variant="error"
+              heading={locale === 'zh' ? '登录失败' : 'Sign in failed'}
+              description={locale === 'zh' ? '认证信息无效或已经过期' : 'Authentication is invalid or expired'}
+              action={<button type="button" className="vg-btn primary">{locale === 'zh' ? '重试' : 'Retry'}</button>}
+            />
+          </div>
+          <div className="vg-component-demo-card vg-component-demo-account">
+            <p>{locale === 'zh' ? '账户菜单使用真实 React + 原生 Popover API' : 'Real React account menu using the native Popover API'}</p>
+            <VoyageAccountMenu
+              locale={locale}
+              isAuthenticated={demoAuthenticated}
+              identity={{ name: 'Voyage User', secondary: 'voyage@example.com' }}
+              onLogin={() => setDemoAuthenticated(true)}
+              onLogout={() => setDemoAuthenticated(false)}
+            />
+          </div>
+        </div>,
+        componentDemoHost
+      ) : null}
     </VoyageProvider>
   );
 }
@@ -189,6 +222,8 @@ installDemoIntake();
 
 const toolbar = document.getElementById('toolbar');
 if (!toolbar) throw new Error('Voyage 试衣间缺少 #toolbar');
+const componentDemoHost = document.getElementById('componentDemoRoot');
+document.getElementById('componentStatic')?.setAttribute('hidden', '');
 
 const host = document.createElement('span');
 host.id = 'reporterDemoRoot';

@@ -9,5 +9,7 @@ describe('SSR 安全', () => {
     expect(typeof mod.VoyageProvider).toBe('function');
     expect(typeof mod.useVoyage).toBe('function');
     expect(typeof mod.VoyageSwitcher).toBe('function');
+    expect(typeof mod.VoyageStateView).toBe('function');
+    expect(typeof mod.VoyageAccountMenu).toBe('function');
   });
 });

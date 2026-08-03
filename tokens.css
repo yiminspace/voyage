@@ -194,6 +194,22 @@
   --cell-py: 7px;
   --btn-pad: 6px 12px;
   --topline-o: 0.9;
+
+  /* 新组件开始只消费带 vg 命名空间的公共语义 token。旧组件仍可继续使用
+     --fg/--bg2 等历史短名；Voyage 1.0 再统一迁移并保留兼容别名。 */
+  --vg-color-text: var(--fg);
+  --vg-color-text-muted: var(--fg2);
+  --vg-color-text-subtle: var(--fg3);
+  --vg-color-accent: var(--acc);
+  --vg-color-accent-text: var(--acc-text);
+  --vg-color-danger: var(--red-fg);
+  --vg-color-surface: var(--surf-1);
+  --vg-color-control: var(--bg2);
+  --vg-color-control-hover: var(--bg3);
+  --vg-color-border: var(--line2-c, var(--line2));
+  --vg-radius-control: var(--r-btn);
+  --vg-radius-surface: var(--r-win);
+  --vg-shadow-popover: 0 12px 36px color-mix(in srgb, var(--bg0) 55%, transparent);
 }
 
 /* ---------------------------------------------------------------------------
