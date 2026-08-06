@@ -32,3 +32,4 @@ export {
   type VoyageIssueReporterProps,
   type VoyageIssueSubmitResult,
 } from './voyage-issue-reporter';
+export * from './dashboard';

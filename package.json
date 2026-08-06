@@ -1,6 +1,6 @@
 {
   "name": "@yiminlab/voyage",
-  "version": "0.13.0",
+  "version": "0.14.0",
   "description": "YiminLab 统一样式系统: 四轴 token 矩阵 (theme x mode x style x tone) + quarry 规格组件层",
   "homepage": "https://github.com/yiminspace/voyage#readme",
   "bugs": {
@@ -30,6 +30,11 @@
       "types": "./dist/react/primitives/index.d.ts",
       "import": "./dist/react/primitives/index.mjs",
       "require": "./dist/react/primitives/index.js"
+    },
+    "./react/dashboard": {
+      "types": "./dist/react/dashboard/index.d.ts",
+      "import": "./dist/react/dashboard/index.mjs",
+      "require": "./dist/react/dashboard/index.js"
     },
     "./tokens.css": "./tokens.css",
     "./voyage.css": "./voyage.css",
