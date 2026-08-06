@@ -58,7 +58,7 @@
 
       语义种子色 (--ok / --warn / --red) 每套主题必须给全 dark 与 light 两档:
       漏给不会回落到某个默认值, 而是让 .vg-badge / .vg-state 直接吃到裸变量
-      变透明。tokens-theme.test.ts 对 10 x 2 = 20 种组合逐一断言。
+      变透明。tokens-theme.test.ts 对全部 theme x mode 组合逐一断言。
 
       配套的染色底 (--*-bg) 与彩色文字 (--*-fg) 默认由第 3 段用 color-mix
       从种子色推导, 不需逐主题手调; 只有 slate (quarry 基准) 与 github
@@ -131,6 +131,11 @@
    accent 本身是林绿, ok 若同用会与主色糊在一起, 故取色板里更黄的 aqua/green 区分 */
 .vg[data-theme='everforest'][data-mode='dark'] { --bg0:#272e33; --bg1:#2d353b; --bg2:#343f44; --bg3:#3d484d; --line:#475258; --line2:#56635f; --accent:#a7c080; --accent-hi:#b7cf95; --accent-ink:#1c2418; --ok:#83c092; --warn:#dbbc7f; --red:#e67e80; }
 .vg[data-theme='everforest'][data-mode='light'] { --bg0:#f4f0d9; --bg1:#fdf6e3; --bg2:#efebd4; --bg3:#e6e2cc; --line:#d5d0b6; --line2:#bdb8a0; --accent:#8da101; --accent-hi:#a0b420; --accent-ink:#ffffff; --ok:#35a77c; --warn:#bf7f18; --red:#f85552; }
+
+/* iris 鸢尾 — Taskdeck demo 原值: 冷白/深蓝底 + 清晰紫色强调。
+   与 quiet 系列不同, 这套色板刻意保留更强的面层和边界差, 供控制台类界面使用。 */
+.vg[data-theme='iris'][data-mode='dark'] { --bg0:#080d1a; --bg1:#11182a; --bg2:#1b263e; --bg3:#24314c; --line:#34425e; --line2:#53627d; --accent:#9b8cff; --accent-hi:#b0a5ff; --accent-ink:#ffffff; --ok:#54d6a5; --warn:#fdb022; --red:#ff8a72; }
+.vg[data-theme='iris'][data-mode='light'] { --bg0:#f4f6fb; --bg1:#ffffff; --bg2:#eef1f8; --bg3:#e6eaf3; --line:#d0d5dd; --line2:#98a2b3; --accent:#6558e8; --accent-hi:#7b6ff0; --accent-ink:#ffffff; --ok:#087f5b; --warn:#8a5a00; --red:#c4320a; }
 
 /* ---------------------------------------------------------------------------
    3. 有效变量层: 组件只消费这一层, tone / style 通过覆写它们生效
@@ -209,6 +214,7 @@
   --vg-color-border: var(--line2-c, var(--line2));
   --vg-radius-control: var(--r-btn);
   --vg-radius-surface: var(--r-win);
+  --vg-shadow-surface: 0 8px 28px color-mix(in srgb, #000 14%, transparent);
   /* 遮罩随底色走; 浮层阴影用正文色推导, 相对 --bg0/--bg1 承载面才有明暗差 */
   --vg-color-overlay: color-mix(in srgb, var(--bg0) 62%, transparent);
   --vg-shadow-popover: 0 12px 36px color-mix(in srgb, var(--fg) 28%, transparent);
@@ -258,6 +264,24 @@
   --th-tt: uppercase;
   --th-ls: 0.07em;
 }
+.vg[data-style='cloud'] {
+  --r-win: 24px;
+  --r-btn: 12px;
+  --r-pill: 99px;
+  --nav-py: 8px;
+  --cell-py: 10px;
+  --btn-pad: 8px 15px;
+  --td-rb: none;
+  --line-c: var(--line);
+  --line2-c: var(--line2);
+  --btn-sh: 0 3px 14px color-mix(in srgb, var(--fg) 7%, transparent);
+  --glow: 0 5px 14px color-mix(in srgb, var(--accent) 28%, transparent);
+  --vg-shadow-surface: 0 12px 40px color-mix(in srgb, var(--fg) 9%, transparent);
+}
+.vg[data-style='cloud'][data-mode='dark'] {
+  --btn-sh: 0 5px 18px color-mix(in srgb, #000 28%, transparent);
+  --vg-shadow-surface: 0 18px 54px color-mix(in srgb, #000 38%, transparent);
+}
 
 /* ---------------------------------------------------------------------------
    5. 对比层: quiet (久航) — 必须放在风格层之后 (同特异度后者胜)
@@ -283,6 +307,15 @@
     color-mix(in srgb, var(--g2) 58%, #06070a));
   --fill-ink: #f3f1ee;
 }
+.vg[data-tone='crisp'] {
+  --acc-text: color-mix(in srgb, var(--accent) 82%, var(--fg));
+  --sel-bg: color-mix(in srgb, var(--accent) 12%, var(--bg1));
+  --hl-bg: linear-gradient(transparent 62%, color-mix(in srgb, var(--accent) 28%, transparent) 0);
+  --thline: var(--line2);
+  --topline-o: 0.7;
+  --fill-grad: var(--acc-grad);
+  --fill-ink: var(--accent-ink);
+}
 
 /* ---------------------------------------------------------------------------
    6. 主题微调层: 个别主题对明暗基座灰阶的覆写
@@ -299,4 +332,16 @@
 .vg[data-theme='ink'][data-mode='dark'] {
   --fg2: #c4bcae;
   --fg3: #a09a8e;
+}
+
+/* iris: 精确保留 Taskdeck demo 的三级文字灰阶。 */
+.vg[data-theme='iris'][data-mode='dark'] {
+  --fg: #f8fafc;
+  --fg2: #dbe4f0;
+  --fg3: #a9b6c9;
+}
+.vg[data-theme='iris'][data-mode='light'] {
+  --fg: #101828;
+  --fg2: #344054;
+  --fg3: #667085;
 }

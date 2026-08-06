@@ -10,10 +10,10 @@ yiminlab 统一样式系统。**所有 GUI 应用的视觉基础**: 一套 quarr
 
 | 轴 | 取值 | 管什么 |
 |---|---|---|
-| `data-theme` | 自研: `slate` 板岩铜 (quarry 基准) / `ink` 纸墨朱; 经典采编 (MIT, 出处见 tokens.css): `github` 石墨 (兼 evolve GUI 基准, accent 取 Primer 链接蓝) / `nord` 北极 / `tokyo` 东京夜 / `catppuccin` 摩卡 / `onedark` 原子 / `solarized` 日晒 / `rosepine` 玫瑰松 / `everforest` 常青林 | 颜色 |
+| `data-theme` | 自研: `slate` 板岩铜 (quarry 基准) / `ink` 纸墨朱 / `iris` 鸢尾 (Taskdeck 高对比基准); 经典采编 (MIT, 出处见 tokens.css): `github` 石墨 (兼 evolve GUI 基准, accent 取 Primer 链接蓝) / `nord` 北极 / `tokyo` 东京夜 / `catppuccin` 摩卡 / `onedark` 原子 / `solarized` 日晒 / `rosepine` 玫瑰松 / `everforest` 常青林 | 颜色 |
 | `data-mode` | `dark` / `light` | 底色深浅 |
-| `data-style` | `classic` / `glass` / `soft` / `sharp` | 结构: 圆角 / 密度 / 材质 / 阴影 |
-| `data-tone` | `normal` / `quiet` | 对比强度; **quiet (久航) 是日常默认**, normal 留给演示 / 截图 |
+| `data-style` | `classic` / `glass` / `soft` / `sharp` / `cloud` | 结构: 圆角 / 密度 / 材质 / 阴影；`cloud` 是 Taskdeck 的大圆角与清晰阴影 |
+| `data-tone` | `normal` / `quiet` / `crisp` | 对比强度; **quiet (久航) 是日常默认**, `crisp` 强化层级与边界 |
 
 四轴完全正交, 任意组合成立。主题层只有色值, 风格层只有结构值, tone 层用 `color-mix` 从种子色推导, 不需要为每套主题手调。
 
@@ -29,7 +29,7 @@ yiminlab 统一样式系统。**所有 GUI 应用的视觉基础**: 一套 quarr
 
 **语义色**: `--ok` / `--warn` / `--red` 三枚种子色**随主题走**, 每套主题在 tokens.css 第 2 段自报 dark 与 light 两档 —— 全主题共用一枚 Primer 红会让 everforest、rosepine 这类有自己色相语言的主题出戏。配套的染色底 `--*-bg` 与彩色文字 `--*-fg` 由第 3 段用 `color-mix` 从种子色推导, 不必逐主题手调; 只有 `slate` (quarry 基准) 与 `github` (evolve GUI 基准) 在主题矩阵里手写覆写这几位, 因为它们要逐值保真既有视觉。
 
-新增主题时**必须给全三枚种子色**: CSS 自定义属性没有继承兜底, 漏给会让 `.vg-badge` / `.vg-state` 吃到空值直接变透明 —— 表现为「徽章没了」而非「颜色不对」, 极难察觉。`tokens-theme.test.ts` 对 10 × 2 共 20 种组合逐一断言, 漏给即红。
+新增主题时**必须给全三枚种子色**: CSS 自定义属性没有继承兜底, 漏给会让 `.vg-badge` / `.vg-state` 吃到空值直接变透明 —— 表现为「徽章没了」而非「颜色不对」, 极难察觉。`tokens-theme.test.ts` 对全部 11 × 2 组合逐一断言, 漏给即红。
 
 ## 用法
 
@@ -249,6 +249,7 @@ intake API 接收完整 JSON 报告。成功响应可以直接返回 GitHub 风�
 | engram | ink 纸墨朱 | light | soft | quiet |
 | jsontailor | tokyo 东京夜 | dark | glass | quiet |
 | ai | everforest 常青林 | dark | classic | quiet |
+| taskdeck | iris 鸢尾 | light | cloud | crisp |
 | quarry | slate 板岩铜 (原始基准) | dark | classic | normal |
 | portal | — 搁置, 保持现有设计 | | | |
 
@@ -272,7 +273,7 @@ open demo/fitting-room.html
 
 被测样式全部来自 tokens.css / voyage.css 本体; 改 token 后先开这页对照四轴组合。`file://` 模式不加载 React，页面顶栏内嵌一个 `vg-topbar` 静态实例 (原生 JS 驱动, 与 `VoyageToolbar` 组件同一份标记/样式), 兼作顶栏控件的视觉基准 —— 三颗钮的等高/同圆角、以及切换语言时右侧控件不位移, 都在这页上量。卡片内的 `.vg-toolbar` 按钮行 (「hysteresis」卡片下方) 是另一语境的静态实例, 两者不共用类名。
 
-手工对照仍可用 (改 token 后开页肉眼核对四轴组合), 但上述尺寸契约已由 `e2e/` 下的 Playwright 用例自动守住: 真实浏览器排版引擎跑 `getBoundingClientRect()` / `getComputedStyle()`, 断言三颗钮等高等宽同圆角、语言钮在多种文案 (含明显更宽的文案) 下宽度恒定、切换语言不推动右侧控件、圆角随 `data-style` 轴变化、`--vg-lang-w` 覆盖生效且可回落默认。这类断言 jsdom 测不出来 (不解析 `var()`、无字体引擎、不跑 flex 布局), 只有真实渲染才能当场暴露。
+手工对照仍可用 (改 token 后开页肉眼核对四轴组合), 但上述尺寸契约已由 `e2e/` 下的 Playwright 用例自动守住: 真实浏览器排版引擎跑 `getBoundingClientRect()` / `getComputedStyle()`, 断言三颗钮等高等宽同圆角、语言钮在多种文案 (含明显更宽的文案) 下宽度恒定、切换语言不推动右侧控件、圆角随 `data-style` 轴变化、`--vg-lang-w` 覆盖生效且可回落默认。Taskdeck 组合还会分别在 light/dark 下断言正文与次级文字对比度、24px 表面圆角、12px 控件圆角和实色边界。这类断言 jsdom 测不出来 (不解析 `var()`、无字体引擎、不跑 flex 布局), 只有真实渲染才能当场暴露。
 
 ```
 pnpm test        # vitest — 组件行为/token 解析

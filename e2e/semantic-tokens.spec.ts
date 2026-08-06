@@ -20,7 +20,7 @@ const DEMO_URL = pathToFileURL(
 
 const THEMES = [
   'slate', 'ink', 'github', 'nord', 'tokyo',
-  'catppuccin', 'onedark', 'solarized', 'rosepine', 'everforest',
+  'catppuccin', 'onedark', 'solarized', 'rosepine', 'everforest', 'iris',
 ] as const;
 const MODES = ['dark', 'light'] as const;
 

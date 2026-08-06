@@ -1,6 +1,6 @@
 {
   "name": "@yiminlab/voyage",
-  "version": "0.12.4",
+  "version": "0.13.0",
   "description": "YiminLab 统一样式系统: 四轴 token 矩阵 (theme x mode x style x tone) + quarry 规格组件层",
   "homepage": "https://github.com/yiminspace/voyage#readme",
   "bugs": {

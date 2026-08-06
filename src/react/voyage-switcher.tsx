@@ -120,7 +120,7 @@ export interface VoyageSwitcherProps {
 /**
  * 顶栏切换器: 一个 vg-iconbtn 一键切明暗 + 一个调色板按钮弹出主题面板。
  *
- * 面板 = 明暗分段 + 8 张策展主题卡 (VOYAGE_PRESETS): 每张卡用自己的
+ * 面板 = 明暗分段 + 策展主题卡 (VOYAGE_PRESETS): 每张卡用自己的
  * data-theme/style/tone 作用域渲染 mini 预览; hover / 聚焦某张卡时把该主题
  * 临时应用到整页做即时预览 (不写 localStorage), 移出 / Esc / 关面板还原,
  * 点击才落定 —— VS Code 主题选择器的交互模型。

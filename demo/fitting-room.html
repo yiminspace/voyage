@@ -121,6 +121,7 @@
     <button class="chip" data-pick="solarized" style="--ac:#268bd2"><i></i>日晒</button>
     <button class="chip" data-pick="rosepine" style="--ac:#ebbcba"><i></i>玫瑰松</button>
     <button class="chip" data-pick="everforest" style="--ac:#a7c080"><i></i>常青林</button>
+    <button class="chip" data-pick="iris" style="--ac:#6558e8"><i></i>鸢尾</button>
   </div>
   <div class="bench">
     <span class="lbl">明暗</span>
@@ -131,9 +132,11 @@
     <button class="chip" data-style-pick="glass" style="--ac:#8fb6d9"><i></i>玻璃</button>
     <button class="chip" data-style-pick="soft" style="--ac:#a4b08e"><i></i>圆软</button>
     <button class="chip" data-style-pick="sharp" style="--ac:#8e97a4"><i></i>方锐</button>
+    <button class="chip" data-style-pick="cloud" style="--ac:#6558e8"><i></i>云圆</button>
     <span class="lbl" style="margin-left:14px">对比</span>
     <button class="chip" data-tone-pick="normal" style="--ac:#d4966a"><i></i>标准</button>
     <button class="chip on" data-tone-pick="quiet" style="--ac:#8d7a67"><i></i>柔和</button>
+    <button class="chip" data-tone-pick="crisp" style="--ac:#6558e8"><i></i>清晰</button>
   </div>
 
   <div class="stage">
@@ -322,7 +325,8 @@
     { id: 'onedark',    label: '原子',   hint: 'One Dark 中性耐看',    style: 'classic', tone: 'quiet' },
     { id: 'solarized',  label: '日晒',   hint: 'Solarized 学院经典',   style: 'classic', tone: 'quiet' },
     { id: 'rosepine',   label: '玫瑰松', hint: 'Rosé Pine 哑光玫瑰',   style: 'soft',    tone: 'quiet' },
-    { id: 'everforest', label: '常青林', hint: 'Everforest 护眼绿',    style: 'soft',    tone: 'quiet' }
+    { id: 'everforest', label: '常青林', hint: 'Everforest 护眼绿',    style: 'soft',    tone: 'quiet' },
+    { id: 'iris',       label: '鸢尾',   hint: 'Taskdeck 高对比圆角', style: 'cloud',   tone: 'crisp' }
   ];
 
   // 已落定的四轴状态 (bind 的 after 回调里维护), 预览还原时以它为准

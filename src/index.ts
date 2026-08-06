@@ -18,14 +18,15 @@ export type VoyageTheme =
   | 'onedark'    // 原子 — One Dark / One Light (Atom)
   | 'solarized'  // 日晒 — Solarized
   | 'rosepine'   // 玫瑰松 — Rosé Pine main/dawn
-  | 'everforest'; // 常青林 — Everforest
+  | 'everforest' // 常青林 — Everforest
+  | 'iris';      // 鸢尾 — Taskdeck 高对比紫蓝
 
 export type VoyageMode = 'dark' | 'light';
-export type VoyageStyle = 'classic' | 'glass' | 'soft' | 'sharp';
-export type VoyageTone = 'normal' | 'quiet';
+export type VoyageStyle = 'classic' | 'glass' | 'soft' | 'sharp' | 'cloud';
+export type VoyageTone = 'normal' | 'quiet' | 'crisp';
 
 /** 与 package.json 同步；报告证据用它定位实际生效的 Voyage 版本。 */
-export const VOYAGE_VERSION = '0.12.4';
+export const VOYAGE_VERSION = '0.13.0';
 
 export interface VoyagePrefs {
   theme: VoyageTheme;
@@ -36,11 +37,11 @@ export interface VoyagePrefs {
 
 export const VOYAGE_THEMES: readonly VoyageTheme[] = [
   'slate', 'ink', 'github', 'nord', 'tokyo',
-  'catppuccin', 'onedark', 'solarized', 'rosepine', 'everforest',
+  'catppuccin', 'onedark', 'solarized', 'rosepine', 'everforest', 'iris',
 ] as const;
 export const VOYAGE_MODES: readonly VoyageMode[] = ['dark', 'light'] as const;
-export const VOYAGE_STYLES: readonly VoyageStyle[] = ['classic', 'glass', 'soft', 'sharp'] as const;
-export const VOYAGE_TONES: readonly VoyageTone[] = ['normal', 'quiet'] as const;
+export const VOYAGE_STYLES: readonly VoyageStyle[] = ['classic', 'glass', 'soft', 'sharp', 'cloud'] as const;
+export const VOYAGE_TONES: readonly VoyageTone[] = ['normal', 'quiet', 'crisp'] as const;
 
 /** 全线缺省: 柔和 (久航) 是日常默认, normal 留给演示 / 截图 */
 export const VOYAGE_DEFAULT_PREFS: VoyagePrefs = {
@@ -55,6 +56,7 @@ export const VOYAGE_APP_DEFAULTS: Record<string, VoyagePrefs> = {
   engram:     { theme: 'ink',        mode: 'light', style: 'soft',    tone: 'quiet' },
   jsontailor: { theme: 'tokyo',      mode: 'dark',  style: 'glass',   tone: 'quiet' },
   ai:         { theme: 'everforest', mode: 'dark',  style: 'classic', tone: 'quiet' },
+  taskdeck:   { theme: 'iris',       mode: 'light', style: 'cloud',   tone: 'crisp' },
   // quarry 是本规格的原始基准: tone 用 normal (原版是实色 accent 填充,
   // 不是 quiet 的压明度+白字), 以贴合它现有视觉不变。
   quarry:     { theme: 'slate', mode: 'dark', style: 'classic', tone: 'normal' },
@@ -96,6 +98,7 @@ export const VOYAGE_PRESETS: readonly VoyagePreset[] = [
   { id: 'solarized',  label: { zh: '日晒',   en: 'Solarized' },      hint: { zh: 'Solarized 学院经典',   en: 'The academic classic' },  theme: 'solarized',  style: 'classic', tone: 'quiet' },
   { id: 'rosepine',   label: { zh: '玫瑰松', en: 'Rosé Pine' },      hint: { zh: 'Rosé Pine 哑光玫瑰',   en: 'Muted rosé elegance' },   theme: 'rosepine',   style: 'soft',    tone: 'quiet' },
   { id: 'everforest', label: { zh: '常青林', en: 'Everforest' },     hint: { zh: 'Everforest 护眼绿',    en: 'Comfy forest green' },    theme: 'everforest', style: 'soft',    tone: 'quiet' },
+  { id: 'iris',       label: { zh: '鸢尾',   en: 'Iris' },           hint: { zh: 'Taskdeck 高对比圆角',   en: 'Taskdeck high contrast' }, theme: 'iris',       style: 'cloud',   tone: 'crisp' },
 ] as const;
 
 /** preset + 当前明暗 -> 完整四轴偏好 */
