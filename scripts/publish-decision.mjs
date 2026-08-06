@@ -166,10 +166,15 @@ export function fetchPublishedVersion(packageName, deps = {}) {
     });
     const text = String(raw).trim();
     const parsed = JSON.parse(text);
-    if (typeof parsed !== 'string' || !parsed) {
+    const version = typeof parsed === 'string'
+      ? parsed
+      : Array.isArray(parsed) && parsed.length === 1 && typeof parsed[0] === 'string'
+        ? parsed[0]
+        : undefined;
+    if (!version) {
       throw new Error(`Unexpected npm view payload: ${text}`);
     }
-    return parsed;
+    return version;
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     const error = new Error(`npm registry query failed for ${packageName}: ${message}`);

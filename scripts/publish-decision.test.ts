@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   compareSemVer,
   decidePublish,
+  fetchPublishedVersion,
   parseSemVer,
   resolvePublishDecision,
 } from './publish-decision.mjs';
@@ -150,6 +151,26 @@ describe('resolvePublishDecision', () => {
     });
     expect(decision.action).toBe('fail');
     expect(decision).not.toMatchObject({ published: '0.0.0' });
+  });
+});
+
+describe('fetchPublishedVersion', () => {
+  it('accepts npm string and single-version array payloads', () => {
+    expect(fetchPublishedVersion('@yiminlab/voyage', {
+      execSync: (() => JSON.stringify('0.12.4')) as never,
+    })).toBe('0.12.4');
+    expect(fetchPublishedVersion('@yiminlab/voyage', {
+      execSync: (() => JSON.stringify(['0.12.4'])) as never,
+    })).toBe('0.12.4');
+  });
+
+  it('rejects ambiguous or empty array payloads', () => {
+    expect(() => fetchPublishedVersion('@yiminlab/voyage', {
+      execSync: (() => JSON.stringify([])) as never,
+    })).toThrow(/Unexpected npm view payload/);
+    expect(() => fetchPublishedVersion('@yiminlab/voyage', {
+      execSync: (() => JSON.stringify(['0.12.3', '0.12.4'])) as never,
+    })).toThrow(/Unexpected npm view payload/);
   });
 });
 
