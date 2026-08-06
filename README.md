@@ -362,7 +362,7 @@ gh run download --name voyage-visual-snapshots --dir e2e/visual-regression.spec.
 | 相等 | 成功跳过（不重复 publish、不改 tag） |
 | 更低 / 非法 SemVer / registry 查询失败 | workflow 失败（fail closed，不再回落 `0.0.0`） |
 
-真正 `pnpm publish` 前会 `pnpm install --frozen-lockfile`、typecheck、build，并用 `scripts/check-pack-contents.mjs` 检查 pack 清单必须包含根入口、React 入口、React primitives 入口以及 `tokens.css` / `voyage.css` / `index.css`。npm Trusted Publishing (OIDC) 发布成功后才创建指向该 `main` commit 的 `voyage-v<version>` tag。
+真正 `npm publish` 前会 `pnpm install --frozen-lockfile`、typecheck、build，并用 `scripts/check-pack-contents.mjs` 检查 pack 清单必须包含根入口、React 入口、React primitives 入口以及 `tokens.css` / `voyage.css` / `index.css`。发布步骤直接使用已更新的 npm CLI，避免包管理器转发不兼容参数；npm Trusted Publishing (OIDC) 发布成功后才创建指向该 `main` commit 的 `voyage-v<version>` tag。
 
 发布判定逻辑有 Vitest 覆盖（`scripts/publish-decision.test.ts`）。更细的维护说明见 [docs/publishing.md](docs/publishing.md)。
 

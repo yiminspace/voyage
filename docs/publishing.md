@@ -29,6 +29,6 @@ pnpm exec vitest run scripts/publish-decision.test.ts
 
 1. `pnpm install --frozen-lockfile` → typecheck → build  
 2. `node scripts/check-pack-contents.mjs --pack`（根 / React / primitives 入口 + 三份 CSS）  
-3. `pnpm publish`（Trusted Publishing）  
+3. `npm publish --access public --provenance`（Trusted Publishing；直接使用 workflow 中更新后的 npm CLI）
 4. 确保 `voyage-v<version>` 指向触发发布的 commit：缺失则创建；已存在且同 SHA 则不变；指向其他 commit 则失败（不覆盖）。  
 5. 版本 equal/skip 时不重复 publish，但仍会幂等校验 / 补建 tag（用于 npm 已成功但 tag 步骤曾失败的重跑）。
