@@ -99,12 +99,12 @@ test.describe('语言钮宽度锁死', () => {
 });
 
 test.describe('圆角跟随 data-style 轴变化', () => {
-  test('classic / sharp / soft 取值互不相同', async ({ page }) => {
+  test('classic / sharp / soft / cloud 取值互不相同', async ({ page }) => {
     const host = page.locator('#fit');
     const { lang } = toolbarButtons(page);
 
     const radii: Record<string, string> = {};
-    for (const style of ['classic', 'sharp', 'soft']) {
+    for (const style of ['classic', 'sharp', 'soft', 'cloud']) {
       await host.evaluate(
         (el, s) => el.setAttribute('data-style', s),
         style
@@ -114,7 +114,7 @@ test.describe('圆角跟随 data-style 轴变化', () => {
       );
     }
 
-    expect(new Set(Object.values(radii)).size).toBe(3);
+    expect(new Set(Object.values(radii)).size).toBe(4);
   });
 });
 
