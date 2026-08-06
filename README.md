@@ -171,6 +171,54 @@ import { VoyageAccountMenu } from '@yiminlab/voyage/react';
 
 推荐由 `@yiminlab/authkit/voyage` 这类适配入口负责把 AuthKit 的 session/user 映射为上述 props，避免 Voyage 与 AuthKit 双向依赖。
 
+### 产品控制台组件
+
+`@yiminlab/voyage/react/dashboard` 提供完整的 dashboard / control-panel 信息架构，不只是一组颜色和卡片 class。宿主负责数据和业务动作，Voyage 负责层级、密度、状态、响应式和可访问性契约：
+
+```tsx
+import {
+  VoyageDashboardShell,
+  VoyageDashboardHeader,
+  VoyageDashboardHero,
+  VoyageMetricGrid,
+  VoyageMetricCard,
+  VoyageDashboardWorkspace,
+  VoyagePanel,
+  VoyageEntityRow,
+  VoyageInspector,
+  VoyageFieldGroup,
+  VoyageChoiceGrid,
+  VoyageChoiceCard,
+  VoyageRouteList,
+  VoyageSwitch,
+} from '@yiminlab/voyage/react/dashboard';
+
+<VoyageDashboardShell>
+  <VoyageDashboardHeader title="Taskdeck" eyebrow="Local scheduler" />
+  <VoyageDashboardHero title="让每一次唤醒都清清楚楚" />
+  <VoyageMetricGrid>
+    <VoyageMetricCard label="当前任务" value="12" />
+  </VoyageMetricGrid>
+  <VoyageDashboardWorkspace>
+    <VoyagePanel title="任务库">
+      <VoyageEntityRow title="每日汇总" description="每天 08:30" selected />
+    </VoyagePanel>
+    <VoyageInspector title="每日汇总">
+      <VoyageFieldGroup label="模型策略">
+        <VoyageChoiceGrid>
+          <VoyageChoiceCard title="平衡" selected />
+          <VoyageChoiceCard title="深度" />
+        </VoyageChoiceGrid>
+      </VoyageFieldGroup>
+      <VoyageRouteList steps={[{ id: 'wake', title: 'launchd 唤醒' }]} />
+      <VoyageSwitch label="失败重试" checked />
+    </VoyageInspector>
+  </VoyageDashboardWorkspace>
+</VoyageDashboardShell>
+```
+
+完整实景见 [`demo/dashboard.html`](./demo/dashboard.html)。组件不读取任务数据、不执行调度，也不内置假指标；所有可见数字与状态必须由宿主传入。
+
 ## 页面问题上报
 
 `VoyageIssueReporter` 让用户直接点选有问题的界面或文字，比只附截图多一层可机器读取的定位证据。它只负责浏览器端的选择、脱敏、取证与 `POST`；GitHub token、仓库路由和 Issue 创建必须留在服务端。

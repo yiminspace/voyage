@@ -32,4 +32,13 @@ export default defineConfig([
     clean: false,
     external: ['react', 'react-dom'],
   },
+  {
+    entry: { 'react/dashboard/index': 'src/react/dashboard/index.ts' },
+    format: ['cjs', 'esm'],
+    dts: true,
+    splitting: false,
+    sourcemap: true,
+    clean: false,
+    external: ['react', 'react-dom'],
+  },
 ]);
