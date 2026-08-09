@@ -10,7 +10,7 @@ yiminlab 统一样式系统。**所有 GUI 应用的视觉基础**: 一套 quarr
 
 | 轴 | 取值 | 管什么 |
 |---|---|---|
-| `data-theme` | 自研: `slate` 板岩铜 (quarry 基准) / `ink` 纸墨朱 / `iris` 鸢尾 (Taskdeck 高对比基准) / `signal` 信号 (纯黑白工作台); 经典采编 (MIT, 出处见 tokens.css): `github` 石墨 (兼 evolve GUI 基准, accent 取 Primer 链接蓝) / `nord` 北极 / `tokyo` 东京夜 / `catppuccin` 摩卡 / `onedark` 原子 / `solarized` 日晒 / `rosepine` 玫瑰松 / `everforest` 常青林 | 颜色 |
+| `data-theme` | 自研: `slate` 板岩铜 (quarry 基准) / `ink` 纸墨朱 / `iris` 鸢尾 (Taskdeck 高对比基准) / `signal` 信号 (纯黑白工作台) / `trace` 轨迹纸 (记录纸与蓝图观测台); 经典采编 (MIT, 出处见 tokens.css): `github` 石墨 (兼 evolve GUI 基准, accent 取 Primer 链接蓝) / `nord` 北极 / `tokyo` 东京夜 / `catppuccin` 摩卡 / `onedark` 原子 / `solarized` 日晒 / `rosepine` 玫瑰松 / `everforest` 常青林 | 颜色 |
 | `data-mode` | `dark` / `light` | 底色深浅 |
 | `data-style` | `classic` / `glass` / `soft` / `sharp` / `cloud` | 结构: 圆角 / 密度 / 材质 / 阴影；`cloud` 是 Taskdeck 的大圆角与清晰阴影 |
 | `data-tone` | `normal` / `quiet` / `crisp` | 对比强度; **quiet (久航) 是日常默认**, `crisp` 强化层级与边界 |
@@ -29,7 +29,7 @@ yiminlab 统一样式系统。**所有 GUI 应用的视觉基础**: 一套 quarr
 
 **语义色**: `--ok` / `--warn` / `--red` 三枚种子色**随主题走**, 每套主题在 tokens.css 第 2 段自报 dark 与 light 两档 —— 全主题共用一枚 Primer 红会让 everforest、rosepine 这类有自己色相语言的主题出戏。配套的染色底 `--*-bg` 与彩色文字 `--*-fg` 由第 3 段用 `color-mix` 从种子色推导, 不必逐主题手调; 只有 `slate` (quarry 基准) 与 `github` (evolve GUI 基准) 在主题矩阵里手写覆写这几位, 因为它们要逐值保真既有视觉。
 
-新增主题时**必须给全三枚种子色**: CSS 自定义属性没有继承兜底, 漏给会让 `.vg-badge` / `.vg-state` 吃到空值直接变透明 —— 表现为「徽章没了」而非「颜色不对」, 极难察觉。`tokens-theme.test.ts` 对全部 12 × 2 组合逐一断言, 漏给即红。
+新增主题时**必须给全三枚种子色**: CSS 自定义属性没有继承兜底, 漏给会让 `.vg-badge` / `.vg-state` 吃到空值直接变透明 —— 表现为「徽章没了」而非「颜色不对」, 极难察觉。`tokens-theme.test.ts` 对全部 13 × 2 组合逐一断言, 漏给即红。
 
 ## 用法
 
@@ -87,9 +87,11 @@ function App() {
 }
 ```
 
-- **`VoyageProvider`** — 挂载时执行 `initVoyage`, 通过 context 分发偏好与 setter; 需要同时维护 tailwind `.dark` class 的应用传 `syncDarkClass`。SSR 场景仍需配合 `voyageInitScript` 防闪烁 (本组件只管挂载后的状态)。
-- **`useVoyage()`** — 返回 `{ prefs, setTheme, setMode, setStyle, setTone, setPrefs, reset }`, 每次调用写入 `localStorage('vg_prefs')` 并同步宿主元素属性。
-- **`VoyageToolbar`** — **顶栏首选**: 把反馈入口、语言钮、主题切换器与可选账户入口按固定顺序排成一行。缺省仍是 **语言 → 明暗 → 调色板**；全部启用时是 **反馈 | 语言 → 明暗 → 调色板 → 账户**。明暗与调色板同属主题外观、天然相邻; 语言是另一维度的设置, 整体靠边而非夹在主题族旁边。不传 `onLocaleChange` 则不渲染语言钮 (不做多语言的宿主直接省略)，不传 `account` 则不渲染账户区或空占位。`icons` 透传给内部的 `VoyageSwitcher`。
+- **`VoyageProvider`** — 挂载时执行 `initVoyage`, 通过 context 分发偏好与 setter; 需要同时维护 tailwind `.dark` class 的应用传 `syncDarkClass`。嵌入 iframe 或微前端时传 `target={appRoot}` 与独立 `storageKey`, 四轴和 `.dark` 都只落在该根节点。SSR 场景仍需配合 `voyageInitScript` 防闪烁 (本组件只管挂载后的状态)。
+- **`useVoyage()`** — 返回 `{ prefs, target, setTheme, setMode, setStyle, setTone, setPrefs, reset }`; 缺省写入 `localStorage('vg_prefs')` 并同步 `<html>`, scoped Provider 则使用自己的 key 与根节点。
+- **`VoyageToolbar`** — **顶栏首选**: 把反馈入口、语言钮、主题切换器与可选账户入口按固定顺序排成一行。缺省仍是 **语言 → 明暗 → 调色板**；全部启用时是 **反馈 | 语言 → 明暗 → 调色板 → 账户**。明暗与调色板同属主题外观、天然相邻; 语言是另一维度的设置, 整体靠边而非夹在主题族旁边。不传 `onLocaleChange` 则不渲染语言钮，不传 `account` 则不渲染账户区或空占位。`icons` 透传给内部的 `VoyageSwitcher`。
+
+  scoped root 也要消除首帧闪烁时，把 `voyageInitScript(..., { targetSelector, storageKey })` 生成的脚本放在目标元素之后、React/Vite module 之前；放在 `<head>` 时 body 内的 selector 尚不存在，脚本会安全跳过并等 Provider 挂载。
 
   顺序之所以要由组件固化: 此前两个单品各自导出、谁左谁右无人约束, 两个宿主排成了相反的顺序 —— 设计系统管住了每颗钮"长什么样", 却没管"站哪儿"。需要自定义排布的宿主仍可直接用下面两个单品, 但那样顺序就是宿主自己的责任了。
 
@@ -109,6 +111,8 @@ import { VoyageAuthMenu } from '@yiminlab/authkit/voyage';
   不传 `account` 表示产品不提供账户入口；传入账户组件但当前未登录时，账户组件仍会显示登录动作。若产品只想在登录后显示头像，由宿主按认证状态传入组件或 `null`。账户头像保留独立的身份区规格，不强行压成语言/明暗/调色板的同款图标按钮。
 
   根节点类名是 **`.vg-topbar`**, 与卡片内一排按钮 (`.vg-section` 里的 `.vg-toolbar`, 见 `voyage.css` 「工具条 / 按钮 / 输入」段: `padding: 9px 14px; background: var(--surf-1); border-bottom: 1px solid`) 是两个独立的类名, 不再共用。`.vg-topbar` 只负责排列 (`display / align-items / gap`), 不带 padding / 背景 / 边框 —— 外观完全交给宿主的 `.vg-header` 等容器。
+
+  尚未接入反馈或语言功能但需要保留标准工具条位置时，传 `reporter={{ disabled: true }}` 与 `language={{ disabled: true }}`。组件渲染原生 disabled 按钮，不需要伪造 endpoint 或 no-op 回调。
 - **`VoyageSwitcher`** — 顶栏放一个即可: 月亮/太阳一键切明暗 + 调色板按钮弹出主题面板。面板是 **策展主题卡** (`VOYAGE_PRESETS`, 每个色系一个设计过的 style/tone 组合, 卡片用该主题自身 tokens 渲染 mini 预览) + 明暗分段; hover / 聚焦即时全页预览, 移出 / Esc 还原, 点击落定 —— VS Code 主题选择器的交互模型。style/tone 原始轴不再直接暴露给用户 (token 引擎不变, 仍可经 `useVoyage()` 编程设置)。浮层用原生 Popover API (支持时启用), 交互始终由 React state 兜底, 键盘可达 (Esc 关闭, 焦点环见 voyage.css)。
 - **图标插槽** — `VoyageSwitcher` 内置图标取 Tabler Icons 原始 path (24 网格 / stroke 2 / 1em 跟随字号); 宿主用图标字体时可整体替换, 与顶栏其余图标保持同一视觉语言:
 
@@ -314,10 +318,11 @@ intake API 接收完整 JSON 报告。成功响应可以直接返回 GitHub 风�
 | ai | everforest 常青林 | dark | classic | quiet |
 | taskdeck | iris 鸢尾 | light | cloud | crisp |
 | skillloom | signal 信号 | light | classic | quiet |
+| brainws | trace 轨迹纸 | light | classic | quiet |
 | quarry | slate 板岩铜 (原始基准) | dark | classic | normal |
 | portal | — 搁置, 保持现有设计 | | | |
 
-用户在任意应用内切换后经 `localStorage('vg_prefs')` 持久化, 覆盖应用默认。
+用户切换后缺省经 `localStorage('vg_prefs')` 持久化；嵌入式应用可传独立 `storageKey`，避免同源应用互相覆盖。
 
 ## 试衣间 (视觉回归基准)
 

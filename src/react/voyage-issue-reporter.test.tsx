@@ -57,6 +57,29 @@ afterEach(() => {
 });
 
 describe('VoyageIssueReporter', () => {
+  it('portal 自带四轴作用域，不依赖宿主 <html> 的主题属性', () => {
+    document.documentElement.setAttribute('data-theme', 'light');
+    const target = document.createElement('section');
+    document.body.appendChild(target);
+    render(
+      <VoyageProvider
+        target={target}
+        defaults={{ theme: 'trace', mode: 'dark', style: 'classic', tone: 'quiet' }}
+      >
+        <VoyageIssueReporter endpoint="/api/intake" app="brainws" />
+      </VoyageProvider>,
+      { container: target }
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: '反馈当前页面' }));
+
+    const layer = document.querySelector('.vg-reporter-layer');
+    expect(layer?.classList.contains('vg')).toBe(true);
+    expect(layer?.getAttribute('data-theme')).toBe('trace');
+    expect(layer?.getAttribute('data-mode')).toBe('dark');
+    expect(document.documentElement.getAttribute('data-theme')).toBe('light');
+  });
+
   it('选择元素后 POST 脱敏证据包，并默认请求 intake 标签的 GitHub Issue', async () => {
     const fetchMock = vi.fn().mockResolvedValue(
       response({

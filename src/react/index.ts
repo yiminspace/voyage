@@ -10,7 +10,11 @@
  */
 
 export { VoyageProvider, useVoyage, type VoyageContextValue, type VoyageProviderProps } from './voyage-provider';
-export { VoyageToolbar, type VoyageToolbarProps } from './voyage-toolbar';
+export {
+  VoyageToolbar,
+  type VoyageToolbarPlaceholder,
+  type VoyageToolbarProps,
+} from './voyage-toolbar';
 export { VoyageSwitcher, type VoyageSwitcherProps, type VoyageSwitcherIcons } from './voyage-switcher';
 export { VoyageLangSwitcher, type VoyageLangSwitcherProps } from './voyage-lang-switcher';
 export {
@@ -30,6 +34,7 @@ export {
 } from './voyage-account-menu';
 export {
   VoyageIssueReporter,
+  VoyageReportIcon,
   type VoyageIssueReporterProps,
   type VoyageIssueSubmitResult,
 } from './voyage-issue-reporter';

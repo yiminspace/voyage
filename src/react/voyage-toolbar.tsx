@@ -4,6 +4,7 @@ import type { ReactNode } from 'react';
 import type { VoyageLocale } from '../index';
 import {
   VoyageIssueReporter,
+  VoyageReportIcon,
   type VoyageIssueReporterProps,
 } from './voyage-issue-reporter';
 import { VoyageLangSwitcher } from './voyage-lang-switcher';
@@ -18,19 +19,36 @@ export interface VoyageToolbarProps {
    * 而不是自己拿 VoyageSwitcher 另拼一套。
    */
   onLocaleChange?: (locale: VoyageLocale) => void;
+  /** 保留标准语言钮但禁用，适合功能尚未接入的占位阶段。 */
+  language?: VoyageToolbarPlaceholder;
   /** 宿主用自家图标体系时传入 (如 quarry 传 tabler webfont 的 <i>) */
   icons?: VoyageSwitcherIcons;
   /**
    * 可选 UI 问题上报。传入后顺序为 反馈 | 语言 → 明暗 → 调色板；
    * endpoint 接收证据包并由服务端创建带 intake 标签的 GitHub Issue。
    */
-  reporter?: Omit<VoyageIssueReporterProps, 'locale' | 'className'>;
+  reporter?: Omit<VoyageIssueReporterProps, 'locale' | 'className'> | VoyageToolbarPlaceholder;
   /**
    * 可选账户入口，固定排在调色板之后。通常传 VoyageAccountMenu，或由
    * @yiminlab/authkit/voyage 提供的 VoyageAuthMenu；不传则不渲染也不留空位。
    */
   account?: ReactNode;
 }
+
+export interface VoyageToolbarPlaceholder {
+  disabled: true;
+  /** 禁用原因；同时作为原生 title。 */
+  title?: string;
+}
+
+function isPlaceholder(value: unknown): value is VoyageToolbarPlaceholder {
+  return !!value && typeof value === 'object' && (value as VoyageToolbarPlaceholder).disabled === true;
+}
+
+const PLACEHOLDER_LABELS: Record<VoyageLocale, { reporter: string; language: string; reason: string }> = {
+  zh: { reporter: '问题上报', language: '语言切换', reason: '尚未接入' },
+  en: { reporter: 'Issue reporting', language: 'Language switcher', reason: 'Not available yet' },
+};
 
 /**
  * 顶栏工具条: 把反馈、语言、主题切换器 (明暗 + 调色板) 与可选账户入口
@@ -56,19 +74,44 @@ export function VoyageToolbar({
   className,
   locale = 'zh',
   onLocaleChange,
+  language,
   icons,
   reporter,
   account,
 }: VoyageToolbarProps = {}) {
+  const placeholderLabels = PLACEHOLDER_LABELS[locale];
+  const languagePlaceholder = isPlaceholder(language) ? language : null;
   return (
     <div className={['vg-topbar', className].filter(Boolean).join(' ')}>
       {reporter ? (
         <>
-          <VoyageIssueReporter {...reporter} locale={locale} />
+          {isPlaceholder(reporter) ? (
+            <button
+              type="button"
+              className="vg-iconbtn vg-reporter-trigger vg-toolbar-placeholder"
+              disabled
+              aria-label={`${placeholderLabels.reporter}（${reporter.title ?? placeholderLabels.reason}）`}
+              title={reporter.title ?? placeholderLabels.reason}
+            >
+              <VoyageReportIcon />
+            </button>
+          ) : (
+            <VoyageIssueReporter {...reporter} locale={locale} />
+          )}
           <span className="vg-topbar-separator" aria-hidden="true" />
         </>
       ) : null}
-      {onLocaleChange ? (
+      {languagePlaceholder ? (
+        <button
+          type="button"
+          className="vg-iconbtn vg-lang-switch vg-toolbar-placeholder"
+          disabled
+          aria-label={`${placeholderLabels.language}（${languagePlaceholder.title ?? placeholderLabels.reason}）`}
+          title={languagePlaceholder.title ?? placeholderLabels.reason}
+        >
+          {locale === 'zh' ? '中' : 'EN'}
+        </button>
+      ) : onLocaleChange ? (
         <VoyageLangSwitcher locale={locale} onLocaleChange={onLocaleChange} />
       ) : null}
       <VoyageSwitcher locale={locale} icons={icons} />

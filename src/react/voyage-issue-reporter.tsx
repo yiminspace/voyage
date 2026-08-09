@@ -188,7 +188,8 @@ const STRINGS: Record<
   },
 };
 
-function DefaultReportIcon() {
+/** Voyage 问题上报入口的标准图标，供 Toolbar 的禁用占位复用。 */
+export function VoyageReportIcon() {
   return (
     <svg
       className="vg-reporter-icon"
@@ -727,7 +728,11 @@ export function VoyageIssueReporter({
       ? createPortal(
           <div
             ref={setLayerRef}
-            className="vg-reporter-layer"
+            className="vg vg-reporter-layer"
+            data-theme={prefs.theme}
+            data-mode={prefs.mode}
+            data-style={prefs.style}
+            data-tone={prefs.tone}
             data-vg-reporter-ui
             data-vg-private
           >
@@ -954,7 +959,7 @@ export function VoyageIssueReporter({
         }}
         onClick={() => startReport(false, preservedSelectionRef.current)}
       >
-        {icon ?? <DefaultReportIcon />}
+        {icon ?? <VoyageReportIcon />}
       </button>
       {layer}
     </>
