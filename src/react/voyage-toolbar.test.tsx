@@ -144,4 +144,37 @@ describe('VoyageToolbar', () => {
     expect(classNames[3]).toMatch(/\bvg-switcher-trigger\b/);
     expect(document.querySelector('.vg-topbar-separator')).not.toBeNull();
   });
+
+  it('把可选账户入口固定放在调色板之后，且不增加第二条分隔线', () => {
+    render(
+      <VoyageProvider>
+        <VoyageToolbar
+          locale="zh"
+          onLocaleChange={() => {}}
+          reporter={{ endpoint: '/api/intake', app: 'quarry' }}
+          account={<button type="button" className="host-account">用户菜单</button>}
+        />
+      </VoyageProvider>
+    );
+
+    const classNames = toolbarButtons().map((button) => button.className);
+    expect(classNames).toHaveLength(5);
+    expect(classNames[0]).toMatch(/\bvg-reporter-trigger\b/);
+    expect(classNames[1]).toMatch(/\bvg-lang-switch\b/);
+    expect(classNames[2]).toMatch(/\bvg-switcher-mode\b/);
+    expect(classNames[3]).toMatch(/\bvg-switcher-trigger\b/);
+    expect(classNames[4]).toMatch(/\bhost-account\b/);
+    expect(document.querySelectorAll('.vg-topbar-separator')).toHaveLength(1);
+    expect(document.querySelector('.vg-topbar-account')).not.toBeNull();
+  });
+
+  it('不传账户入口时不渲染尾部容器', () => {
+    render(
+      <VoyageProvider>
+        <VoyageToolbar />
+      </VoyageProvider>
+    );
+
+    expect(document.querySelector('.vg-topbar-account')).toBeNull();
+  });
 });

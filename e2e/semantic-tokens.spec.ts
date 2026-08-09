@@ -20,7 +20,7 @@ const DEMO_URL = pathToFileURL(
 
 const THEMES = [
   'slate', 'ink', 'github', 'nord', 'tokyo',
-  'catppuccin', 'onedark', 'solarized', 'rosepine', 'everforest', 'iris',
+  'catppuccin', 'onedark', 'solarized', 'rosepine', 'everforest', 'iris', 'signal',
 ] as const;
 const MODES = ['dark', 'light'] as const;
 
@@ -217,5 +217,47 @@ test.describe('github 主题逐值保真 evolve GUI 基准', () => {
     expect(toRgb(got.ok)).toEqual([63, 185, 80]);      // #3fb950
     expect(toRgb(got.warn)).toEqual([210, 153, 34]);   // #d29922
     expect(toRgb(got.red)).toEqual([248, 81, 73]);     // #f85149
+  });
+});
+
+test.describe('signal 主题保持严格纯黑白和中性灰', () => {
+  const EXPECTED = {
+    dark: {
+      '--bg0': [0, 0, 0], '--bg1': [0, 0, 0], '--bg2': [16, 16, 16],
+      '--bg3': [27, 27, 27], '--fg': [245, 245, 245], '--fg2': [200, 200, 200],
+      '--fg3': [146, 146, 146], '--accent': [88, 166, 255],
+    },
+    light: {
+      '--bg0': [255, 255, 255], '--bg1': [255, 255, 255], '--bg2': [245, 245, 245],
+      '--bg3': [235, 235, 235], '--fg': [17, 17, 17], '--fg2': [80, 80, 80],
+      '--fg3': [118, 118, 118], '--accent': [37, 99, 235],
+    },
+  } as const;
+
+  for (const mode of MODES) {
+    test(`${mode} 计算值不带色温`, async ({ page }) => {
+      await sampleSemantics(page, 'signal', mode);
+
+      for (const [name, expected] of Object.entries(EXPECTED[mode])) {
+        expect(toRgb(await readVar(page, name)), `${mode} 的 ${name} 偏离 signal 规格`)
+          .toEqual(expected);
+      }
+    });
+  }
+
+  test('所有 style 都不叠加带色背景图', async ({ page }) => {
+    const backgrounds = await page.evaluate(() => {
+      const el = document.getElementById('semantic')!;
+      el.setAttribute('data-theme', 'signal');
+      el.setAttribute('data-mode', 'light');
+      return ['classic', 'glass', 'soft', 'sharp', 'cloud'].map((style) => {
+        el.setAttribute('data-style', style);
+        return [style, getComputedStyle(el).getPropertyValue('--app-img').trim()];
+      });
+    });
+
+    expect(Object.fromEntries(backgrounds)).toEqual({
+      classic: 'none', glass: 'none', soft: 'none', sharp: 'none', cloud: 'none',
+    });
   });
 });

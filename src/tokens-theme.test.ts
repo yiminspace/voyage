@@ -58,7 +58,7 @@ describe('tokens.css 主题微调层', () => {
  *
  * 漏给任一组合不会回落到某个默认值 —— CSS 自定义属性没有继承兜底, 组件层
  * 的 .vg-badge / .vg-state 会直接吃到空值变透明, 页面上表现为"徽章没了",
- * 而不是"颜色不对"。20 种组合逐一断言, 新增主题时这里会立刻红。
+ * 而不是"颜色不对"。全部 theme × mode 组合逐一断言，新增主题时这里会立刻红。
  */
 describe('tokens.css 语义色矩阵', () => {
   const SEEDS = ['--ok', '--warn', '--red'] as const;
