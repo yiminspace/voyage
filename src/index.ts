@@ -19,14 +19,15 @@ export type VoyageTheme =
   | 'solarized'  // 日晒 — Solarized
   | 'rosepine'   // 玫瑰松 — Rosé Pine main/dawn
   | 'everforest' // 常青林 — Everforest
-  | 'iris';      // 鸢尾 — Taskdeck 高对比紫蓝
+  | 'iris'       // 鸢尾 — Taskdeck 高对比紫蓝
+  | 'signal';    // 信号 — 纯黑白工作台 + 工具蓝
 
 export type VoyageMode = 'dark' | 'light';
 export type VoyageStyle = 'classic' | 'glass' | 'soft' | 'sharp' | 'cloud';
 export type VoyageTone = 'normal' | 'quiet' | 'crisp';
 
 /** 与 package.json 同步；报告证据用它定位实际生效的 Voyage 版本。 */
-export const VOYAGE_VERSION = '0.14.0';
+export const VOYAGE_VERSION = '0.15.0';
 
 export interface VoyagePrefs {
   theme: VoyageTheme;
@@ -37,7 +38,7 @@ export interface VoyagePrefs {
 
 export const VOYAGE_THEMES: readonly VoyageTheme[] = [
   'slate', 'ink', 'github', 'nord', 'tokyo',
-  'catppuccin', 'onedark', 'solarized', 'rosepine', 'everforest', 'iris',
+  'catppuccin', 'onedark', 'solarized', 'rosepine', 'everforest', 'iris', 'signal',
 ] as const;
 export const VOYAGE_MODES: readonly VoyageMode[] = ['dark', 'light'] as const;
 export const VOYAGE_STYLES: readonly VoyageStyle[] = ['classic', 'glass', 'soft', 'sharp', 'cloud'] as const;
@@ -57,6 +58,7 @@ export const VOYAGE_APP_DEFAULTS: Record<string, VoyagePrefs> = {
   jsontailor: { theme: 'tokyo',      mode: 'dark',  style: 'glass',   tone: 'quiet' },
   ai:         { theme: 'everforest', mode: 'dark',  style: 'classic', tone: 'quiet' },
   taskdeck:   { theme: 'iris',       mode: 'light', style: 'cloud',   tone: 'crisp' },
+  skillloom:  { theme: 'signal',     mode: 'light', style: 'classic', tone: 'quiet' },
   // quarry 是本规格的原始基准: tone 用 normal (原版是实色 accent 填充,
   // 不是 quiet 的压明度+白字), 以贴合它现有视觉不变。
   quarry:     { theme: 'slate', mode: 'dark', style: 'classic', tone: 'normal' },
@@ -99,6 +101,7 @@ export const VOYAGE_PRESETS: readonly VoyagePreset[] = [
   { id: 'rosepine',   label: { zh: '玫瑰松', en: 'Rosé Pine' },      hint: { zh: 'Rosé Pine 哑光玫瑰',   en: 'Muted rosé elegance' },   theme: 'rosepine',   style: 'soft',    tone: 'quiet' },
   { id: 'everforest', label: { zh: '常青林', en: 'Everforest' },     hint: { zh: 'Everforest 护眼绿',    en: 'Comfy forest green' },    theme: 'everforest', style: 'soft',    tone: 'quiet' },
   { id: 'iris',       label: { zh: '鸢尾',   en: 'Iris' },           hint: { zh: 'Taskdeck 高对比圆角',   en: 'Taskdeck high contrast' }, theme: 'iris',       style: 'cloud',   tone: 'crisp' },
+  { id: 'signal',     label: { zh: '信号',   en: 'Signal' },         hint: { zh: '纯黑白工作台',          en: 'Pure black-and-white workbench' }, theme: 'signal', style: 'classic', tone: 'quiet' },
 ] as const;
 
 /** preset + 当前明暗 -> 完整四轴偏好 */

@@ -4,6 +4,7 @@ import { VOYAGE_APP_DEFAULTS } from '../src';
 import {
   VoyageActionCard,
   VoyageActionGrid,
+  VoyageAccountMenu,
   VoyageChoiceCard,
   VoyageChoiceGrid,
   VoyageDashboardFooter,
@@ -41,6 +42,7 @@ function DashboardDemo() {
   const [selectedId, setSelectedId] = useState('digest');
   const [balanced, setBalanced] = useState(true);
   const [retry, setRetry] = useState(true);
+  const [authenticated, setAuthenticated] = useState(true);
   const selected = tasks.find((task) => task.id === selectedId) ?? tasks[0];
 
   return (
@@ -66,7 +68,16 @@ function DashboardDemo() {
           }
           actions={
             <>
-              <VoyageToolbar />
+              <VoyageToolbar
+                account={
+                  <VoyageAccountMenu
+                    isAuthenticated={authenticated}
+                    identity={{ name: 'Taskdeck User', secondary: 'taskdeck@example.com' }}
+                    onLogin={() => setAuthenticated(true)}
+                    onLogout={() => setAuthenticated(false)}
+                  />
+                }
+              />
               <button className="vg-btn primary" disabled>新建任务</button>
             </>
           }

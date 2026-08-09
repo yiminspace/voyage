@@ -1,5 +1,6 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import type { VoyageLocale } from '../index';
 import {
   VoyageIssueReporter,
@@ -24,12 +25,19 @@ export interface VoyageToolbarProps {
    * endpoint 接收证据包并由服务端创建带 intake 标签的 GitHub Issue。
    */
   reporter?: Omit<VoyageIssueReporterProps, 'locale' | 'className'>;
+  /**
+   * 可选账户入口，固定排在调色板之后。通常传 VoyageAccountMenu，或由
+   * @yiminlab/authkit/voyage 提供的 VoyageAuthMenu；不传则不渲染也不留空位。
+   */
+  account?: ReactNode;
 }
 
 /**
- * 顶栏工具条: 把语言钮与主题切换器 (明暗 + 调色板) 按固定顺序排成一行。
+ * 顶栏工具条: 把反馈、语言、主题切换器 (明暗 + 调色板) 与可选账户入口
+ * 按固定顺序排成一行。
  *
- * 顺序为 语言 → 明暗 → 调色板, 由这里的 DOM 结构固化, 不再交给宿主自己拼 JSX。
+ * 完整顺序为 反馈 | 语言 → 明暗 → 调色板 → 账户，由这里的 DOM 结构固化，
+ * 不再交给宿主自己拼 JSX。
  * 此前 VoyageSwitcher 与 VoyageLangSwitcher 是两个独立导出, 谁左谁右无人约束,
  * 结果两个宿主排成了相反的顺序 —— 设计系统管住了每颗钮"长什么样", 却没管
  * "站哪儿", 规格统一只做了一半。
@@ -40,6 +48,9 @@ export interface VoyageToolbarProps {
  *
  * 需要自定义排布的宿主仍可直接用 VoyageSwitcher / VoyageLangSwitcher, 但那样
  * 顺序就重新变成宿主自己的责任了。
+ *
+ * account 是语义插槽而不是认证配置：Voyage 只管位置，不读取 session/token；
+ * 认证状态仍由宿主或 AuthKit 适配组件负责。
  */
 export function VoyageToolbar({
   className,
@@ -47,6 +58,7 @@ export function VoyageToolbar({
   onLocaleChange,
   icons,
   reporter,
+  account,
 }: VoyageToolbarProps = {}) {
   return (
     <div className={['vg-topbar', className].filter(Boolean).join(' ')}>
@@ -60,6 +72,7 @@ export function VoyageToolbar({
         <VoyageLangSwitcher locale={locale} onLocaleChange={onLocaleChange} />
       ) : null}
       <VoyageSwitcher locale={locale} icons={icons} />
+      {account ? <div className="vg-topbar-account">{account}</div> : null}
     </div>
   );
 }

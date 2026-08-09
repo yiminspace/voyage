@@ -137,6 +137,11 @@
 .vg[data-theme='iris'][data-mode='dark'] { --bg0:#080d1a; --bg1:#11182a; --bg2:#1b263e; --bg3:#24314c; --line:#34425e; --line2:#53627d; --accent:#9b8cff; --accent-hi:#b0a5ff; --accent-ink:#ffffff; --ok:#54d6a5; --warn:#fdb022; --red:#ff8a72; }
 .vg[data-theme='iris'][data-mode='light'] { --bg0:#f4f6fb; --bg1:#ffffff; --bg2:#eef1f8; --bg3:#e6eaf3; --line:#d0d5dd; --line2:#98a2b3; --accent:#6558e8; --accent-hi:#7b6ff0; --accent-ink:#ffffff; --ok:#087f5b; --warn:#8a5a00; --red:#c4320a; }
 
+/* signal 信号 — 纯黑白工作台 + Primer 工具蓝。
+   bg0/bg1 刻意不带任何色温；层级只靠中性灰、边界和小面积信号色表达。 */
+.vg[data-theme='signal'][data-mode='dark'] { --bg0:#000000; --bg1:#000000; --bg2:#101010; --bg3:#1b1b1b; --line:#282828; --line2:#3b3b3b; --accent:#58a6ff; --accent-hi:#79c0ff; --accent-ink:#0a1220; --ok:#3fb950; --warn:#d29922; --red:#f85149; }
+.vg[data-theme='signal'][data-mode='light'] { --bg0:#ffffff; --bg1:#ffffff; --bg2:#f5f5f5; --bg3:#ebebeb; --line:#dedede; --line2:#c6c6c6; --accent:#2563eb; --accent-hi:#3b82f6; --accent-ink:#ffffff; --ok:#17803d; --warn:#92610a; --red:#b32d2d; }
+
 /* ---------------------------------------------------------------------------
    3. 有效变量层: 组件只消费这一层, tone / style 通过覆写它们生效
       色阶语义 (12 级): 1-2 底面 / 3-5 染色底 / 6-8 边框 / 9-10 实色 /
@@ -354,4 +359,18 @@
   --fg: #101828;
   --fg2: #344054;
   --fg3: #667085;
+}
+
+/* signal: 严格中性灰，不继承明暗基座的冷灰；quiet 也不得改写。 */
+.vg[data-theme='signal'][data-mode='dark'] {
+  --fg: #f5f5f5;
+  --fg2: #c8c8c8;
+  --fg3: #929292;
+  --app-img: none;
+}
+.vg[data-theme='signal'][data-mode='light'] {
+  --fg: #111111;
+  --fg2: #505050;
+  --fg3: #767676;
+  --app-img: none;
 }

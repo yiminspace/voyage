@@ -170,6 +170,19 @@ export function VoyageSwitcher({ className, icons, locale = 'zh' }: VoyageSwitch
     el?.setAttribute('popover', 'auto');
   }, []);
 
+  // 另一个 auto popover 打开时，浏览器会原生关闭本面板；把 toggle 事件写回
+  // React state，避免面板已经不可见但 aria-expanded / 下一次点击仍停在 open。
+  useLayoutEffect(() => {
+    if (!open) return;
+    const el = panelRef.current;
+    if (!el) return;
+    const onToggle = (event: Event) => {
+      if ((event as Event & { newState?: string }).newState === 'closed') setOpen(false);
+    };
+    el.addEventListener('toggle', onToggle);
+    return () => el.removeEventListener('toggle', onToggle);
+  }, [open]);
+
   // 同步 React state -> 原生 popover 显隐 (仅在支持时生效)
   useEffect(() => {
     const el = panelRef.current;
@@ -210,6 +223,11 @@ export function VoyageSwitcher({ className, icons, locale = 'zh' }: VoyageSwitch
       if (panelRef.current?.contains(target) || triggerRef.current?.contains(target)) return;
       setOpen(false);
     }
+    function onFocusIn(event: FocusEvent) {
+      const target = event.target as Node;
+      if (panelRef.current?.contains(target) || triggerRef.current?.contains(target)) return;
+      setOpen(false);
+    }
     function onKeyDown(event: KeyboardEvent) {
       if (event.key === 'Escape') setOpen(false);
     }
@@ -217,11 +235,13 @@ export function VoyageSwitcher({ className, icons, locale = 'zh' }: VoyageSwitch
       updatePanelPosition();
     }
     document.addEventListener('pointerdown', onPointerDown);
+    document.addEventListener('focusin', onFocusIn);
     document.addEventListener('keydown', onKeyDown);
     window.addEventListener('resize', onReposition);
     window.addEventListener('scroll', onReposition, true);
     return () => {
       document.removeEventListener('pointerdown', onPointerDown);
+      document.removeEventListener('focusin', onFocusIn);
       document.removeEventListener('keydown', onKeyDown);
       window.removeEventListener('resize', onReposition);
       window.removeEventListener('scroll', onReposition, true);
