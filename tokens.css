@@ -142,6 +142,12 @@
 .vg[data-theme='signal'][data-mode='dark'] { --bg0:#000000; --bg1:#000000; --bg2:#101010; --bg3:#1b1b1b; --line:#282828; --line2:#3b3b3b; --accent:#58a6ff; --accent-hi:#79c0ff; --accent-ink:#0a1220; --ok:#3fb950; --warn:#d29922; --red:#f85149; }
 .vg[data-theme='signal'][data-mode='light'] { --bg0:#ffffff; --bg1:#ffffff; --bg2:#f5f5f5; --bg3:#ebebeb; --line:#dedede; --line2:#c6c6c6; --accent:#2563eb; --accent-hi:#3b82f6; --accent-ink:#ffffff; --ok:#17803d; --warn:#92610a; --red:#b32d2d; }
 
+/* trace 轨迹纸 — 浅色记录纸 / 深色蓝图观测台。
+   色板抽象自消息轨迹、日志与遥测类界面；红绿方向含义仍由宿主应用映射，
+   Voyage 这里只提供 accent / ok / red 的通用语义。 */
+.vg[data-theme='trace'][data-mode='dark'] { --bg0:#0e1c30; --bg1:#152540; --bg2:#1b2d49; --bg3:#223857; --line:#283c60; --line2:#3b5278; --accent:#ff8f77; --accent-hi:#ffa38e; --accent-ink:#26100b; --ok:#55cfa4; --warn:#e0b34e; --red:#ff6f91; }
+.vg[data-theme='trace'][data-mode='light'] { --bg0:#f2f1e8; --bg1:#faf9f2; --bg2:#ecebe0; --bg3:#e4e3d6; --line:#d6d5c3; --line2:#b9b9a5; --accent:#b93a28; --accent-hi:#cc503c; --accent-ink:#ffffff; --ok:#1c6e55; --warn:#9a6a10; --red:#c63255; }
+
 /* ---------------------------------------------------------------------------
    3. 有效变量层: 组件只消费这一层, tone / style 通过覆写它们生效
       色阶语义 (12 级): 1-2 底面 / 3-5 染色底 / 6-8 边框 / 9-10 实色 /
@@ -373,4 +379,18 @@
   --fg2: #505050;
   --fg3: #767676;
   --app-img: none;
+}
+
+/* trace: 保留记录纸的暖墨与蓝图的冷灰文字层级。 */
+.vg[data-theme='trace'][data-mode='dark'] {
+  --fg: #dbe4f4;
+  --fg2: #93a3c0;
+  --fg3: #5f7091;
+  --num: #93b2f5;
+}
+.vg[data-theme='trace'][data-mode='light'] {
+  --fg: #272b20;
+  --fg2: #666b58;
+  --fg3: #94988a;
+  --num: #35508f;
 }

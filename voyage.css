@@ -94,6 +94,13 @@
   cursor: pointer;
 }
 .vg-iconbtn:hover { color: var(--fg); background: var(--hoverbg); }
+.vg-iconbtn:disabled,
+.vg-iconbtn:disabled:hover {
+  color: var(--fg3);
+  background: none;
+  cursor: not-allowed;
+  opacity: 0.48;
+}
 
 /* ---- 主体骨架 ---- */
 .vg-main { flex: 1; display: flex; min-height: 0; }
@@ -913,6 +920,11 @@
   flex-direction: column;
   gap: 10px;
   width: 236px;
+  /* content-box：左右 12px padding + 1px border 需从 viewport 余量再扣 26px。 */
+  max-width: calc(100vw - 42px);
+  max-height: calc(100dvh - 42px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
   margin: 0;
   padding: 12px;
   border-radius: var(--r-win);

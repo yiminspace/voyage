@@ -177,4 +177,29 @@ describe('VoyageToolbar', () => {
 
     expect(document.querySelector('.vg-topbar-account')).toBeNull();
   });
+
+  it('可为尚未接入的反馈与语言保留原生 disabled 占位', () => {
+    render(
+      <VoyageProvider>
+        <VoyageToolbar
+          locale="zh"
+          reporter={{ disabled: true }}
+          language={{ disabled: true }}
+        />
+      </VoyageProvider>
+    );
+
+    const buttons = toolbarButtons();
+    expect(buttons).toHaveLength(4);
+    expect(buttons[0].className).toMatch(/\bvg-reporter-trigger\b/);
+    expect(buttons[1].className).toMatch(/\bvg-lang-switch\b/);
+    expect(buttons[2].className).toMatch(/\bvg-switcher-mode\b/);
+    expect(buttons[3].className).toMatch(/\bvg-switcher-trigger\b/);
+    expect(buttons[0].disabled).toBe(true);
+    expect(buttons[1].disabled).toBe(true);
+    expect(buttons[0].getAttribute('title')).toBe('尚未接入');
+    expect(buttons[1].textContent).toBe('中');
+    expect(buttons[2].disabled).toBe(false);
+    expect(buttons[3].disabled).toBe(false);
+  });
 });

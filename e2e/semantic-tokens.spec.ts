@@ -13,15 +13,13 @@
 import { test, expect, type Page } from '@playwright/test';
 import { pathToFileURL } from 'node:url';
 import path from 'node:path';
+import { VOYAGE_THEMES } from '../src';
 
 const DEMO_URL = pathToFileURL(
   path.resolve(__dirname, '../demo/fitting-room.html')
 ).href;
 
-const THEMES = [
-  'slate', 'ink', 'github', 'nord', 'tokyo',
-  'catppuccin', 'onedark', 'solarized', 'rosepine', 'everforest', 'iris', 'signal',
-] as const;
+const THEMES = VOYAGE_THEMES;
 const MODES = ['dark', 'light'] as const;
 
 /** 语义色的完整六位: 三枚种子 + 各自推导出的染色底与彩色文字 */

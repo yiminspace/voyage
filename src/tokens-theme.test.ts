@@ -47,7 +47,7 @@ describe('tokens.css 主题微调层', () => {
     expect(block).toMatch(/--fg2:\s*#c4bcae/);
     expect(block).toMatch(/--fg3:\s*#a09a8e/);
 
-    // 冷灰基座本身没被动过 (其余 9 套主题仍用它)
+    // 冷灰基座本身没被动过 (没有独立微调的主题仍用它)
     expect(TOKENS).toMatch(/--fg2:\s*#b9c0ca/);
     expect(TOKENS).toMatch(/--fg3:\s*#a3abb8/);
   });

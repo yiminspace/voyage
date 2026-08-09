@@ -20,14 +20,15 @@ export type VoyageTheme =
   | 'rosepine'   // 玫瑰松 — Rosé Pine main/dawn
   | 'everforest' // 常青林 — Everforest
   | 'iris'       // 鸢尾 — Taskdeck 高对比紫蓝
-  | 'signal';    // 信号 — 纯黑白工作台 + 工具蓝
+  | 'signal'     // 信号 — 纯黑白工作台 + 工具蓝
+  | 'trace';     // 轨迹纸 — 记录纸 / 蓝图双模式观测台
 
 export type VoyageMode = 'dark' | 'light';
 export type VoyageStyle = 'classic' | 'glass' | 'soft' | 'sharp' | 'cloud';
 export type VoyageTone = 'normal' | 'quiet' | 'crisp';
 
 /** 与 package.json 同步；报告证据用它定位实际生效的 Voyage 版本。 */
-export const VOYAGE_VERSION = '0.15.0';
+export const VOYAGE_VERSION = '0.16.0';
 
 export interface VoyagePrefs {
   theme: VoyageTheme;
@@ -38,7 +39,7 @@ export interface VoyagePrefs {
 
 export const VOYAGE_THEMES: readonly VoyageTheme[] = [
   'slate', 'ink', 'github', 'nord', 'tokyo',
-  'catppuccin', 'onedark', 'solarized', 'rosepine', 'everforest', 'iris', 'signal',
+  'catppuccin', 'onedark', 'solarized', 'rosepine', 'everforest', 'iris', 'signal', 'trace',
 ] as const;
 export const VOYAGE_MODES: readonly VoyageMode[] = ['dark', 'light'] as const;
 export const VOYAGE_STYLES: readonly VoyageStyle[] = ['classic', 'glass', 'soft', 'sharp', 'cloud'] as const;
@@ -59,6 +60,7 @@ export const VOYAGE_APP_DEFAULTS: Record<string, VoyagePrefs> = {
   ai:         { theme: 'everforest', mode: 'dark',  style: 'classic', tone: 'quiet' },
   taskdeck:   { theme: 'iris',       mode: 'light', style: 'cloud',   tone: 'crisp' },
   skillloom:  { theme: 'signal',     mode: 'light', style: 'classic', tone: 'quiet' },
+  brainws:    { theme: 'trace',      mode: 'light', style: 'classic', tone: 'quiet' },
   // quarry 是本规格的原始基准: tone 用 normal (原版是实色 accent 填充,
   // 不是 quiet 的压明度+白字), 以贴合它现有视觉不变。
   quarry:     { theme: 'slate', mode: 'dark', style: 'classic', tone: 'normal' },
@@ -102,6 +104,7 @@ export const VOYAGE_PRESETS: readonly VoyagePreset[] = [
   { id: 'everforest', label: { zh: '常青林', en: 'Everforest' },     hint: { zh: 'Everforest 护眼绿',    en: 'Comfy forest green' },    theme: 'everforest', style: 'soft',    tone: 'quiet' },
   { id: 'iris',       label: { zh: '鸢尾',   en: 'Iris' },           hint: { zh: 'Taskdeck 高对比圆角',   en: 'Taskdeck high contrast' }, theme: 'iris',       style: 'cloud',   tone: 'crisp' },
   { id: 'signal',     label: { zh: '信号',   en: 'Signal' },         hint: { zh: '纯黑白工作台',          en: 'Pure black-and-white workbench' }, theme: 'signal', style: 'classic', tone: 'quiet' },
+  { id: 'trace',      label: { zh: '轨迹纸', en: 'Trace Paper' },    hint: { zh: '记录纸与蓝图观测台',    en: 'Paper and blueprint console' }, theme: 'trace',      style: 'classic', tone: 'quiet' },
 ] as const;
 
 /** preset + 当前明暗 -> 完整四轴偏好 */
@@ -131,10 +134,13 @@ function isValid(prefs: unknown): prefs is VoyagePrefs {
 }
 
 /** 读取偏好; 无存储或不合法时回落到 defaults */
-export function loadVoyagePrefs(defaults: VoyagePrefs = VOYAGE_DEFAULT_PREFS): VoyagePrefs {
+export function loadVoyagePrefs(
+  defaults: VoyagePrefs = VOYAGE_DEFAULT_PREFS,
+  storageKey = VOYAGE_STORAGE_KEY
+): VoyagePrefs {
   if (typeof window === 'undefined') return defaults;
   try {
-    const raw = window.localStorage.getItem(VOYAGE_STORAGE_KEY);
+    const raw = window.localStorage.getItem(storageKey);
     if (!raw) return defaults;
     const parsed = JSON.parse(raw) as unknown;
     return isValid(parsed) ? parsed : defaults;
@@ -143,10 +149,13 @@ export function loadVoyagePrefs(defaults: VoyagePrefs = VOYAGE_DEFAULT_PREFS): V
   }
 }
 
-export function saveVoyagePrefs(prefs: VoyagePrefs): void {
+export function saveVoyagePrefs(
+  prefs: VoyagePrefs,
+  storageKey = VOYAGE_STORAGE_KEY
+): void {
   if (typeof window === 'undefined') return;
   try {
-    window.localStorage.setItem(VOYAGE_STORAGE_KEY, JSON.stringify(prefs));
+    window.localStorage.setItem(storageKey, JSON.stringify(prefs));
   } catch {
     /* storage 不可用时静默 */
   }
@@ -162,27 +171,60 @@ export function applyVoyagePrefs(el: Element, prefs: VoyagePrefs): void {
 }
 
 /** 客户端一步到位: 读偏好 -> 应用到 <html> -> 返回生效值 */
-export function initVoyage(defaults: VoyagePrefs = VOYAGE_DEFAULT_PREFS): VoyagePrefs {
-  const prefs = loadVoyagePrefs(defaults);
+export interface VoyageInitOptions {
+  /** 偏好隔离键；嵌入式应用应使用应用独有的 key。 */
+  storageKey?: string;
+  /** 四轴属性的作用元素；缺省仍为 document.documentElement。 */
+  target?: Element | null;
+}
+
+export function initVoyage(
+  defaults: VoyagePrefs = VOYAGE_DEFAULT_PREFS,
+  options: VoyageInitOptions = {}
+): VoyagePrefs {
+  const prefs = loadVoyagePrefs(defaults, options.storageKey);
   if (typeof document !== 'undefined') {
-    applyVoyagePrefs(document.documentElement, prefs);
+    const target = options.target === undefined ? document.documentElement : options.target;
+    if (target) applyVoyagePrefs(target, prefs);
   }
   return prefs;
 }
 
+export interface VoyageInitScriptOptions {
+  /** 偏好隔离键；缺省保持历史的 vg_prefs。 */
+  storageKey?: string;
+  /** 首帧要写入的宿主 selector；缺省为 document.documentElement。 */
+  targetSelector?: string;
+}
+
 /**
- * 生成免闪烁内联脚本 (放 <head> 里, 在首帧渲染前打属性)。
+ * 生成免闪烁内联脚本，在首帧渲染前打属性。缺省 target 为 <html> 时放 <head>；
+ * 使用 targetSelector 时，脚本必须放在该元素之后、应用 module 之前，确保 selector
+ * 已经可解析（否则脚本安全 no-op，Provider 挂载后再完成初始化）。
  * Next.js 用法:
  *   <script dangerouslySetInnerHTML={{ __html: voyageInitScript(VOYAGE_APP_DEFAULTS.engram) }} />
  */
-export function voyageInitScript(defaults: VoyagePrefs = VOYAGE_DEFAULT_PREFS): string {
+export function voyageInitScript(
+  defaults: VoyagePrefs = VOYAGE_DEFAULT_PREFS,
+  options: VoyageInitScriptOptions = {}
+): string {
   const d = JSON.stringify(defaults);
+  const storageKey = JSON.stringify(options.storageKey ?? VOYAGE_STORAGE_KEY);
+  const themes = JSON.stringify(VOYAGE_THEMES);
+  const modes = JSON.stringify(VOYAGE_MODES);
+  const styles = JSON.stringify(VOYAGE_STYLES);
+  const tones = JSON.stringify(VOYAGE_TONES);
+  const targetSelector = options.targetSelector === undefined
+    ? 'null'
+    : JSON.stringify(options.targetSelector);
   return (
     '(function(){try{' +
     `var d=${d};var p=d;` +
-    `try{var r=localStorage.getItem('${VOYAGE_STORAGE_KEY}');if(r){var q=JSON.parse(r);` +
-    'if(q&&q.theme&&q.mode&&q.style&&q.tone){p=q;}}}catch(e){}' +
-    "var e=document.documentElement;e.classList.add('vg');" +
+    `try{var r=localStorage.getItem(${storageKey});if(r){var q=JSON.parse(r);` +
+    `if(q&&${themes}.indexOf(q.theme)>=0&&${modes}.indexOf(q.mode)>=0&&` +
+    `${styles}.indexOf(q.style)>=0&&${tones}.indexOf(q.tone)>=0){p=q;}}}catch(e){}` +
+    `var s=${targetSelector};var e=s?document.querySelector(s):document.documentElement;if(!e)return;` +
+    "e.classList.add('vg');" +
     "e.setAttribute('data-theme',p.theme);e.setAttribute('data-mode',p.mode);" +
     "e.setAttribute('data-style',p.style);e.setAttribute('data-tone',p.tone);" +
     '}catch(e){}})();'

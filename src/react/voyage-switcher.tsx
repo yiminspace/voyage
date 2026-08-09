@@ -130,10 +130,14 @@ export interface VoyageSwitcherProps {
  * (包括测试用的 jsdom) 依然可用。
  */
 export function VoyageSwitcher({ className, icons, locale = 'zh' }: VoyageSwitcherProps = {}) {
-  const { prefs, setPrefs, setMode } = useVoyage();
+  const { prefs, target, setPrefs, setMode } = useVoyage();
   const tr = STRINGS[locale];
   const [open, setOpen] = useState(false);
-  const [panelPos, setPanelPos] = useState<{ top: number; right: number } | null>(null);
+  const [panelPos, setPanelPos] = useState<{
+    top: number;
+    right: number;
+    maxHeight: number;
+  } | null>(null);
   const panelRef = useRef<HTMLDivElement | null>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const panelId = useId();
@@ -144,17 +148,17 @@ export function VoyageSwitcher({ className, icons, locale = 'zh' }: VoyageSwitch
   committedRef.current = prefs;
 
   const previewPreset = useCallback((preset: VoyagePreset) => {
-    if (typeof document === 'undefined') return;
+    if (!target) return;
     applyVoyagePrefs(
-      document.documentElement,
+      target,
       voyagePresetPrefs(preset, committedRef.current.mode)
     );
-  }, []);
+  }, [target]);
 
   const revertPreview = useCallback(() => {
-    if (typeof document === 'undefined') return;
-    applyVoyagePrefs(document.documentElement, committedRef.current);
-  }, []);
+    if (!target) return;
+    applyVoyagePrefs(target, committedRef.current);
+  }, [target]);
 
   // 面板关闭 (Esc / 点外部 / 再点触发钮 / 卸载) 时兜底还原预览;
   // 已点击落定的场合 committedRef 就是新偏好, 这里等价于 no-op。
@@ -206,7 +210,19 @@ export function VoyageSwitcher({ className, icons, locale = 'zh' }: VoyageSwitch
     const trigger = triggerRef.current;
     if (!trigger) return;
     const rect = trigger.getBoundingClientRect();
-    setPanelPos({ top: rect.bottom + 8, right: Math.max(0, window.innerWidth - rect.right) });
+    const top = rect.bottom + 8;
+    const panel = panelRef.current;
+    const style = panel ? getComputedStyle(panel) : null;
+    const verticalChrome = style
+      ? ['paddingTop', 'paddingBottom', 'borderTopWidth', 'borderBottomWidth']
+          .reduce((sum, key) => sum + (Number.parseFloat(style[key as keyof CSSStyleDeclaration] as string) || 0), 0)
+      : 26;
+    setPanelPos({
+      top,
+      right: Math.max(8, window.innerWidth - rect.right),
+      // max-height 在 content-box 上生效，先扣除 padding + border，确保外盒不越界。
+      maxHeight: Math.max(80, window.innerHeight - top - 8 - verticalChrome),
+    });
   }, []);
 
   useLayoutEffect(() => {
@@ -292,7 +308,11 @@ export function VoyageSwitcher({ className, icons, locale = 'zh' }: VoyageSwitch
           className="vg-switcher-panel"
           role="menu"
           aria-label={tr.panel}
-          style={panelPos ? { top: panelPos.top, right: panelPos.right } : undefined}
+          style={panelPos ? {
+            top: panelPos.top,
+            right: panelPos.right,
+            maxHeight: panelPos.maxHeight,
+          } : undefined}
         >
           <div
             className="vg-preset-grid"
