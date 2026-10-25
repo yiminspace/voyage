@@ -115,6 +115,11 @@ export interface VoyageSwitcherProps {
   icons?: VoyageSwitcherIcons;
   /** UI 文案语言, 跟随宿主的语言状态传入; 缺省中文 */
   locale?: VoyageLocale;
+  /**
+   * 是否提供主题面板 (调色板钮 + 策展主题卡); 缺省 true。只开放明暗的宿主
+   * 传 false, 此时只渲染明暗钮。
+   */
+  palette?: boolean;
 }
 
 /**
@@ -129,10 +134,12 @@ export interface VoyageSwitcherProps {
  * 同时始终由 React state 驱动可见性与交互, 保证在不支持 Popover 的环境下
  * (包括测试用的 jsdom) 依然可用。
  */
-export function VoyageSwitcher({ className, icons, locale = 'zh' }: VoyageSwitcherProps = {}) {
+export function VoyageSwitcher({ className, icons, locale = 'zh', palette = true }: VoyageSwitcherProps = {}) {
   const { prefs, target, setPrefs, setMode } = useVoyage();
   const tr = STRINGS[locale];
   const [open, setOpen] = useState(false);
+  // palette 关掉时面板随之关闭; 各 effect 跟随它, 这样运行中切到 false 也会还原预览
+  const panelOpen = palette && open;
   const [panelPos, setPanelPos] = useState<{
     top: number;
     right: number;
@@ -163,9 +170,9 @@ export function VoyageSwitcher({ className, icons, locale = 'zh' }: VoyageSwitch
   // 面板关闭 (Esc / 点外部 / 再点触发钮 / 卸载) 时兜底还原预览;
   // 已点击落定的场合 committedRef 就是新偏好, 这里等价于 no-op。
   useEffect(() => {
-    if (!open) return;
+    if (!panelOpen) return;
     return () => revertPreview();
-  }, [open, revertPreview]);
+  }, [panelOpen, revertPreview]);
 
   // popover 是较新的 DOM 属性, @types/react 18 尚未收录, 用 ref 回调 setAttribute
   // (而非 JSX 属性) 挂上去; 不支持的环境 (含测试用的 jsdom) 属性本身是惰性的。
@@ -177,7 +184,7 @@ export function VoyageSwitcher({ className, icons, locale = 'zh' }: VoyageSwitch
   // 另一个 auto popover 打开时，浏览器会原生关闭本面板；把 toggle 事件写回
   // React state，避免面板已经不可见但 aria-expanded / 下一次点击仍停在 open。
   useLayoutEffect(() => {
-    if (!open) return;
+    if (!panelOpen) return;
     const el = panelRef.current;
     if (!el) return;
     const onToggle = (event: Event) => {
@@ -185,14 +192,14 @@ export function VoyageSwitcher({ className, icons, locale = 'zh' }: VoyageSwitch
     };
     el.addEventListener('toggle', onToggle);
     return () => el.removeEventListener('toggle', onToggle);
-  }, [open]);
+  }, [panelOpen]);
 
   // 同步 React state -> 原生 popover 显隐 (仅在支持时生效)
   useEffect(() => {
     const el = panelRef.current;
     if (!supportsPopover(el)) return;
     try {
-      if (open) {
+      if (panelOpen) {
         el.showPopover();
       } else {
         el.hidePopover();
@@ -200,7 +207,7 @@ export function VoyageSwitcher({ className, icons, locale = 'zh' }: VoyageSwitch
     } catch {
       /* 状态已一致 (例如已经是 open) 时原生 API 会抛错, 忽略即可 */
     }
-  }, [open]);
+  }, [panelOpen]);
 
   // 面板的展示位置按触发按钮的 viewport 坐标现算, 不依赖 .vg-switcher 作为
   // position:absolute 的包含块: 挂了 popover="auto" 的面板在支持原生 Popover
@@ -226,14 +233,14 @@ export function VoyageSwitcher({ className, icons, locale = 'zh' }: VoyageSwitch
   }, []);
 
   useLayoutEffect(() => {
-    if (!open) return;
+    if (!panelOpen) return;
     updatePanelPosition();
-  }, [open, updatePanelPosition]);
+  }, [panelOpen, updatePanelPosition]);
 
   // 点击面板外部 / Esc 关闭 (不依赖原生 light-dismiss, 全环境一致);
   // 展开期间窗口滚动/缩放要跟着重算面板位置, 否则会跟触发按钮脱节。
   useEffect(() => {
-    if (!open) return;
+    if (!panelOpen) return;
     function onPointerDown(event: PointerEvent) {
       const target = event.target as Node;
       if (panelRef.current?.contains(target) || triggerRef.current?.contains(target)) return;
@@ -262,7 +269,7 @@ export function VoyageSwitcher({ className, icons, locale = 'zh' }: VoyageSwitch
       window.removeEventListener('resize', onReposition);
       window.removeEventListener('scroll', onReposition, true);
     };
-  }, [open, updatePanelPosition]);
+  }, [panelOpen, updatePanelPosition]);
 
   const toggleMode = () => setMode(prefs.mode === 'dark' ? 'light' : 'dark');
   const activePreset = matchVoyagePreset(prefs);
@@ -289,19 +296,21 @@ export function VoyageSwitcher({ className, icons, locale = 'zh' }: VoyageSwitch
           </span>
         )}
       </button>
-      <button
-        type="button"
-        ref={triggerRef}
-        className="vg-iconbtn vg-switcher-trigger"
-        aria-label={tr.open}
-        aria-haspopup="true"
-        aria-expanded={open}
-        aria-controls={panelId}
-        onClick={() => setOpen((v) => !v)}
-      >
-        {icons?.trigger ?? DEFAULT_TRIGGER}
-      </button>
-      {open ? (
+      {palette ? (
+        <button
+          type="button"
+          ref={triggerRef}
+          className="vg-iconbtn vg-switcher-trigger"
+          aria-label={tr.open}
+          aria-haspopup="true"
+          aria-expanded={panelOpen}
+          aria-controls={panelId}
+          onClick={() => setOpen((v) => !v)}
+        >
+          {icons?.trigger ?? DEFAULT_TRIGGER}
+        </button>
+      ) : null}
+      {panelOpen ? (
         <div
           id={panelId}
           ref={setPanelRef}

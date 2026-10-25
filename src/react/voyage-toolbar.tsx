@@ -24,6 +24,11 @@ export interface VoyageToolbarProps {
   /** 宿主用自家图标体系时传入 (如 quarry 传 tabler webfont 的 <i>) */
   icons?: VoyageSwitcherIcons;
   /**
+   * 是否提供调色板 (主题面板); 缺省 true。主题由产品固定、只开放明暗的宿主
+   * 传 false, 工具条里只剩明暗钮。
+   */
+  palette?: boolean;
+  /**
    * 可选 UI 问题上报。传入后顺序为 反馈 | 语言 → 明暗 → 调色板；
    * endpoint 接收证据包并由服务端创建带 intake 标签的 GitHub Issue。
    */
@@ -76,6 +81,7 @@ export function VoyageToolbar({
   onLocaleChange,
   language,
   icons,
+  palette = true,
   reporter,
   account,
 }: VoyageToolbarProps = {}) {
@@ -114,7 +120,7 @@ export function VoyageToolbar({
       ) : onLocaleChange ? (
         <VoyageLangSwitcher locale={locale} onLocaleChange={onLocaleChange} />
       ) : null}
-      <VoyageSwitcher locale={locale} icons={icons} />
+      <VoyageSwitcher locale={locale} icons={icons} palette={palette} />
       {account ? <div className="vg-topbar-account">{account}</div> : null}
     </div>
   );

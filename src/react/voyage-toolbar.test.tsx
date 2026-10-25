@@ -65,6 +65,26 @@ describe('VoyageToolbar', () => {
     expect(document.querySelector('.vg-lang-switch')).toBeNull();
   });
 
+  it('palette={false} 时只保留明暗钮, 语言与账户位置不变', () => {
+    render(
+      <VoyageProvider>
+        <VoyageToolbar
+          locale="zh"
+          onLocaleChange={() => {}}
+          palette={false}
+          account={<button type="button" className="host-account">用户菜单</button>}
+        />
+      </VoyageProvider>
+    );
+
+    const classNames = toolbarButtons().map((b) => b.className);
+    expect(classNames).toHaveLength(3);
+    expect(classNames[0]).toMatch(/\bvg-lang-switch\b/);
+    expect(classNames[1]).toMatch(/\bvg-switcher-mode\b/);
+    expect(classNames[2]).toMatch(/\bhost-account\b/);
+    expect(document.querySelector('.vg-switcher-trigger')).toBeNull();
+  });
+
   it('语言钮宽度锁死: "中" 与 "EN" 计算宽度相同, 切换语言不会推动同排控件', () => {
     // jsdom 的 getBoundingClientRect 恒为 0, 量不到真实位移; 但横向重排的根因
     // 是这颗钮的宽度随文案变化, 所以改为断言宽度是固定值且两种文案下一致 ——
