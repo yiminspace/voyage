@@ -148,6 +148,23 @@
 .vg[data-theme='trace'][data-mode='dark'] { --bg0:#0e1c30; --bg1:#152540; --bg2:#1b2d49; --bg3:#223857; --line:#283c60; --line2:#3b5278; --accent:#ff8f77; --accent-hi:#ffa38e; --accent-ink:#26100b; --ok:#55cfa4; --warn:#e0b34e; --red:#ff6f91; }
 .vg[data-theme='trace'][data-mode='light'] { --bg0:#f2f1e8; --bg1:#faf9f2; --bg2:#ecebe0; --bg3:#e4e3d6; --line:#d6d5c3; --line2:#b9b9a5; --accent:#b93a28; --accent-hi:#cc503c; --accent-ink:#ffffff; --ok:#1c6e55; --warn:#9a6a10; --red:#c63255; }
 
+/* examhall 考场 — 白底黑字的机考界面 / 白字黑底。
+   light 的 bg2 / bg3 / line 与参照机考界面实测值一致 (说明条底、首题的禁用步进钮、
+   说明条边框); 其余值按 WCAG 门槛定, 对比度表见 README「考场层」。 */
+.vg[data-theme='examhall'][data-mode='light'] { --bg0:#ffffff; --bg1:#ffffff; --bg2:#f1f2ec; --bg3:#dddddd; --line:#d5d5d5; --line2:#b9b9b9; --accent:#2f78ad; --accent-hi:#3a86bd; --accent-ink:#ffffff; --ok:#1f7a3d; --warn:#8a5a00; --red:#b3261e; }
+.vg[data-theme='examhall'][data-mode='dark'] { --bg0:#000000; --bg1:#000000; --bg2:#262626; --bg3:#333333; --line:#555555; --line2:#777777; --accent:#89c8ff; --accent-hi:#a6d6ff; --accent-ink:#000000; --ok:#5fd38a; --warn:#f2bd5c; --red:#ff8a80; }
+/* 判定色 (对 / 部分 / 错) 手写 -fg / -bg: 推导公式在纯白/纯黑底上给不出 ≥4.5 的字底对 */
+.vg[data-theme='examhall'][data-mode='light'] {
+  --ok-fg:#17633c;   --ok-bg:#e7f3eb;
+  --warn-fg:#755400; --warn-bg:#fff2cc;
+  --red-fg:#923a2c;  --red-bg:#f9e9e5;
+}
+.vg[data-theme='examhall'][data-mode='dark'] {
+  --ok-fg:#6fdc98;   --ok-bg:#0e2a18;
+  --warn-fg:#f2bd5c; --warn-bg:#33250a;
+  --red-fg:#ff9088;  --red-bg:#3a1412;
+}
+
 /* ---------------------------------------------------------------------------
    3. 有效变量层: 组件只消费这一层, tone / style 通过覆写它们生效
       色阶语义 (12 级): 1-2 底面 / 3-5 染色底 / 6-8 边框 / 9-10 实色 /
@@ -233,6 +250,16 @@
   --vg-color-filled: var(--fill-grad);
   --vg-color-filled-text: var(--fill-ink);
   --vg-color-border: var(--line2-c, var(--line2));
+  /* 焦点环 / ≥3:1 的控件边框 / 荧光笔 / 复查标记 / 实心警示块。缺省值让既有
+     主题外观不变 (焦点环与 0.16 的 .vg :focus-visible 同式); examhall 与考场
+     层给出不透明的精确值。 */
+  --vg-color-focus: color-mix(in srgb, var(--acc) 70%, transparent);
+  --vg-color-border-strong: var(--fg3);
+  --vg-color-mark: color-mix(in srgb, var(--warn) 30%, var(--bg1));
+  --vg-color-mark-text: var(--fg);
+  --vg-color-flag: var(--warn);
+  --vg-color-danger-solid: var(--red);
+  --vg-color-danger-solid-text: var(--bg1);
   --vg-radius-control: var(--r-btn);
   --vg-radius-surface: var(--r-win);
   --vg-shadow-surface: 0 8px 28px color-mix(in srgb, #000 14%, transparent);
@@ -302,6 +329,20 @@
 .vg[data-style='cloud'][data-mode='dark'] {
   --btn-sh: 0 5px 18px color-mix(in srgb, #000 28%, transparent);
   --vg-shadow-surface: 0 18px 54px color-mix(in srgb, #000 38%, transparent);
+}
+/* plain 素: 近直角 (控件 3px 与其余样式的圆角互不相同), 比 sharp 宽松,
+   表头不转大写; 没有阴影、发光和模糊 —— 只有浮层保留 --vg-shadow-popover。 */
+.vg[data-style='plain'] {
+  --r-win: 4px;
+  --r-btn: 3px;
+  --r-pill: 3px;
+  --nav-py: 7px;
+  --cell-py: 8px;
+  --btn-pad: 8px 15px;
+  --btn-sh: none;
+  --glow: none;
+  --blur: none;
+  --vg-shadow-surface: none;
 }
 
 /* ---------------------------------------------------------------------------
@@ -393,4 +434,138 @@
   --fg2: #666b58;
   --fg3: #94988a;
   --num: #35508f;
+}
+
+/* examhall: 纯黑白文字层级, 墨色实心按钮 (不是蓝色), 控件边框提到 ≥3:1。
+   与对比层同特异度 (0,3,0), 排在其后, 所以 quiet / crisp 都改不动它。 */
+.vg[data-theme='examhall'][data-mode='light'] {
+  --fg: #000000;
+  --fg2: #5b5b5b;
+  --fg3: #686868;
+  --fill-grad: var(--fg);
+  --fill-ink: var(--bg1);
+  --acc-text: #22669c;
+  --line2-c: var(--vg-color-border-strong);
+  --app-img: none;
+  --vg-color-focus: #2f78ad;
+  --vg-color-border-strong: #767676;
+  --vg-color-mark: #fff200;
+  --vg-color-mark-text: #000000;
+  --vg-color-flag: #a35f00;
+  --vg-color-danger-solid: #b3261e;
+  --vg-color-danger-solid-text: #ffffff;
+}
+.vg[data-theme='examhall'][data-mode='dark'] {
+  --fg: #ffffff;
+  --fg2: #d6d6d6;
+  --fg3: #b8b8b8;
+  --fill-grad: var(--fg);
+  --fill-ink: var(--bg1);
+  --acc-text: #a6d6ff;
+  --line2-c: var(--vg-color-border-strong);
+  --app-img: none;
+  --vg-color-focus: #89c8ff;
+  --vg-color-border-strong: #b0b0b0;
+  --vg-color-mark: #ffea00;
+  --vg-color-mark-text: #000000;
+  --vg-color-flag: #f0a840;
+  --vg-color-danger-solid: #ff9088;
+  --vg-color-danger-solid-text: #000000;
+}
+
+/* ---------------------------------------------------------------------------
+   7. 考场层: .vg-exam 根节点上的 --vg-exam-* token
+
+      考场根节点由 voyageExamAttrs() 生成: class="vg vg-exam" + 四轴写死
+      (examhall x plain x crisp, mode 由对比度决定) + data-exam-contrast /
+      data-exam-text 两个属性。它是嵌套的 .vg, 外层偏好与切换器预览碰不到它;
+      两个考场属性也不进 vg_prefs。
+
+      --vg-exam-* 一律从第 3 段的通用 token 推出, 所以 .vg-exam 放在任何主题下
+      都成立; examhall 与下面的黄字黑底覆写给出精确值。
+   -------------------------------------------------------------------------- */
+.vg-exam {
+  --vg-exam-paper: var(--vg-color-surface);
+  --vg-exam-ink: var(--vg-color-text);
+  --vg-exam-muted: var(--vg-color-text-muted);
+  --vg-exam-subtle: var(--vg-color-text-subtle);
+  --vg-exam-panel: var(--vg-color-surface-raised);
+  --vg-exam-hover: var(--vg-color-control-hover);
+  --vg-exam-rule: var(--line);
+  --vg-exam-field: var(--vg-color-border-strong);
+  --vg-exam-focus: var(--vg-color-focus);
+  --vg-exam-link: var(--vg-color-accent-text);
+  /* Next / Previous / Play / Submit: 正文色作底、表面色作字, 三档里按钮边缘对底都 ≥17:1 */
+  --vg-exam-solid: var(--vg-color-text);
+  --vg-exam-solid-ink: var(--vg-color-surface);
+  /* 禁用的步进钮: 悬停底 + 次级文字 (bg3 上只用 fg2, fg3 在 light 下只有 4.10:1) */
+  --vg-exam-step-off: var(--vg-exam-hover);
+  --vg-exam-step-off-ink: var(--vg-exam-muted);
+  /* 当前题框 / 已答横条 / 未答轨道: 粗细不同本身就是非颜色线索 */
+  --vg-exam-current: var(--vg-exam-ink);
+  --vg-exam-done: var(--vg-exam-ink);
+  --vg-exam-todo: var(--vg-exam-field);
+  --vg-exam-flag: var(--vg-color-flag);
+  --vg-exam-mark: var(--vg-color-mark);
+  --vg-exam-mark-ink: var(--vg-color-mark-text);
+  --vg-exam-alert: var(--vg-color-danger-solid);
+  --vg-exam-alert-ink: var(--vg-color-danger-solid-text);
+  --vg-exam-ok: var(--vg-color-success);
+  --vg-exam-ok-bg: var(--vg-color-success-soft);
+  --vg-exam-ok-line: var(--vg-color-success);
+  --vg-exam-bad: var(--vg-color-danger);
+  --vg-exam-bad-bg: var(--vg-color-danger-soft);
+  --vg-exam-bad-line: var(--vg-color-danger);
+  --vg-exam-part: var(--vg-color-warning);
+  --vg-exam-part-bg: var(--vg-color-warning-soft);
+  --vg-exam-overlay: var(--vg-color-overlay);
+  --vg-exam-shadow: var(--vg-shadow-popover);
+
+  /* 作答内容字号 16 / 19 / 22: 用 rem, 浏览器默认字号也算进去 */
+  --vg-exam-text: 1rem;
+  /* 运行时不加载网络字体; Liberation Sans / Arimo 与 Arial 等宽, 供 Linux 回落 */
+  --vg-exam-font: Arial, Helvetica, 'Liberation Sans', Arimo, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+  --vg-exam-lh: 1.5;
+  --vg-exam-lh-passage: 1.85;
+
+  --vg-exam-bar-h: 56px;
+  --vg-exam-nav-h: 54px;
+  --vg-exam-step: 48px;
+  --vg-exam-touch: 44px;
+  --vg-exam-gap-w: 9em;
+  --vg-exam-radius: var(--vg-radius-control);
+}
+.vg-exam[data-exam-text='large'] { --vg-exam-text: 1.1875rem; }
+.vg-exam[data-exam-text='x-large'] { --vg-exam-text: 1.375rem; }
+
+/* 黄字黑底: 考场层覆写, 不是主题 (它没有有意义的浅色模式)。
+   特异度 0,4,0, 且必须排在第 6 段 examhall 微调之后 (tokens-theme.test.ts 钉住)。
+   焦点环 / 高亮 / 标记 / 警示块改用白色, 靠色相与黄色边框、黄色实心钮区分。 */
+.vg.vg-exam[data-mode='dark'][data-exam-contrast='yellow-on-black'] {
+  --bg0: #000000;
+  --bg1: #000000;
+  --bg2: #232323;
+  --bg3: #303030;
+  --line: #6b6420;
+  --line2: #aaa055;
+  --fg: #ffea00;
+  --fg2: #e5d65c;
+  --fg3: #d6c64e;
+  --accent: #ffea00;
+  --accent-hi: #ffea00;
+  --accent-ink: #000000;
+  --acc-text: #ffea00;
+  --fill-grad: var(--fg);
+  --fill-ink: var(--bg1);
+  --line2-c: var(--vg-color-border-strong);
+  --ok-fg: #7ae6a2;   --ok-bg: #0e2a18;
+  --warn-fg: #ffc970; --warn-bg: #33250a;
+  --red-fg: #ffa098;  --red-bg: #3a1412;
+  --vg-color-focus: #ffffff;
+  --vg-color-border-strong: #d9c84a;
+  --vg-color-mark: #ffffff;
+  --vg-color-mark-text: #000000;
+  --vg-color-flag: #ffffff;
+  --vg-color-danger-solid: #ffffff;
+  --vg-color-danger-solid-text: #000000;
 }

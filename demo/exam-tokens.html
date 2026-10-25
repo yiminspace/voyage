@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>voyage — exam hall tokens</title>
+<link rel="stylesheet" href="../index.css" />
+<style>
+  /* 本页只有展厅自身的版面; 颜色全部引用 Voyage token, 考场部分只用 --vg-exam-*。
+     demo-exam-* 是演示用的局部类, 不是 Voyage 组件。 */
+  html, body { margin: 0; }
+  body { background: var(--bg0); color: var(--fg); font-size: 14px; line-height: 1.55; }
+  .demo-page { max-width: 1080px; margin: 0 auto; padding: 0 16px 48px; }
+  .demo-head { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+  .demo-head h1 { margin: 0; font-size: 17px; }
+  .demo-head p { margin: 0; color: var(--fg2); font-size: 13px; }
+  .demo-sp { flex: 1; }
+  .demo-controls { display: flex; flex-wrap: wrap; gap: 12px; margin: 16px 0; }
+  .demo-controls fieldset { display: flex; flex-wrap: wrap; gap: 12px; margin: 0; padding: 8px 12px; border: 1px solid var(--line); border-radius: var(--r-win); }
+  .demo-controls legend { padding: 0 4px; color: var(--fg2); font-size: 12px; }
+  .demo-controls label { display: inline-flex; align-items: center; gap: 6px; }
+  .demo-daily { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 16px; }
+  .demo-daily-mark { background: var(--vg-color-mark); color: var(--vg-color-mark-text); }
+
+  .demo-exam { display: flex; flex-direction: column; border: 1px solid var(--line2); }
+  .demo-exam-bar { display: flex; align-items: center; gap: 24px; height: var(--vg-exam-bar-h); box-sizing: border-box; padding: 4px 16px; border-bottom: 1px solid var(--line2); font-size: 16px; }
+  .demo-exam-bar small { color: var(--vg-exam-muted); font-size: 13px; }
+  .demo-exam-rubric { margin: 16px; padding: 10px 16px; border: 1px solid var(--vg-exam-rule); border-radius: var(--vg-exam-radius); background: var(--vg-exam-panel); font-size: 16px; }
+  .demo-exam-rubric strong { display: block; font-size: 1.1em; line-height: 1.4; }
+  .demo-exam-rubric p { margin: 0; }
+  .demo-exam-content { padding: 0 16px 24px; }
+  .demo-exam-content h2 { margin: 0 0 12px; font-size: 1em; }
+  .demo-exam-content p { margin: 0 0 12px; }
+  .demo-exam-content a { color: var(--vg-exam-link); }
+  .demo-exam-gap { box-sizing: border-box; width: var(--vg-exam-gap-w); height: 1.375em; padding: 0 4px; border: 1px solid var(--vg-exam-field); border-radius: var(--vg-exam-radius); background: var(--vg-exam-paper); color: var(--vg-exam-ink); font: inherit; text-align: center; }
+  .demo-exam-gap::placeholder { color: var(--vg-exam-ink); font-weight: 700; opacity: 1; }
+  .demo-exam-options { margin: 0 0 12px; padding: 0; border: 0; }
+  .demo-exam-options legend { margin-bottom: 8px; padding: 0; font-weight: 700; }
+  .demo-exam-options label { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+  .demo-exam-options input { width: 18px; height: 18px; margin: 0; }
+  .demo-exam-verdicts { display: flex; flex-wrap: wrap; gap: 8px; }
+  .demo-exam-verdict { display: inline-flex; gap: 4px; padding: 2px 8px; border: 1px solid; border-radius: var(--vg-exam-radius); font-size: 14px; }
+  .demo-exam-verdict.is-correct { border-color: var(--vg-exam-ok-line); background: var(--vg-exam-ok-bg); color: var(--vg-exam-ok); }
+  .demo-exam-verdict.is-incorrect { border-color: var(--vg-exam-bad-line); background: var(--vg-exam-bad-bg); color: var(--vg-exam-bad); }
+  .demo-exam-verdict.is-partial { border-color: currentColor; background: var(--vg-exam-part-bg); color: var(--vg-exam-part); }
+  .demo-exam-alert { display: inline-block; padding: 4px 10px; background: var(--vg-exam-alert); color: var(--vg-exam-alert-ink); font-size: 13px; font-weight: 700; }
+  .demo-exam-steps { display: flex; justify-content: flex-end; gap: 4px; padding: 8px 16px; }
+  .demo-exam-step { display: inline-flex; align-items: center; justify-content: center; width: var(--vg-exam-step); height: var(--vg-exam-step); padding: 0; border: 0; border-radius: var(--vg-exam-radius); background: var(--vg-exam-solid); color: var(--vg-exam-solid-ink); cursor: pointer; }
+  .demo-exam-step[aria-disabled='true'] { background: var(--vg-exam-step-off); color: var(--vg-exam-step-off-ink); cursor: default; }
+  .demo-exam-nav { display: flex; align-items: center; gap: 8px; height: var(--vg-exam-nav-h); padding: 0 16px; border-top: 1px solid var(--vg-exam-rule); font-size: 16px; }
+  .demo-exam-nav strong { margin-right: 8px; }
+  .demo-exam-qbtn { position: relative; box-sizing: border-box; min-width: 24px; min-height: 28px; padding: 0 4px; border: 0; border-top: 1px solid var(--vg-exam-todo); background: transparent; color: var(--vg-exam-ink); font: inherit; cursor: pointer; }
+  .demo-exam-qbtn.is-answered { border-top: 3px solid var(--vg-exam-done); }
+  .demo-exam-qbtn[aria-current='step'] { box-shadow: inset 0 0 0 2px var(--vg-exam-current); font-weight: 700; }
+  .demo-exam-qbtn.is-flagged::after { content: ''; position: absolute; right: 1px; bottom: 1px; width: 6px; height: 6px; border-radius: 50%; background: var(--vg-exam-flag); }
+  .demo-exam-swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; padding: 16px; border-top: 1px solid var(--vg-exam-rule); font-size: 12px; }
+  .demo-exam-swatch { display: flex; align-items: center; gap: 8px; }
+  .demo-exam-swatch i { flex: none; width: 28px; height: 28px; border: 1px solid var(--vg-exam-rule); background: var(--demo-swatch); }
+  .demo-exam-swatch code { font-family: var(--vg-mono); }
+  .demo-exam-swatch small { display: block; color: var(--vg-exam-muted); }
+</style>
+</head>
+<body>
+  <div id="exam-demo-root"></div>
+  <script type="module" src="./exam-tokens-demo.tsx"></script>
+</body>
+</html>

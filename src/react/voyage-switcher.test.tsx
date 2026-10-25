@@ -99,6 +99,43 @@ describe('VoyageSwitcher', () => {
     );
   });
 
+  it('palette={false} 只渲染明暗钮, 明暗切换照常', () => {
+    render(
+      <VoyageProvider defaults={{ theme: 'examhall', mode: 'light', style: 'plain', tone: 'crisp' }}>
+        <VoyageSwitcher palette={false} />
+      </VoyageProvider>
+    );
+
+    expect(screen.queryByRole('button', { name: '展开主题设置' })).toBeNull();
+    expect(screen.queryByRole('menu')).toBeNull();
+    expect(document.querySelectorAll('.vg-switcher button')).toHaveLength(1);
+
+    fireEvent.click(screen.getByRole('button', { name: '切换为暗色模式' }));
+    expect(document.documentElement.getAttribute('data-mode')).toBe('dark');
+    expect(document.documentElement.getAttribute('data-theme')).toBe('examhall');
+  });
+
+  it('运行中把 palette 切到 false 会关掉面板并还原预览', () => {
+    const { rerender } = render(
+      <VoyageProvider>
+        <VoyageSwitcher />
+      </VoyageProvider>
+    );
+
+    openPanel();
+    fireEvent.focus(screen.getByRole('menuitemradio', { name: '北极' }));
+    expect(document.documentElement.getAttribute('data-theme')).toBe('nord');
+
+    rerender(
+      <VoyageProvider>
+        <VoyageSwitcher palette={false} />
+      </VoyageProvider>
+    );
+
+    expect(screen.queryByRole('menu', { name: '主题设置' })).toBeNull();
+    expect(document.documentElement.getAttribute('data-theme')).toBe('slate');
+  });
+
   it('点击 月亮/太阳 翻转 data-mode', () => {
     render(
       <VoyageProvider defaults={{ theme: 'slate', mode: 'dark', style: 'classic', tone: 'quiet' }}>

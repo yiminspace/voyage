@@ -124,6 +124,7 @@
     <button class="chip" data-pick="iris" style="--ac:#6558e8"><i></i>鸢尾</button>
     <button class="chip" data-pick="signal" style="--ac:#2563eb"><i></i>信号</button>
     <button class="chip" data-pick="trace" style="--ac:#b93a28"><i></i>轨迹纸</button>
+    <button class="chip" data-pick="examhall" style="--ac:#2f78ad"><i></i>考场</button>
   </div>
   <div class="bench">
     <span class="lbl">明暗</span>
@@ -135,6 +136,7 @@
     <button class="chip" data-style-pick="soft" style="--ac:#a4b08e"><i></i>圆软</button>
     <button class="chip" data-style-pick="sharp" style="--ac:#8e97a4"><i></i>方锐</button>
     <button class="chip" data-style-pick="cloud" style="--ac:#6558e8"><i></i>云圆</button>
+    <button class="chip" data-style-pick="plain" style="--ac:#b9b9b9"><i></i>素</button>
     <span class="lbl" style="margin-left:14px">对比</span>
     <button class="chip" data-tone-pick="normal" style="--ac:#d4966a"><i></i>标准</button>
     <button class="chip on" data-tone-pick="quiet" style="--ac:#8d7a67"><i></i>柔和</button>
@@ -330,7 +332,8 @@
     { id: 'everforest', label: '常青林', hint: 'Everforest 护眼绿',    style: 'soft',    tone: 'quiet' },
     { id: 'iris',       label: '鸢尾',   hint: 'Taskdeck 高对比圆角', style: 'cloud',   tone: 'crisp' },
     { id: 'signal',     label: '信号',   hint: '纯黑白工作台',          style: 'classic', tone: 'quiet' },
-    { id: 'trace',      label: '轨迹纸', hint: '记录纸与蓝图观测台', style: 'classic', tone: 'quiet' }
+    { id: 'trace',      label: '轨迹纸', hint: '记录纸与蓝图观测台', style: 'classic', tone: 'quiet' },
+    { id: 'examhall',   label: '考场',   hint: '白底黑字的机考界面',   style: 'plain',   tone: 'crisp' }
   ];
 
   // 已落定的四轴状态 (bind 的 after 回调里维护), 预览还原时以它为准

@@ -39,6 +39,21 @@ describe('tokens.css 主题微调层', () => {
     expect(inkTweak).toBeGreaterThan(toneQuietDark);
   });
 
+  it('examhall 微调排在对比层之后, 考场层 (第 7 段) 又排在 examhall 微调之后', () => {
+    const toneQuietDark = TOKENS.indexOf(".vg[data-tone='quiet'][data-mode='dark']");
+    const examhallLight = TOKENS.lastIndexOf(".vg[data-theme='examhall'][data-mode='light']");
+    const examhallDark = TOKENS.lastIndexOf(".vg[data-theme='examhall'][data-mode='dark']");
+    const examLayer = TOKENS.indexOf('7. 考场层');
+    const examRoot = TOKENS.indexOf('.vg-exam {');
+    const yellowOnBlack = TOKENS.indexOf(".vg.vg-exam[data-mode='dark'][data-exam-contrast='yellow-on-black']");
+
+    expect(examhallLight).toBeGreaterThan(toneQuietDark);
+    expect(examhallDark).toBeGreaterThan(toneQuietDark);
+    expect(examLayer).toBeGreaterThan(Math.max(examhallLight, examhallDark));
+    expect(examRoot).toBeGreaterThan(examLayer);
+    expect(yellowOnBlack).toBeGreaterThan(examRoot);
+  });
+
   it('ink 暗色用暖灰次级文字, 不用全主题共用的冷灰', () => {
     // 微调层里的 ink 块 (lastIndexOf 取到的是第 6 段那份, 不是主题矩阵那份)
     const inkTweak = TOKENS.slice(TOKENS.lastIndexOf(".vg[data-theme='ink'][data-mode='dark']"));

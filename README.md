@@ -10,9 +10,9 @@ yiminlab 统一样式系统。**所有 GUI 应用的视觉基础**: 一套 quarr
 
 | 轴 | 取值 | 管什么 |
 |---|---|---|
-| `data-theme` | 自研: `slate` 板岩铜 (quarry 基准) / `ink` 纸墨朱 / `iris` 鸢尾 (Taskdeck 高对比基准) / `signal` 信号 (纯黑白工作台) / `trace` 轨迹纸 (记录纸与蓝图观测台); 经典采编 (MIT, 出处见 tokens.css): `github` 石墨 (兼 evolve GUI 基准, accent 取 Primer 链接蓝) / `nord` 北极 / `tokyo` 东京夜 / `catppuccin` 摩卡 / `onedark` 原子 / `solarized` 日晒 / `rosepine` 玫瑰松 / `everforest` 常青林 | 颜色 |
+| `data-theme` | 自研: `slate` 板岩铜 (quarry 基准) / `ink` 纸墨朱 / `iris` 鸢尾 (Taskdeck 高对比基准) / `signal` 信号 (纯黑白工作台) / `trace` 轨迹纸 (记录纸与蓝图观测台) / `examhall` 考场 (白底黑字的机考界面, 见「考场层」); 经典采编 (MIT, 出处见 tokens.css): `github` 石墨 (兼 evolve GUI 基准, accent 取 Primer 链接蓝) / `nord` 北极 / `tokyo` 东京夜 / `catppuccin` 摩卡 / `onedark` 原子 / `solarized` 日晒 / `rosepine` 玫瑰松 / `everforest` 常青林 | 颜色 |
 | `data-mode` | `dark` / `light` | 底色深浅 |
-| `data-style` | `classic` / `glass` / `soft` / `sharp` / `cloud` | 结构: 圆角 / 密度 / 材质 / 阴影；`cloud` 是 Taskdeck 的大圆角与清晰阴影 |
+| `data-style` | `classic` / `glass` / `soft` / `sharp` / `cloud` / `plain` | 结构: 圆角 / 密度 / 材质 / 阴影；`cloud` 是 Taskdeck 的大圆角与清晰阴影；`plain` 素: 控件 3px / 窗口 4px, 比 `sharp` 宽松, 无阴影/发光/模糊, 表头不转大写 |
 | `data-tone` | `normal` / `quiet` / `crisp` | 对比强度; **quiet (久航) 是日常默认**, `crisp` 强化层级与边界 |
 
 四轴完全正交, 任意组合成立。主题层只有色值, 风格层只有结构值, tone 层用 `color-mix` 从种子色推导, 不需要为每套主题手调。
@@ -29,7 +29,7 @@ yiminlab 统一样式系统。**所有 GUI 应用的视觉基础**: 一套 quarr
 
 **语义色**: `--ok` / `--warn` / `--red` 三枚种子色**随主题走**, 每套主题在 tokens.css 第 2 段自报 dark 与 light 两档 —— 全主题共用一枚 Primer 红会让 everforest、rosepine 这类有自己色相语言的主题出戏。配套的染色底 `--*-bg` 与彩色文字 `--*-fg` 由第 3 段用 `color-mix` 从种子色推导, 不必逐主题手调; 只有 `slate` (quarry 基准) 与 `github` (evolve GUI 基准) 在主题矩阵里手写覆写这几位, 因为它们要逐值保真既有视觉。
 
-新增主题时**必须给全三枚种子色**: CSS 自定义属性没有继承兜底, 漏给会让 `.vg-badge` / `.vg-state` 吃到空值直接变透明 —— 表现为「徽章没了」而非「颜色不对」, 极难察觉。`tokens-theme.test.ts` 对全部 13 × 2 组合逐一断言, 漏给即红。
+新增主题时**必须给全三枚种子色**: CSS 自定义属性没有继承兜底, 漏给会让 `.vg-badge` / `.vg-state` 吃到空值直接变透明 —— 表现为「徽章没了」而非「颜色不对」, 极难察觉。`tokens-theme.test.ts` 对全部 14 × 2 组合逐一断言, 漏给即红。
 
 ## 用法
 
@@ -89,7 +89,7 @@ function App() {
 
 - **`VoyageProvider`** — 挂载时执行 `initVoyage`, 通过 context 分发偏好与 setter; 需要同时维护 tailwind `.dark` class 的应用传 `syncDarkClass`。嵌入 iframe 或微前端时传 `target={appRoot}` 与独立 `storageKey`, 四轴和 `.dark` 都只落在该根节点。SSR 场景仍需配合 `voyageInitScript` 防闪烁 (本组件只管挂载后的状态)。
 - **`useVoyage()`** — 返回 `{ prefs, target, setTheme, setMode, setStyle, setTone, setPrefs, reset }`; 缺省写入 `localStorage('vg_prefs')` 并同步 `<html>`, scoped Provider 则使用自己的 key 与根节点。
-- **`VoyageToolbar`** — **顶栏首选**: 把反馈入口、语言钮、主题切换器与可选账户入口按固定顺序排成一行。缺省仍是 **语言 → 明暗 → 调色板**；全部启用时是 **反馈 | 语言 → 明暗 → 调色板 → 账户**。明暗与调色板同属主题外观、天然相邻; 语言是另一维度的设置, 整体靠边而非夹在主题族旁边。不传 `onLocaleChange` 则不渲染语言钮，不传 `account` 则不渲染账户区或空占位。`icons` 透传给内部的 `VoyageSwitcher`。
+- **`VoyageToolbar`** — **顶栏首选**: 把反馈入口、语言钮、主题切换器与可选账户入口按固定顺序排成一行。缺省仍是 **语言 → 明暗 → 调色板**；全部启用时是 **反馈 | 语言 → 明暗 → 调色板 → 账户**。明暗与调色板同属主题外观、天然相邻; 语言是另一维度的设置, 整体靠边而非夹在主题族旁边。不传 `onLocaleChange` 则不渲染语言钮，不传 `account` 则不渲染账户区或空占位。`icons` 透传给内部的 `VoyageSwitcher`。主题由产品固定、只开放明暗的宿主传 `palette={false}`：调色板钮和主题面板都不渲染，其余顺序不变。
 
   scoped root 也要消除首帧闪烁时，把 `voyageInitScript(..., { targetSelector, storageKey })` 生成的脚本放在目标元素之后、React/Vite module 之前；放在 `<head>` 时 body 内的 selector 尚不存在，脚本会安全跳过并等 Provider 挂载。
 
@@ -113,7 +113,7 @@ import { VoyageAuthMenu } from '@yiminlab/authkit/voyage';
   根节点类名是 **`.vg-topbar`**, 与卡片内一排按钮 (`.vg-section` 里的 `.vg-toolbar`, 见 `voyage.css` 「工具条 / 按钮 / 输入」段: `padding: 9px 14px; background: var(--surf-1); border-bottom: 1px solid`) 是两个独立的类名, 不再共用。`.vg-topbar` 只负责排列 (`display / align-items / gap`), 不带 padding / 背景 / 边框 —— 外观完全交给宿主的 `.vg-header` 等容器。
 
   尚未接入反馈或语言功能但需要保留标准工具条位置时，传 `reporter={{ disabled: true }}` 与 `language={{ disabled: true }}`。组件渲染原生 disabled 按钮，不需要伪造 endpoint 或 no-op 回调。
-- **`VoyageSwitcher`** — 顶栏放一个即可: 月亮/太阳一键切明暗 + 调色板按钮弹出主题面板。面板是 **策展主题卡** (`VOYAGE_PRESETS`, 每个色系一个设计过的 style/tone 组合, 卡片用该主题自身 tokens 渲染 mini 预览) + 明暗分段; hover / 聚焦即时全页预览, 移出 / Esc 还原, 点击落定 —— VS Code 主题选择器的交互模型。style/tone 原始轴不再直接暴露给用户 (token 引擎不变, 仍可经 `useVoyage()` 编程设置)。浮层用原生 Popover API (支持时启用), 交互始终由 React state 兜底, 键盘可达 (Esc 关闭, 焦点环见 voyage.css)。
+- **`VoyageSwitcher`** — 顶栏放一个即可: 月亮/太阳一键切明暗 + 调色板按钮弹出主题面板 (`palette={false}` 时只有明暗钮)。面板是 **策展主题卡** (`VOYAGE_PRESETS`, 每个色系一个设计过的 style/tone 组合, 卡片用该主题自身 tokens 渲染 mini 预览) + 明暗分段; hover / 聚焦即时全页预览, 移出 / Esc 还原, 点击落定 —— VS Code 主题选择器的交互模型。style/tone 原始轴不再直接暴露给用户 (token 引擎不变, 仍可经 `useVoyage()` 编程设置)。浮层用原生 Popover API (支持时启用), 交互始终由 React state 兜底, 键盘可达 (Esc 关闭, 焦点环见 voyage.css)。
 - **图标插槽** — `VoyageSwitcher` 内置图标取 Tabler Icons 原始 path (24 网格 / stroke 2 / 1em 跟随字号); 宿主用图标字体时可整体替换, 与顶栏其余图标保持同一视觉语言:
 
 ```tsx
@@ -319,10 +319,85 @@ intake API 接收完整 JSON 报告。成功响应可以直接返回 GitHub 风�
 | taskdeck | iris 鸢尾 | light | cloud | crisp |
 | skillloom | signal 信号 | light | classic | quiet |
 | brainws | trace 轨迹纸 | light | classic | quiet |
+| prism | examhall 考场 | light | plain | crisp |
 | quarry | slate 板岩铜 (原始基准) | dark | classic | normal |
 | portal | — 搁置, 保持现有设计 | | | |
 
 用户切换后缺省经 `localStorage('vg_prefs')` 持久化；嵌入式应用可传独立 `storageKey`，避免同源应用互相覆盖。
+
+## 考场层: `examhall` × `plain` + `.vg-exam`
+
+面向机考练习界面的一组 token：主题 `examhall` 管颜色，样式 `plain` 管结构，考场根节点 `.vg-exam` 上的两个属性管这一场考试的对比度和字号。**不新增轴，也不新增 tone**：对比度与字号是"这一场考试的设置"，不是全站外观偏好，所以挂在考场根节点上 —— 不进 `vg_prefs`，不出现在切换器里，外层的全局切换和悬停预览都碰不到它。
+
+```tsx
+import { voyageExamAttrs } from '@yiminlab/voyage';
+
+<section {...voyageExamAttrs({ contrast: 'yellow-on-black', text: 'large' })}>…</section>
+// class="vg vg-exam" data-theme="examhall" data-mode="dark" data-style="plain" data-tone="crisp"
+// data-exam-contrast="yellow-on-black" data-exam-text="large"
+```
+
+- `VoyageExamContrast`：`black-on-white`（缺省，light）/ `white-on-black`（dark）/ `yellow-on-black`（dark + 考场层覆写）。
+- `VoyageExamTextSize`：`regular` 16px / `large` 19px / `x-large` 22px（`--vg-exam-text`，用 rem，浏览器默认字号也算进去）。
+- `VOYAGE_EXAM_CONTRASTS` / `VOYAGE_EXAM_TEXT_SIZES` 按 Options 的顺序排列，首项是缺省；从存储读出的旧值或非法值逐项回落到缺省。
+- 根节点是嵌套的 `.vg`，四轴由 helper 一次写死，不需要第二个 Provider。
+- 黄字黑底是 `tokens.css` 第 7 段的考场层覆写，不是主题：它没有有意义的浅色模式。
+- 0.17 只含 token、helper 与根节点规则（字体、字号、`color-scheme`、`accent-color`、`.vg-exam-mark` 荧光笔）。顶栏、说明条、题号导航等 `vg-exam-*` 外观原子在后续版本加入，宿主在那之前自行实现，只引用 `--vg-exam-*`。
+
+**日常界面**不套 `.vg-exam`，直接用 `examhall × light × plain × crisp`（`VOYAGE_APP_DEFAULTS.prism`）加 `<VoyageToolbar palette={false} />`：白底黑字、灰色说明条、1px 细线、近直角、墨色实心按钮（深色模式里是白色实心）。字体栈 `--vg-exam-font` 以 Arial 打头，Linux 回落到同字宽的 Liberation Sans；运行时不加载任何网络字体。
+
+**5 个通用 token**（第 3 段，所有主题都有缺省值，既有主题外观不变；examhall 给不透明的精确值）：
+
+| token | 用途 | 缺省 | examhall light / dark |
+|---|---|---|---|
+| `--vg-color-focus` | 焦点环；`.vg :focus-visible` 改用它 | `color-mix(in srgb, var(--acc) 70%, transparent)`（与 0.16 相同） | `#2f78ad` / `#89c8ff` |
+| `--vg-color-border-strong` | ≥3:1 的控件边框 | `var(--fg3)` | `#767676` / `#b0b0b0` |
+| `--vg-color-mark` / `-mark-text` | 荧光笔高亮 | `color-mix(in srgb, var(--warn) 30%, var(--bg1))` / `var(--fg)` | `#fff200` 底 `#000000` 字 / `#ffea00` 底 `#000000` 字 |
+| `--vg-color-flag` | 标记、复查 | `var(--warn)` | `#a35f00` / `#f0a840` |
+| `--vg-color-danger-solid` / `-solid-text` | 实心警示块 | `var(--red)` / `var(--bg1)` | `#b3261e` 底 `#ffffff` 字 / `#ff9088` 底 `#000000` 字 |
+
+examhall 的微调（第 6 段，排在对比层之后，`quiet` / `crisp` 都改不动它）还把实心按钮改成墨色（`--fill-grad: var(--fg)`），把 `.vg-input` / `.vg-btn` / 徽章的边框（`--line2-c`）提到 `border-strong`。焦点环在 examhall 下偏移 2px：环紧贴墨色实心按钮时，两者之间只有 1.2–4.4:1，要隔一圈底色。
+
+**`--vg-exam-*`**（第 7 段，只定义在 `.vg-exam` 上，全部从通用 token 推出，所以 `.vg-exam` 放在任何主题下都成立）：
+
+| token | 来源 / 值 | 用途 |
+|---|---|---|
+| `paper` / `ink` / `muted` / `subtle` | surface / text / text-muted / text-subtle | 作答区底与三级文字 |
+| `panel` / `hover` | surface-raised / control-hover | 说明条、已答格 / 悬停 |
+| `rule` / `field` | `--line` / border-strong | 装饰线与说明条边框 / 填空框、下拉框、矩阵线、未答轨道 |
+| `focus` / `link` | color-focus / accent-text | 焦点环 / 链接 |
+| `solid` / `solid-ink` | text / surface | 上一题、下一题、播放、交卷等实心按钮 |
+| `step-off` / `step-off-ink` | hover / muted | 禁用的步进按钮（悬停底上只用次级文字） |
+| `current` / `done` / `todo` | ink / ink / field | 当前题框 2px / 已答横条 3px / 未答轨道 1px |
+| `flag` / `mark` / `mark-ink` / `alert` / `alert-ink` | 上表的通用 token | 标记 / 高亮 / 警示块 |
+| `ok` `ok-bg` `ok-line` / `bad` `bad-bg` `bad-line` / `part` `part-bg` | success / danger / warning | 揭晓后的判定 |
+| `overlay` / `shadow` | color-overlay / shadow-popover | 遮罩 / 浮层阴影 |
+| `text` / `font` / `lh` / `lh-passage` | 1rem·1.1875rem·1.375rem / Arial 打头的字体栈 / 1.5 / 1.85 | 作答内容排印 |
+| `bar-h` / `nav-h` / `step` / `touch` / `gap-w` / `radius` | 56px / 54px / 48px / 44px / 9em / 控件圆角 | 结构尺寸 |
+
+**对比度**（WCAG 2.x；`e2e/exam-tokens.spec.ts` 在 Chromium / Firefox / WebKit 上用计算样式逐项断言门槛与精确值）：
+
+| 检查项 | 门槛 | 黑字白底 | 白字黑底 | 黄字黑底 |
+|---|---|---|---|---|
+| 正文：底 / 说明条 | 7 | 21.00 / 18.65 | 21.00 / 15.13 | 17.02 / 12.74 |
+| 次级文字：底 / 说明条 / 悬停底 | 4.5 | 6.79 / 6.03 / 5.00 | 14.45 / 10.41 / 8.69 | 14.10 / 10.56 / 8.86 |
+| 弱文字：底 / 说明条 | 4.5 | 5.57 / 4.95 | 10.59 / 7.63 | 12.05 / 9.02 |
+| 链接：底 / 说明条 | 4.5 | 6.09 / 5.41 | 13.68 / 9.86 | 17.02 / 12.74 |
+| 控件边框、未答轨道：底 / 说明条 | 3 | 4.54 / 4.03 | 9.68 / 6.98 | 12.31 / 9.21 |
+| 焦点环：底 / 说明条 | 3 | 4.76 / 4.23 | 11.77 / 8.48 | 21.00 / 15.72 |
+| 实心按钮的字 | 7 | 21.00 | 21.00 | 17.02 |
+| 高亮里的字 | 7 | 17.95 | 17.02 | 21.00 |
+| 标记：底 / 说明条 | 3 | 5.01 / 4.45 | 10.38 / 7.48 | 21.00 / 15.72 |
+| 判定 对 / 错 / 部分（字对染色底） | 4.5 | 6.38 / 6.22 / 6.22 | 9.07 / 7.45 / 8.66 | 10.03 / 8.33 / 9.82 |
+| 判定边框 对 / 错 | 3 | 7.28 / 7.33 | 12.37 / 9.60 | 13.67 / 10.73 |
+| 警示块的字 | 4.5 | 6.54 | 9.60 | 21.00 |
+
+- light 的弱文字放在悬停底（`bg3`）上只有 4.10:1，所以悬停、禁用底上的文字一律用次级文字。
+- 装饰线（`rule`）与禁用的步进按钮不承载状态，不要求对比度；表达状态的线都用 `field` 或 `ink`。
+
+**兼容性**：0.15 / 0.16 的运行时读到存了 `examhall` 或 `plain` 的偏好会判为非法并整体回落到缺省。只有同一个源下混用新旧版本时才会碰到。
+
+完整实景：`pnpm demo` 后打开 `http://127.0.0.1:4173/demo/exam-tokens.html`（三档配色、三档字号、`palette` 开关、嵌套根节点与全部 `--vg-exam-*` 色板；示例文字都是自写的合成内容）。
 
 ## 试衣间 (视觉回归基准)
 

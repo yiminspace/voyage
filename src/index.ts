@@ -2,10 +2,11 @@
  * @yiminlab/voyage — 主题偏好助手
  *
  * 样式本体在 tokens.css / voyage.css (纯 CSS, 零运行时依赖)。
- * 这里只做三件事:
+ * 这里只做四件事:
  *   1. 类型与常量 (四轴的合法取值、各应用默认组合);
  *   2. localStorage 偏好读写 + 应用到宿主元素;
- *   3. 生成免闪烁 (no-FOUC) 内联脚本, SSR 首屏前打上属性。
+ *   3. 生成免闪烁 (no-FOUC) 内联脚本, SSR 首屏前打上属性;
+ *   4. 考场根节点 (.vg-exam) 的属性生成。
  */
 
 export type VoyageTheme =
@@ -21,14 +22,15 @@ export type VoyageTheme =
   | 'everforest' // 常青林 — Everforest
   | 'iris'       // 鸢尾 — Taskdeck 高对比紫蓝
   | 'signal'     // 信号 — 纯黑白工作台 + 工具蓝
-  | 'trace';     // 轨迹纸 — 记录纸 / 蓝图双模式观测台
+  | 'trace'      // 轨迹纸 — 记录纸 / 蓝图双模式观测台
+  | 'examhall';  // 考场 — 白底黑字的机考界面
 
 export type VoyageMode = 'dark' | 'light';
-export type VoyageStyle = 'classic' | 'glass' | 'soft' | 'sharp' | 'cloud';
+export type VoyageStyle = 'classic' | 'glass' | 'soft' | 'sharp' | 'cloud' | 'plain';
 export type VoyageTone = 'normal' | 'quiet' | 'crisp';
 
 /** 与 package.json 同步；报告证据用它定位实际生效的 Voyage 版本。 */
-export const VOYAGE_VERSION = '0.16.0';
+export const VOYAGE_VERSION = '0.17.0';
 
 export interface VoyagePrefs {
   theme: VoyageTheme;
@@ -40,9 +42,10 @@ export interface VoyagePrefs {
 export const VOYAGE_THEMES: readonly VoyageTheme[] = [
   'slate', 'ink', 'github', 'nord', 'tokyo',
   'catppuccin', 'onedark', 'solarized', 'rosepine', 'everforest', 'iris', 'signal', 'trace',
+  'examhall',
 ] as const;
 export const VOYAGE_MODES: readonly VoyageMode[] = ['dark', 'light'] as const;
-export const VOYAGE_STYLES: readonly VoyageStyle[] = ['classic', 'glass', 'soft', 'sharp', 'cloud'] as const;
+export const VOYAGE_STYLES: readonly VoyageStyle[] = ['classic', 'glass', 'soft', 'sharp', 'cloud', 'plain'] as const;
 export const VOYAGE_TONES: readonly VoyageTone[] = ['normal', 'quiet', 'crisp'] as const;
 
 /** 全线缺省: 柔和 (久航) 是日常默认, normal 留给演示 / 截图 */
@@ -61,6 +64,7 @@ export const VOYAGE_APP_DEFAULTS: Record<string, VoyagePrefs> = {
   taskdeck:   { theme: 'iris',       mode: 'light', style: 'cloud',   tone: 'crisp' },
   skillloom:  { theme: 'signal',     mode: 'light', style: 'classic', tone: 'quiet' },
   brainws:    { theme: 'trace',      mode: 'light', style: 'classic', tone: 'quiet' },
+  prism:      { theme: 'examhall',   mode: 'light', style: 'plain',   tone: 'crisp' },
   // quarry 是本规格的原始基准: tone 用 normal (原版是实色 accent 填充,
   // 不是 quiet 的压明度+白字), 以贴合它现有视觉不变。
   quarry:     { theme: 'slate', mode: 'dark', style: 'classic', tone: 'normal' },
@@ -105,6 +109,7 @@ export const VOYAGE_PRESETS: readonly VoyagePreset[] = [
   { id: 'iris',       label: { zh: '鸢尾',   en: 'Iris' },           hint: { zh: 'Taskdeck 高对比圆角',   en: 'Taskdeck high contrast' }, theme: 'iris',       style: 'cloud',   tone: 'crisp' },
   { id: 'signal',     label: { zh: '信号',   en: 'Signal' },         hint: { zh: '纯黑白工作台',          en: 'Pure black-and-white workbench' }, theme: 'signal', style: 'classic', tone: 'quiet' },
   { id: 'trace',      label: { zh: '轨迹纸', en: 'Trace Paper' },    hint: { zh: '记录纸与蓝图观测台',    en: 'Paper and blueprint console' }, theme: 'trace',      style: 'classic', tone: 'quiet' },
+  { id: 'examhall',   label: { zh: '考场',   en: 'Exam Hall' },      hint: { zh: '白底黑字的机考界面',    en: 'Plain computer-based test screen' }, theme: 'examhall', style: 'plain', tone: 'crisp' },
 ] as const;
 
 /** preset + 当前明暗 -> 完整四轴偏好 */
@@ -229,6 +234,57 @@ export function voyageInitScript(
     "e.setAttribute('data-style',p.style);e.setAttribute('data-tone',p.tone);" +
     '}catch(e){}})();'
   );
+}
+
+/**
+ * 考场层: 一场考试自己的显示设置, 不是全站外观偏好 —— 不进 vg_prefs,
+ * 不出现在切换器里。两组取值的顺序就是 Options 里的顺序, 首项是缺省。
+ */
+export type VoyageExamContrast = 'black-on-white' | 'white-on-black' | 'yellow-on-black';
+export type VoyageExamTextSize = 'regular' | 'large' | 'x-large';
+
+export const VOYAGE_EXAM_CONTRASTS: readonly VoyageExamContrast[] = [
+  'black-on-white', 'white-on-black', 'yellow-on-black',
+] as const;
+export const VOYAGE_EXAM_TEXT_SIZES: readonly VoyageExamTextSize[] = ['regular', 'large', 'x-large'] as const;
+
+export interface VoyageExamDisplay {
+  contrast: VoyageExamContrast;
+  text: VoyageExamTextSize;
+}
+
+/** 考场根节点的全部属性; 可直接展开到 React 元素上 */
+export interface VoyageExamAttrs {
+  className: 'vg vg-exam';
+  'data-theme': 'examhall';
+  'data-mode': VoyageMode;
+  'data-style': 'plain';
+  'data-tone': 'crisp';
+  'data-exam-contrast': VoyageExamContrast;
+  'data-exam-text': VoyageExamTextSize;
+}
+
+function isOneOf<T extends string>(values: readonly T[], value: unknown): value is T {
+  return (values as readonly unknown[]).includes(value);
+}
+
+/**
+ * 一次生成考场根节点的属性, 避免手拼出不成立的组合: 四轴写死, mode 由对比度
+ * 决定 (black-on-white → light, 其余 → dark)。根节点是嵌套的 .vg, 外层偏好与
+ * 切换器预览都碰不到它。读自存储的旧值或非法值逐项回落到缺省。
+ */
+export function voyageExamAttrs(display: Partial<VoyageExamDisplay> = {}): VoyageExamAttrs {
+  const contrast = isOneOf(VOYAGE_EXAM_CONTRASTS, display.contrast) ? display.contrast : VOYAGE_EXAM_CONTRASTS[0];
+  const text = isOneOf(VOYAGE_EXAM_TEXT_SIZES, display.text) ? display.text : VOYAGE_EXAM_TEXT_SIZES[0];
+  return {
+    className: 'vg vg-exam',
+    'data-theme': 'examhall',
+    'data-mode': contrast === 'black-on-white' ? 'light' : 'dark',
+    'data-style': 'plain',
+    'data-tone': 'crisp',
+    'data-exam-contrast': contrast,
+    'data-exam-text': text,
+  };
 }
 
 export * from './report';

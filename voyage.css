@@ -521,9 +521,12 @@
 
 /* ---- 可访问性: 焦点环 (全组件统一) ---- */
 .vg :focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--acc) 70%, transparent);
+  outline: 2px solid var(--vg-color-focus);
   outline-offset: 1px;
 }
+/* examhall 有墨色实心按钮: 焦点环紧贴时与按钮本身只有 1.2–4.4:1,
+   偏移 2px 让环与按钮之间隔一圈底色 */
+.vg[data-theme='examhall'] :focus-visible { outline-offset: 2px; }
 
 /* ---- 滚动条 ---- */
 .vg ::-webkit-scrollbar { width: 8px; height: 8px; }
@@ -1656,4 +1659,31 @@
   .vg-spinner { animation: none; }
   .vg-dashboard-action-card,
   .vg-dashboard-switch > span { transition: none; }
+}
+
+/* ---- 考场根节点 (.vg-exam, 属性由 voyageExamAttrs() 一次生成) ----
+   0.17 只放根节点本身与荧光笔; 顶栏、说明条、题号导航等 vg-exam-* 外观原子
+   留到后续版本。颜色全部来自 tokens.css 第 7 段的 --vg-exam-*。
+   color-scheme 用 only: 浏览器的自动深色不得改写考场配色。 */
+.vg-exam {
+  font-family: var(--vg-exam-font);
+  font-size: var(--vg-exam-text);
+  line-height: var(--vg-exam-lh);
+  color: var(--vg-exam-ink);
+  background-color: var(--vg-exam-paper);
+  accent-color: var(--vg-exam-ink);
+}
+.vg.vg-exam[data-mode='light'] { color-scheme: only light; }
+.vg.vg-exam[data-mode='dark'] { color-scheme: only dark; }
+.vg-exam-mark {
+  border-radius: 0;
+  background-color: var(--vg-exam-mark);
+  color: var(--vg-exam-mark-ink);
+}
+@media (forced-colors: active) {
+  .vg-exam-mark {
+    forced-color-adjust: none;
+    background-color: Mark;
+    color: MarkText;
+  }
 }
