@@ -11,6 +11,8 @@ import {
 } from '../src';
 import { VoyageProvider, VoyageToolbar } from '../src/react';
 
+const demoTheme = new URLSearchParams(location.search).get('theme') === 'ielts' ? 'ielts' : 'examhall';
+
 const CONTRAST_LABELS: Record<VoyageExamContrast, string> = {
   'black-on-white': 'Black on white',
   'white-on-black': 'White on black',
@@ -135,6 +137,7 @@ function ExamSample({ display }: { display: VoyageExamDisplay }) {
 
 function ExamTokensDemo() {
   const [display, setDisplay] = useState<VoyageExamDisplay>({
+    theme: demoTheme,
     contrast: VOYAGE_EXAM_CONTRASTS[0],
     text: VOYAGE_EXAM_TEXT_SIZES[0],
   });
@@ -145,7 +148,7 @@ function ExamTokensDemo() {
       <header className="demo-head">
         <div>
           <h1>Exam hall tokens</h1>
-          <p>examhall × plain × crisp, with a nested .vg-exam root from voyageExamAttrs()</p>
+          <p>{demoTheme} × plain × crisp, with a nested .vg-exam root from voyageExamAttrs()</p>
         </div>
         <span className="demo-sp" />
         <VoyageToolbar locale="en" palette={palette} />
@@ -205,7 +208,7 @@ const rootElement = document.getElementById('exam-demo-root');
 if (!rootElement) throw new Error('missing #exam-demo-root');
 
 createRoot(rootElement).render(
-  <VoyageProvider defaults={VOYAGE_APP_DEFAULTS.prism} storageKey="voyage-demo:exam-tokens">
+  <VoyageProvider defaults={demoTheme === 'ielts' ? VOYAGE_APP_DEFAULTS.ielts : VOYAGE_APP_DEFAULTS.prism} storageKey={`voyage-demo:exam-tokens:${demoTheme}`}>
     <ExamTokensDemo />
   </VoyageProvider>
 );

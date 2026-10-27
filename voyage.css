@@ -527,6 +527,7 @@
 /* examhall 有墨色实心按钮: 焦点环紧贴时与按钮本身只有 1.2–4.4:1,
    偏移 2px 让环与按钮之间隔一圈底色 */
 .vg[data-theme='examhall'] :focus-visible { outline-offset: 2px; }
+.vg[data-theme='ielts'] :focus-visible { outline-offset: 2px; }
 
 /* ---- 滚动条 ---- */
 .vg ::-webkit-scrollbar { width: 8px; height: 8px; }

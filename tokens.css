@@ -165,6 +165,24 @@
   --red-fg:#ff9088;  --red-bg:#3a1412;
 }
 
+/* IELTS Lab — 沿用考场可读性，中性白灰与应用现有版面一致。
+   ielts 考场 — 白底黑字的机考界面 / 白字黑底。
+   light 的 bg2 / bg3 / line 与参照机考界面实测值一致 (说明条底、首题的禁用步进钮、
+   说明条边框); 其余值按 WCAG 门槛定, 对比度表见 README「考场层」。 */
+.vg[data-theme='ielts'][data-mode='light'] { --bg0:#ffffff; --bg1:#ffffff; --bg2:#f1f1ed; --bg3:#dddddd; --line:#d5d5d5; --line2:#b9b9b9; --accent:#2f78ad; --accent-hi:#3a86bd; --accent-ink:#ffffff; --ok:#1f7a3d; --warn:#8a5a00; --red:#b3261e; }
+.vg[data-theme='ielts'][data-mode='dark'] { --bg0:#000000; --bg1:#000000; --bg2:#262626; --bg3:#333333; --line:#555555; --line2:#777777; --accent:#89c8ff; --accent-hi:#a6d6ff; --accent-ink:#000000; --ok:#5fd38a; --warn:#f2bd5c; --red:#ff8a80; }
+/* 判定色 (对 / 部分 / 错) 手写 -fg / -bg: 推导公式在纯白/纯黑底上给不出 ≥4.5 的字底对 */
+.vg[data-theme='ielts'][data-mode='light'] {
+  --ok-fg:#17633c;   --ok-bg:#e7f3eb;
+  --warn-fg:#755400; --warn-bg:#fff2cc;
+  --red-fg:#923a2c;  --red-bg:#f9e9e5;
+}
+.vg[data-theme='ielts'][data-mode='dark'] {
+  --ok-fg:#6fdc98;   --ok-bg:#0e2a18;
+  --warn-fg:#f2bd5c; --warn-bg:#33250a;
+  --red-fg:#ff9088;  --red-bg:#3a1412;
+}
+
 /* ---------------------------------------------------------------------------
    3. 有效变量层: 组件只消费这一层, tone / style 通过覆写它们生效
       色阶语义 (12 级): 1-2 底面 / 3-5 染色底 / 6-8 边框 / 9-10 实色 /
@@ -472,6 +490,47 @@
   --vg-color-danger-solid: #ff9088;
   --vg-color-danger-solid-text: #000000;
 }
+
+/* ielts: 纯黑白文字层级, 墨色实心按钮 (不是蓝色), 控件边框提到 ≥3:1。
+   与对比层同特异度 (0,3,0), 排在其后, 所以 quiet / crisp 都改不动它。 */
+.vg[data-theme='ielts'][data-mode='light'] {
+  --fg: #000000;
+  --fg2: #5b5b5b;
+  --fg3: #686868;
+  --fill-grad: var(--fg);
+  --fill-ink: var(--bg1);
+  --acc-text: #22669c;
+  --line2-c: var(--vg-color-border-strong);
+  --app-img: none;
+  --vg-color-focus: #2f78ad;
+  --vg-color-border-strong: #767676;
+  --vg-color-mark: #fff200;
+  --vg-color-mark-text: #000000;
+  --vg-color-flag: #a35f00;
+  --vg-color-danger-solid: #b3261e;
+  --vg-color-danger-solid-text: #ffffff;
+}
+.vg[data-theme='ielts'][data-mode='dark'] {
+  --fg: #ffffff;
+  --fg2: #d6d6d6;
+  --fg3: #b8b8b8;
+  --fill-grad: var(--fg);
+  --fill-ink: var(--bg1);
+  --acc-text: #a6d6ff;
+  --line2-c: var(--vg-color-border-strong);
+  --app-img: none;
+  --vg-color-focus: #89c8ff;
+  --vg-color-border-strong: #b0b0b0;
+  --vg-color-mark: #ffea00;
+  --vg-color-mark-text: #000000;
+  --vg-color-flag: #f0a840;
+  --vg-color-danger-solid: #ff9088;
+  --vg-color-danger-solid-text: #000000;
+}
+
+/* IELTS 只在 plain 组合收紧控件圆角；其他结构风格仍由 style 轴负责。 */
+.vg[data-theme='ielts'][data-style='plain'] { --r-btn: 2px; }
+.vg[data-theme='ielts'] { --vg-font-ui: Arial, Helvetica, 'Liberation Sans', Arimo, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans SC', sans-serif; }
 
 /* ---------------------------------------------------------------------------
    7. 考场层: .vg-exam 根节点上的 --vg-exam-* token

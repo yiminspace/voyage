@@ -23,14 +23,15 @@ export type VoyageTheme =
   | 'iris'       // 鸢尾 — Taskdeck 高对比紫蓝
   | 'signal'     // 信号 — 纯黑白工作台 + 工具蓝
   | 'trace'      // 轨迹纸 — 记录纸 / 蓝图双模式观测台
-  | 'examhall';  // 考场 — 白底黑字的机考界面
+  | 'examhall'   // 考场 — 白底黑字的机考界面
+  | 'ielts';     // IELTS Lab — 中性白灰 / Arial / 近直角
 
 export type VoyageMode = 'dark' | 'light';
 export type VoyageStyle = 'classic' | 'glass' | 'soft' | 'sharp' | 'cloud' | 'plain';
 export type VoyageTone = 'normal' | 'quiet' | 'crisp';
 
 /** 与 package.json 同步；报告证据用它定位实际生效的 Voyage 版本。 */
-export const VOYAGE_VERSION = '0.17.0';
+export const VOYAGE_VERSION = '0.18.0';
 
 export interface VoyagePrefs {
   theme: VoyageTheme;
@@ -42,7 +43,7 @@ export interface VoyagePrefs {
 export const VOYAGE_THEMES: readonly VoyageTheme[] = [
   'slate', 'ink', 'github', 'nord', 'tokyo',
   'catppuccin', 'onedark', 'solarized', 'rosepine', 'everforest', 'iris', 'signal', 'trace',
-  'examhall',
+  'examhall', 'ielts',
 ] as const;
 export const VOYAGE_MODES: readonly VoyageMode[] = ['dark', 'light'] as const;
 export const VOYAGE_STYLES: readonly VoyageStyle[] = ['classic', 'glass', 'soft', 'sharp', 'cloud', 'plain'] as const;
@@ -64,6 +65,7 @@ export const VOYAGE_APP_DEFAULTS: Record<string, VoyagePrefs> = {
   taskdeck:   { theme: 'iris',       mode: 'light', style: 'cloud',   tone: 'crisp' },
   skillloom:  { theme: 'signal',     mode: 'light', style: 'classic', tone: 'quiet' },
   brainws:    { theme: 'trace',      mode: 'light', style: 'classic', tone: 'quiet' },
+  ielts:      { theme: 'ielts',      mode: 'light', style: 'plain',   tone: 'crisp' },
   prism:      { theme: 'examhall',   mode: 'light', style: 'plain',   tone: 'crisp' },
   // quarry 是本规格的原始基准: tone 用 normal (原版是实色 accent 填充,
   // 不是 quiet 的压明度+白字), 以贴合它现有视觉不变。
@@ -110,6 +112,7 @@ export const VOYAGE_PRESETS: readonly VoyagePreset[] = [
   { id: 'signal',     label: { zh: '信号',   en: 'Signal' },         hint: { zh: '纯黑白工作台',          en: 'Pure black-and-white workbench' }, theme: 'signal', style: 'classic', tone: 'quiet' },
   { id: 'trace',      label: { zh: '轨迹纸', en: 'Trace Paper' },    hint: { zh: '记录纸与蓝图观测台',    en: 'Paper and blueprint console' }, theme: 'trace',      style: 'classic', tone: 'quiet' },
   { id: 'examhall',   label: { zh: '考场',   en: 'Exam Hall' },      hint: { zh: '白底黑字的机考界面',    en: 'Plain computer-based test screen' }, theme: 'examhall', style: 'plain', tone: 'crisp' },
+  { id: 'ielts', label: { zh: '雅思练习', en: 'IELTS Lab' }, hint: { zh: '白灰练习室与机考', en: 'Neutral IELTS practice room' }, theme: 'ielts', style: 'plain', tone: 'crisp' },
 ] as const;
 
 /** preset + 当前明暗 -> 完整四轴偏好 */
@@ -248,7 +251,11 @@ export const VOYAGE_EXAM_CONTRASTS: readonly VoyageExamContrast[] = [
 ] as const;
 export const VOYAGE_EXAM_TEXT_SIZES: readonly VoyageExamTextSize[] = ['regular', 'large', 'x-large'] as const;
 
+export type VoyageExamTheme = 'examhall' | 'ielts';
+
 export interface VoyageExamDisplay {
+  /** 缺省保留 examhall；IELTS 宿主可选择独立的 ielts 主题。 */
+  theme?: VoyageExamTheme;
   contrast: VoyageExamContrast;
   text: VoyageExamTextSize;
 }
@@ -256,7 +263,7 @@ export interface VoyageExamDisplay {
 /** 考场根节点的全部属性; 可直接展开到 React 元素上 */
 export interface VoyageExamAttrs {
   className: 'vg vg-exam';
-  'data-theme': 'examhall';
+  'data-theme': VoyageExamTheme;
   'data-mode': VoyageMode;
   'data-style': 'plain';
   'data-tone': 'crisp';
@@ -269,7 +276,7 @@ function isOneOf<T extends string>(values: readonly T[], value: unknown): value 
 }
 
 /**
- * 一次生成考场根节点的属性, 避免手拼出不成立的组合: 四轴写死, mode 由对比度
+ * 一次生成考场根节点的属性, 避免手拼出不成立的组合: 主题可选, style/tone 固定, mode 由对比度
  * 决定 (black-on-white → light, 其余 → dark)。根节点是嵌套的 .vg, 外层偏好与
  * 切换器预览都碰不到它。读自存储的旧值或非法值逐项回落到缺省。
  */
@@ -278,7 +285,7 @@ export function voyageExamAttrs(display: Partial<VoyageExamDisplay> = {}): Voyag
   const text = isOneOf(VOYAGE_EXAM_TEXT_SIZES, display.text) ? display.text : VOYAGE_EXAM_TEXT_SIZES[0];
   return {
     className: 'vg vg-exam',
-    'data-theme': 'examhall',
+    'data-theme': display.theme === 'ielts' ? 'ielts' : 'examhall',
     'data-mode': contrast === 'black-on-white' ? 'light' : 'dark',
     'data-style': 'plain',
     'data-tone': 'crisp',
