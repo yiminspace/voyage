@@ -2,6 +2,12 @@
 
 本文件从 0.17.0 开始记录；更早的版本见 git 历史与 `voyage-v<version>` tag。
 
+## 0.18.0
+
+- 新增正式 `ielts` 主题、策展卡与 `VOYAGE_APP_DEFAULTS.ielts`：中性白灰、Arial、plain 下 2px 控件圆角。
+- `voyageExamAttrs({ theme: 'ielts' })` 允许 IELTS 专用考场根节点，三档对比度与字号沿用考场层；不传主题仍使用 `examhall`。
+- 增加主题注册、偏好恢复与真实浏览器主题/对比度/字号隔离测试。
+
 ## 0.17.0
 
 考场层的 token 与 helper。只做加法，既有主题外观不变；`vg-exam-*` 外观原子（顶栏、说明条、题号导航等）不在本版。

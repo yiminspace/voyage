@@ -10,7 +10,7 @@ yiminlab 统一样式系统。**所有 GUI 应用的视觉基础**: 一套 quarr
 
 | 轴 | 取值 | 管什么 |
 |---|---|---|
-| `data-theme` | 自研: `slate` 板岩铜 (quarry 基准) / `ink` 纸墨朱 / `iris` 鸢尾 (Taskdeck 高对比基准) / `signal` 信号 (纯黑白工作台) / `trace` 轨迹纸 (记录纸与蓝图观测台) / `examhall` 考场 (白底黑字的机考界面, 见「考场层」); 经典采编 (MIT, 出处见 tokens.css): `github` 石墨 (兼 evolve GUI 基准, accent 取 Primer 链接蓝) / `nord` 北极 / `tokyo` 东京夜 / `catppuccin` 摩卡 / `onedark` 原子 / `solarized` 日晒 / `rosepine` 玫瑰松 / `everforest` 常青林 | 颜色 |
+| `data-theme` | 自研: `slate` 板岩铜 (quarry 基准) / `ink` 纸墨朱 / `iris` 鸢尾 (Taskdeck 高对比基准) / `signal` 信号 (纯黑白工作台) / `trace` 轨迹纸 (记录纸与蓝图观测台) / `ielts` 雅思练习（IELTS Lab，中性白灰） / `examhall` 考场 (白底黑字的机考界面, 见「考场层」); 经典采编 (MIT, 出处见 tokens.css): `github` 石墨 (兼 evolve GUI 基准, accent 取 Primer 链接蓝) / `nord` 北极 / `tokyo` 东京夜 / `catppuccin` 摩卡 / `onedark` 原子 / `solarized` 日晒 / `rosepine` 玫瑰松 / `everforest` 常青林 | 颜色 |
 | `data-mode` | `dark` / `light` | 底色深浅 |
 | `data-style` | `classic` / `glass` / `soft` / `sharp` / `cloud` / `plain` | 结构: 圆角 / 密度 / 材质 / 阴影；`cloud` 是 Taskdeck 的大圆角与清晰阴影；`plain` 素: 控件 3px / 窗口 4px, 比 `sharp` 宽松, 无阴影/发光/模糊, 表头不转大写 |
 | `data-tone` | `normal` / `quiet` / `crisp` | 对比强度; **quiet (久航) 是日常默认**, `crisp` 强化层级与边界 |
@@ -29,7 +29,7 @@ yiminlab 统一样式系统。**所有 GUI 应用的视觉基础**: 一套 quarr
 
 **语义色**: `--ok` / `--warn` / `--red` 三枚种子色**随主题走**, 每套主题在 tokens.css 第 2 段自报 dark 与 light 两档 —— 全主题共用一枚 Primer 红会让 everforest、rosepine 这类有自己色相语言的主题出戏。配套的染色底 `--*-bg` 与彩色文字 `--*-fg` 由第 3 段用 `color-mix` 从种子色推导, 不必逐主题手调; 只有 `slate` (quarry 基准) 与 `github` (evolve GUI 基准) 在主题矩阵里手写覆写这几位, 因为它们要逐值保真既有视觉。
 
-新增主题时**必须给全三枚种子色**: CSS 自定义属性没有继承兜底, 漏给会让 `.vg-badge` / `.vg-state` 吃到空值直接变透明 —— 表现为「徽章没了」而非「颜色不对」, 极难察觉。`tokens-theme.test.ts` 对全部 14 × 2 组合逐一断言, 漏给即红。
+新增主题时**必须给全三枚种子色**: CSS 自定义属性没有继承兜底, 漏给会让 `.vg-badge` / `.vg-state` 吃到空值直接变透明 —— 表现为「徽章没了」而非「颜色不对」, 极难察觉。`tokens-theme.test.ts` 对全部 15 × 2 组合逐一断言, 漏给即红。
 
 ## 用法
 
@@ -319,6 +319,7 @@ intake API 接收完整 JSON 报告。成功响应可以直接返回 GitHub 风�
 | taskdeck | iris 鸢尾 | light | cloud | crisp |
 | skillloom | signal 信号 | light | classic | quiet |
 | brainws | trace 轨迹纸 | light | classic | quiet |
+| IELTS Lab | ielts 雅思练习 | light | plain | crisp |
 | prism | examhall 考场 | light | plain | crisp |
 | quarry | slate 板岩铜 (原始基准) | dark | classic | normal |
 | portal | — 搁置, 保持现有设计 | | | |
@@ -534,3 +535,17 @@ pnpm build
 - [ ] engram 迁移 (首个宿主) → jsontailor → ai
 - [ ] focus / disabled / pressed / loading 状态完备化
 - [ ] 间距与排印 scale 系统化
+
+## IELTS Lab 主题（0.18）
+
+`VOYAGE_APP_DEFAULTS.ielts` 使用 `ielts × light × plain × crisp`。它是正式主题轴成员，
+与 `examhall` 分开：白底黑字、中性灰说明条、Arial 字体栈、plain 下 2px 控件圆角。
+保留考场层的三档对比度、三档字号与可读性约束；现有 `examhall` 外观及 helper 缺省不变。
+
+```tsx
+<VoyageProvider defaults={VOYAGE_APP_DEFAULTS.ielts} storageKey="ielts:vg_prefs">…</VoyageProvider>
+<section {...voyageExamAttrs({ theme: 'ielts', contrast: 'black-on-white', text: 'regular' })}>…</section>
+```
+
+IELTS 业务布局仍由宿主实现；此主题不提供评分、题库或登录授权。登录 UI 继续消费
+`@yiminlab/authkit/voyage`。运行 `demo/exam-tokens.html?theme=ielts` 可查看考场及日常控件。
