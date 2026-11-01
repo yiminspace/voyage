@@ -2,6 +2,10 @@
 
 本文件从 0.17.0 开始记录；更早的版本见 git 历史与 `voyage-v<version>` tag。
 
+## 0.17.1
+
+移除已停用 Prism 的应用默认组合；考场示例直接使用通用四轴配置。`examhall`、`plain`、考场 token/helper 与 `palette` 能力保持不变。
+
 ## 0.17.0
 
 考场层的 token 与 helper。只做加法，既有主题外观不变；`vg-exam-*` 外观原子（顶栏、说明条、题号导航等）不在本版。

@@ -1,7 +1,6 @@
 import { useLayoutEffect, useRef, useState, type CSSProperties } from 'react';
 import { createRoot } from 'react-dom/client';
 import {
-  VOYAGE_APP_DEFAULTS,
   VOYAGE_EXAM_CONTRASTS,
   VOYAGE_EXAM_TEXT_SIZES,
   voyageExamAttrs,
@@ -205,7 +204,7 @@ const rootElement = document.getElementById('exam-demo-root');
 if (!rootElement) throw new Error('missing #exam-demo-root');
 
 createRoot(rootElement).render(
-  <VoyageProvider defaults={VOYAGE_APP_DEFAULTS.prism} storageKey="voyage-demo:exam-tokens">
+  <VoyageProvider defaults={{ theme: 'examhall', mode: 'light', style: 'plain', tone: 'crisp' }} storageKey="voyage-demo:exam-tokens">
     <ExamTokensDemo />
   </VoyageProvider>
 );

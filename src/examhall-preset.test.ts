@@ -44,15 +44,6 @@ beforeEach(() => {
 });
 
 describe('examhall preset', () => {
-  it('公开 Prism 的应用默认组合', () => {
-    expect(VOYAGE_APP_DEFAULTS.prism).toEqual({
-      theme: 'examhall',
-      mode: 'light',
-      style: 'plain',
-      tone: 'crisp',
-    });
-  });
-
   it('examhall 进入主题轴, plain 进入风格轴', () => {
     expect(VOYAGE_THEMES).toContain('examhall');
     expect(VOYAGE_STYLES).toContain('plain');
@@ -76,8 +67,10 @@ describe('examhall preset', () => {
   });
 
   it('存下的 examhall × plain 偏好可以读回', () => {
-    saveVoyagePrefs(VOYAGE_APP_DEFAULTS.prism, 'prism:vg_prefs');
-    expect(loadVoyagePrefs(VOYAGE_APP_DEFAULTS.engram, 'prism:vg_prefs')).toEqual(VOYAGE_APP_DEFAULTS.prism);
+    const preset = VOYAGE_PRESETS.find(({ id }) => id === 'examhall');
+    const prefs = voyagePresetPrefs(preset!, 'light');
+    saveVoyagePrefs(prefs, 'exam-test:vg_prefs');
+    expect(loadVoyagePrefs(VOYAGE_APP_DEFAULTS.engram, 'exam-test:vg_prefs')).toEqual(prefs);
   });
 
   it('VOYAGE_VERSION 与 package.json 同步', () => {

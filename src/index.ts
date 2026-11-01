@@ -30,7 +30,7 @@ export type VoyageStyle = 'classic' | 'glass' | 'soft' | 'sharp' | 'cloud' | 'pl
 export type VoyageTone = 'normal' | 'quiet' | 'crisp';
 
 /** 与 package.json 同步；报告证据用它定位实际生效的 Voyage 版本。 */
-export const VOYAGE_VERSION = '0.17.0';
+export const VOYAGE_VERSION = '0.17.1';
 
 export interface VoyagePrefs {
   theme: VoyageTheme;
@@ -64,7 +64,6 @@ export const VOYAGE_APP_DEFAULTS: Record<string, VoyagePrefs> = {
   taskdeck:   { theme: 'iris',       mode: 'light', style: 'cloud',   tone: 'crisp' },
   skillloom:  { theme: 'signal',     mode: 'light', style: 'classic', tone: 'quiet' },
   brainws:    { theme: 'trace',      mode: 'light', style: 'classic', tone: 'quiet' },
-  prism:      { theme: 'examhall',   mode: 'light', style: 'plain',   tone: 'crisp' },
   // quarry 是本规格的原始基准: tone 用 normal (原版是实色 accent 填充,
   // 不是 quiet 的压明度+白字), 以贴合它现有视觉不变。
   quarry:     { theme: 'slate', mode: 'dark', style: 'classic', tone: 'normal' },

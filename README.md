@@ -319,7 +319,6 @@ intake API 接收完整 JSON 报告。成功响应可以直接返回 GitHub 风�
 | taskdeck | iris 鸢尾 | light | cloud | crisp |
 | skillloom | signal 信号 | light | classic | quiet |
 | brainws | trace 轨迹纸 | light | classic | quiet |
-| prism | examhall 考场 | light | plain | crisp |
 | quarry | slate 板岩铜 (原始基准) | dark | classic | normal |
 | portal | — 搁置, 保持现有设计 | | | |
 
@@ -344,7 +343,7 @@ import { voyageExamAttrs } from '@yiminlab/voyage';
 - 黄字黑底是 `tokens.css` 第 7 段的考场层覆写，不是主题：它没有有意义的浅色模式。
 - 0.17 只含 token、helper 与根节点规则（字体、字号、`color-scheme`、`accent-color`、`.vg-exam-mark` 荧光笔）。顶栏、说明条、题号导航等 `vg-exam-*` 外观原子在后续版本加入，宿主在那之前自行实现，只引用 `--vg-exam-*`。
 
-**日常界面**不套 `.vg-exam`，直接用 `examhall × light × plain × crisp`（`VOYAGE_APP_DEFAULTS.prism`）加 `<VoyageToolbar palette={false} />`：白底黑字、灰色说明条、1px 细线、近直角、墨色实心按钮（深色模式里是白色实心）。字体栈 `--vg-exam-font` 以 Arial 打头，Linux 回落到同字宽的 Liberation Sans；运行时不加载任何网络字体。
+**日常界面**不套 `.vg-exam`，直接用 `examhall × light × plain × crisp` 加 `<VoyageToolbar palette={false} />`：白底黑字、灰色说明条、1px 细线、近直角、墨色实心按钮（深色模式里是白色实心）。字体栈 `--vg-exam-font` 以 Arial 打头，Linux 回落到同字宽的 Liberation Sans；运行时不加载任何网络字体。
 
 **5 个通用 token**（第 3 段，所有主题都有缺省值，既有主题外观不变；examhall 给不透明的精确值）：
 
