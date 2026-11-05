@@ -33,8 +33,10 @@ export interface VoyageToolbarProps {
    * endpoint 接收证据包并由服务端创建带 intake 标签的 GitHub Issue。
    */
   reporter?: Omit<VoyageIssueReporterProps, 'locale' | 'className'> | VoyageToolbarPlaceholder;
+  /** 可选 GitHub 仓库链接，在主题控件之后、账户入口之前打开新标签页。 */
+  githubHref?: string;
   /**
-   * 可选账户入口，固定排在调色板之后。通常传 VoyageAccountMenu，或由
+   * 可选账户入口，固定排在末尾。通常传 VoyageAccountMenu，或由
    * @yiminlab/authkit/voyage 提供的 VoyageAuthMenu；不传则不渲染也不留空位。
    */
   account?: ReactNode;
@@ -56,10 +58,10 @@ const PLACEHOLDER_LABELS: Record<VoyageLocale, { reporter: string; language: str
 };
 
 /**
- * 顶栏工具条: 把反馈、语言、主题切换器 (明暗 + 调色板) 与可选账户入口
+ * 顶栏工具条: 把反馈、语言、主题切换器 (明暗 + 调色板)、GitHub 与可选账户入口
  * 按固定顺序排成一行。
  *
- * 完整顺序为 反馈 | 语言 → 明暗 → 调色板 → 账户，由这里的 DOM 结构固化，
+ * 完整顺序为 反馈 | 语言 → 明暗 → 调色板 → GitHub → 账户，由这里的 DOM 结构固化，
  * 不再交给宿主自己拼 JSX。
  * 此前 VoyageSwitcher 与 VoyageLangSwitcher 是两个独立导出, 谁左谁右无人约束,
  * 结果两个宿主排成了相反的顺序 —— 设计系统管住了每颗钮"长什么样", 却没管
@@ -83,6 +85,7 @@ export function VoyageToolbar({
   icons,
   palette = true,
   reporter,
+  githubHref,
   account,
 }: VoyageToolbarProps = {}) {
   const placeholderLabels = PLACEHOLDER_LABELS[locale];
@@ -121,6 +124,16 @@ export function VoyageToolbar({
         <VoyageLangSwitcher locale={locale} onLocaleChange={onLocaleChange} />
       ) : null}
       <VoyageSwitcher locale={locale} icons={icons} palette={palette} />
+      {githubHref ? (
+        <a className="vg-iconbtn vg-topbar-github" href={githubHref} target="_blank" rel="noreferrer"
+          aria-label="GitHub" title="GitHub">
+          {/* Tabler Icons brand-github (MIT), sized like the appearance icons. */}
+          <svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor"
+            strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+          </svg>
+        </a>
+      ) : null}
       {account ? <div className="vg-topbar-account">{account}</div> : null}
     </div>
   );

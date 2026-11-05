@@ -31,7 +31,7 @@ export type VoyageStyle = 'classic' | 'glass' | 'soft' | 'sharp' | 'cloud' | 'pl
 export type VoyageTone = 'normal' | 'quiet' | 'crisp';
 
 /** 与 package.json 同步；报告证据用它定位实际生效的 Voyage 版本。 */
-export const VOYAGE_VERSION = '0.18.0';
+export const VOYAGE_VERSION = '0.19.0';
 
 export interface VoyagePrefs {
   theme: VoyageTheme;

@@ -89,7 +89,7 @@ function App() {
 
 - **`VoyageProvider`** — 挂载时执行 `initVoyage`, 通过 context 分发偏好与 setter; 需要同时维护 tailwind `.dark` class 的应用传 `syncDarkClass`。嵌入 iframe 或微前端时传 `target={appRoot}` 与独立 `storageKey`, 四轴和 `.dark` 都只落在该根节点。SSR 场景仍需配合 `voyageInitScript` 防闪烁 (本组件只管挂载后的状态)。
 - **`useVoyage()`** — 返回 `{ prefs, target, setTheme, setMode, setStyle, setTone, setPrefs, reset }`; 缺省写入 `localStorage('vg_prefs')` 并同步 `<html>`, scoped Provider 则使用自己的 key 与根节点。
-- **`VoyageToolbar`** — **顶栏首选**: 把反馈入口、语言钮、主题切换器与可选账户入口按固定顺序排成一行。缺省仍是 **语言 → 明暗 → 调色板**；全部启用时是 **反馈 | 语言 → 明暗 → 调色板 → 账户**。明暗与调色板同属主题外观、天然相邻; 语言是另一维度的设置, 整体靠边而非夹在主题族旁边。不传 `onLocaleChange` 则不渲染语言钮，不传 `account` 则不渲染账户区或空占位。`icons` 透传给内部的 `VoyageSwitcher`。主题由产品固定、只开放明暗的宿主传 `palette={false}`：调色板钮和主题面板都不渲染，其余顺序不变。
+- **`VoyageToolbar`** — **顶栏首选**: 把反馈入口、语言钮、主题切换器、可选 GitHub 链接与账户入口按固定顺序排成一行。缺省仍是 **语言 → 明暗 → 调色板**；全部启用时是 **反馈 | 语言 → 明暗 → 调色板 → GitHub → 账户**。明暗与调色板同属主题外观、天然相邻; 语言是另一维度的设置, 整体靠边而非夹在主题族旁边。不传 `onLocaleChange` 则不渲染语言钮，不传 `account` 则不渲染账户区或空占位。传入 `githubHref` 指定 GitHub 仓库链接，在新标签页打开；省略时不占位。`icons` 透传给内部的 `VoyageSwitcher`。主题由产品固定、只开放明暗的宿主传 `palette={false}`：调色板钮和主题面板都不渲染，其余顺序不变。
 
   scoped root 也要消除首帧闪烁时，把 `voyageInitScript(..., { targetSelector, storageKey })` 生成的脚本放在目标元素之后、React/Vite module 之前；放在 `<head>` 时 body 内的 selector 尚不存在，脚本会安全跳过并等 Provider 挂载。
 
