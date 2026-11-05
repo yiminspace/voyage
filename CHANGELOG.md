@@ -2,6 +2,10 @@
 
 本文件从 0.17.0 开始记录；更早的版本见 git 历史与 `voyage-v<version>` tag。
 
+## 0.19.0
+
+- `VoyageToolbar.githubHref` 提供可选 GitHub 仓库入口，位于主题控件和账户入口之间。链接使用标准图标按钮样式，在新标签页打开。
+
 ## 0.18.0
 
 - 新增正式 `ielts` 主题、策展卡与 `VOYAGE_APP_DEFAULTS.ielts`：中性白灰、Arial、plain 下 2px 控件圆角。

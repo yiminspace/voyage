@@ -49,6 +49,24 @@ describe('VoyageToolbar', () => {
     expect(classNames[1]).toMatch(/\bvg-switcher-mode\b/);
     expect(classNames[2]).toMatch(/\bvg-switcher-trigger\b/);
     expect(classNames).toHaveLength(3);
+    expect(document.querySelector('.vg-topbar-github')).toBeNull();
+  });
+
+  it('GitHub 链接在主题控件之后、账户之前，并在新标签页打开', () => {
+    const githubHref = 'https://github.com/yiminspace/voyage';
+    const { getByRole } = render(
+      <VoyageProvider>
+        <VoyageToolbar githubHref={githubHref} account={<button type="button">用户菜单</button>} />
+      </VoyageProvider>
+    );
+
+    const link = getByRole('link', { name: 'GitHub' });
+    expect(link.matches('.vg-topbar > .vg-iconbtn.vg-topbar-github')).toBe(true);
+    expect(link.previousElementSibling?.matches('.vg-switcher')).toBe(true);
+    expect(link.nextElementSibling?.matches('.vg-topbar-account')).toBe(true);
+    expect(link.getAttribute('href')).toBe(githubHref);
+    expect(link.getAttribute('target')).toBe('_blank');
+    expect(link.getAttribute('rel')).toBe('noreferrer');
   });
 
   it('不传 onLocaleChange 时不渲染语言钮, 其余两颗顺序不变', () => {
