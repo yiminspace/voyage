@@ -48,6 +48,9 @@ jobs:
       - name: Install visual baseline font
         run: sh scripts/install-visual-font.sh
       - name: Playwright geometry + visual assertions
+        env:
+          # Firefox requires HOME to be owned by the container user.
+          HOME: /root
         run: pnpm run test:e2e
       - name: Upload report, traces, and visual diffs on failure
         if: failure()
