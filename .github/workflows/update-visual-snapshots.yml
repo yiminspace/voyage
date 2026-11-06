@@ -12,6 +12,10 @@ jobs:
   snapshots:
     name: Generate chromium-visual baselines
     runs-on: ubuntu-latest
+    container:
+      # Match pnpm-lock.yaml and the Playwright CI job.
+      image: mcr.microsoft.com/playwright:v1.61.1-resolute
+      options: --ipc=host
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -22,22 +26,8 @@ jobs:
           cache-dependency-path: pnpm-lock.yaml
       - name: Install
         run: pnpm install --frozen-lockfile
-      - name: Get installed Playwright version
-        id: playwright-version
-        run: echo "version=$(node -p "require('@playwright/test/package.json').version")" >> "$GITHUB_OUTPUT"
-      - name: Cache Playwright browsers
-        uses: actions/cache@v4
-        id: playwright-cache
-        with:
-          path: ~/.cache/ms-playwright
-          # 仅 Chromium：勿复用 ci.yml 的三引擎键，避免写入残缺缓存拖垮后续 CI
-          key: playwright-${{ runner.os }}-chromium-only-${{ steps.playwright-version.outputs.version }}
-      - name: Install Playwright browsers
-        if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: pnpm exec playwright install --with-deps chromium
-      - name: Install Playwright system deps
-        if: steps.playwright-cache.outputs.cache-hit == 'true'
-        run: pnpm exec playwright install-deps chromium
+      - name: Install visual baseline font
+        run: sh scripts/install-visual-font.sh
       - name: Update visual snapshots
         run: pnpm exec playwright test --project=chromium-visual --update-snapshots
       - name: Upload baselines
