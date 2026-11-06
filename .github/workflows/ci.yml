@@ -31,6 +31,10 @@ jobs:
   playwright:
     name: Playwright geometry
     runs-on: ubuntu-latest
+    container:
+      # Match pnpm-lock.yaml and the visual snapshot workflow.
+      image: mcr.microsoft.com/playwright:v1.61.1-resolute
+      options: --ipc=host
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -41,23 +45,12 @@ jobs:
           cache-dependency-path: pnpm-lock.yaml
       - name: Install
         run: pnpm install --frozen-lockfile
-      - name: Get installed Playwright version
-        id: playwright-version
-        run: echo "version=$(node -p "require('@playwright/test/package.json').version")" >> "$GITHUB_OUTPUT"
-      - name: Cache Playwright browsers
-        uses: actions/cache@v4
-        id: playwright-cache
-        with:
-          path: ~/.cache/ms-playwright
-          # OS + Playwright 版本 + 引擎范围，避免跨平台/半缓存撞 key
-          key: playwright-${{ runner.os }}-chromium-firefox-webkit-${{ steps.playwright-version.outputs.version }}
-      - name: Install Playwright browsers
-        if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: pnpm exec playwright install --with-deps chromium firefox webkit
-      - name: Install Playwright system deps
-        if: steps.playwright-cache.outputs.cache-hit == 'true'
-        run: pnpm exec playwright install-deps chromium firefox webkit
+      - name: Install visual baseline font
+        run: sh scripts/install-visual-font.sh
       - name: Playwright geometry + visual assertions
+        env:
+          # Firefox requires HOME to be owned by the container user.
+          HOME: /root
         run: pnpm run test:e2e
       - name: Upload report, traces, and visual diffs on failure
         if: failure()
