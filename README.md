@@ -1,6 +1,12 @@
 # @yiminlab/voyage
 
-yiminlab 统一样式系统。**所有 GUI 应用的视觉基础**: 一套 quarry 血统的组件规格 + 四轴正交的 token 矩阵。
+Voyage 是一套 CSS 设计系统与 React 组件库，提供主题 token、基础组件和工作台布局。
+
+```bash
+pnpm add @yiminlab/voyage
+```
+
+从 `@yiminlab/voyage/index.css` 引入样式，从 `@yiminlab/voyage/react` 使用 React 组件。
 
 - 规格血统: 色板公式与组件尺寸源自 quarry 的 Slate & Copper 主题 (带色温的四级灰阶 + 一枚金属色 accent + 数据类型着色)。**quarry 是本规格的基准**: `slate x dark x classic x normal` 必须和 quarry 现有视觉一致, 出现偏差改这里, 不在这里加 quarry 特判。
 - 零运行时依赖: 样式是纯 CSS; JS 入口只有主题偏好读写与免闪烁脚本。
@@ -32,10 +38,6 @@ yiminlab 统一样式系统。**所有 GUI 应用的视觉基础**: 一套 quarr
 新增主题时**必须给全三枚种子色**: CSS 自定义属性没有继承兜底, 漏给会让 `.vg-badge` / `.vg-state` 吃到空值直接变透明 —— 表现为「徽章没了」而非「颜色不对」, 极难察觉。`tokens-theme.test.ts` 对全部 15 × 2 组合逐一断言, 漏给即红。
 
 ## 用法
-
-```bash
-pnpm add @yiminlab/voyage
-```
 
 ```css
 /* globals.css */
@@ -302,7 +304,7 @@ intake API 接收完整 JSON 报告。成功响应可以直接返回 GitHub 风�
 
 ```json
 {
-  "issueUrl": "https://github.com/yiminspace/yiminlab/issues/501",
+  "issueUrl": "https://github.com/example/example-app/issues/501",
   "issueNumber": 501
 }
 ```
@@ -318,7 +320,6 @@ intake API 接收完整 JSON 报告。成功响应可以直接返回 GitHub 风�
 | ai | everforest 常青林 | dark | classic | quiet |
 | taskdeck | iris 鸢尾 | light | cloud | crisp |
 | skillloom | signal 信号 | light | classic | quiet |
-| brainws | trace 轨迹纸 | light | classic | quiet |
 | IELTS Lab | ielts 雅思练习 | light | plain | crisp |
 | prism | examhall 考场 | light | plain | crisp |
 | quarry | slate 板岩铜 (原始基准) | dark | classic | normal |
